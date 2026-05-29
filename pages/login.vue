@@ -14,10 +14,16 @@ const { handleSubmit, errors, defineField } = useForm({
 
 const [email] = defineField('email')
 const [password] = defineField('password')
+const loginError = ref('')
 
 const onSubmit = handleSubmit(async (values) => {
-  await $fetch('/api/login', { method: 'POST', body: values })
-  await navigateTo('/dashboard')
+  loginError.value = ''
+  try {
+    await $fetch('/api/login', { method: 'POST', body: values })
+    await navigateTo('/dashboard')
+  } catch {
+    loginError.value = 'E-mail ou senha inválidos.'
+  }
 })
 </script>
 
@@ -35,6 +41,7 @@ const onSubmit = handleSubmit(async (values) => {
         <input v-model="password" type="password" class="rounded border px-3 py-2" />
         <span v-if="errors.password" class="text-sm text-red-600">{{ errors.password }}</span>
       </label>
+      <p v-if="loginError" class="text-sm text-red-600">{{ loginError }}</p>
       <button type="submit" class="rounded bg-emerald-600 px-4 py-2 text-white">Entrar</button>
     </form>
   </main>
