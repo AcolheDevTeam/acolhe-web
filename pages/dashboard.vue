@@ -14,6 +14,7 @@ const { data: user } = await useFetch('/api/me')
     <nav class="mt-6 flex gap-4">
       <NuxtLink to="/patients" class="text-emerald-700 underline">Pacientes</NuxtLink>
       <NuxtLink to="/sessions" class="text-emerald-700 underline">Sessões</NuxtLink>
+      <NuxtLink to="/activities" class="text-emerald-700 underline">Atividades</NuxtLink>
     </nav>
   </main>
 </template>
