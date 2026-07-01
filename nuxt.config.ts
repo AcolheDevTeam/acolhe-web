@@ -9,6 +9,13 @@ export default defineNuxtConfig({
     '@nuxtjs/tailwindcss',
   ],
 
+  // Deploy em Cloudflare Pages (SSR). O preset gera o `_worker.js` que roda no
+  // runtime Workers. A Cloudflare também injeta NITRO_PRESET=cloudflare-pages no
+  // build da integração Git, mas deixamos explícito pra o build ser determinístico.
+  nitro: {
+    preset: 'cloudflare-pages',
+  },
+
   css: ['~/assets/css/main.css'],
 
   runtimeConfig: {
