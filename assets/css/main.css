@@ -1,3 +1,94 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  :root {
+    /* Paleta editorial "creme + tinta" — ver PDF Acolhe (v0.3). */
+    --background: 45 29% 97%; /* creme quente #FAF9F5 */
+    --foreground: 24 10% 10%; /* tinta quase-preta #1B1917 */
+
+    --card: 0 0% 100%;
+    --card-foreground: 24 10% 10%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 24 10% 10%;
+
+    --primary: 24 10% 12%; /* botões pretos #211E1B */
+    --primary-foreground: 45 29% 98%;
+
+    --secondary: 43 20% 94%;
+    --secondary-foreground: 24 10% 12%;
+
+    --muted: 43 18% 95%;
+    --muted-foreground: 30 5% 42%; /* cinza quente para rótulos */
+
+    --accent: 43 22% 93%;
+    --accent-foreground: 24 10% 12%;
+
+    --destructive: 6 55% 45%; /* "Falta" — vermelho contido */
+    --destructive-foreground: 45 29% 98%;
+
+    --success: 152 30% 32%; /* "Salvo"/"Realizada" — verde discreto */
+    --success-foreground: 45 29% 98%;
+
+    --warning: 32 60% 42%;
+    --warning-foreground: 45 29% 98%;
+
+    --border: 40 14% 88%;
+    --input: 40 14% 85%;
+    --ring: 24 10% 12%;
+
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 24 10% 8%;
+    --foreground: 45 20% 94%;
+    --card: 24 9% 11%;
+    --card-foreground: 45 20% 94%;
+    --popover: 24 9% 11%;
+    --popover-foreground: 45 20% 94%;
+    --primary: 45 20% 94%;
+    --primary-foreground: 24 10% 12%;
+    --secondary: 24 8% 16%;
+    --secondary-foreground: 45 20% 94%;
+    --muted: 24 8% 16%;
+    --muted-foreground: 40 8% 60%;
+    --accent: 24 8% 18%;
+    --accent-foreground: 45 20% 94%;
+    --destructive: 6 55% 52%;
+    --destructive-foreground: 45 20% 94%;
+    --success: 152 25% 55%;
+    --success-foreground: 24 10% 8%;
+    --warning: 32 55% 60%;
+    --warning-foreground: 24 10% 8%;
+    --border: 24 8% 20%;
+    --input: 24 8% 22%;
+    --ring: 45 20% 80%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-feature-settings: 'cv11', 'ss01';
+  }
+}
+
+@layer components {
+  /* Rótulo em mono maiúsculo, espaçado — usado nos micro-cabeçalhos do PDF
+     (ex.: "RESUMO", "AGENDA · HOJE", "SEÇÃO 01"). */
+  .label-mono {
+    @apply font-mono text-[0.6875rem] uppercase tracking-[0.14em] text-muted-foreground;
+  }
+
+  /* Título de display em serif — "Bom dia, Mariana.", "Onboarding." */
+  .display-serif {
+    @apply font-serif font-normal tracking-tight text-foreground;
+  }
+}
