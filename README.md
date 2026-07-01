@@ -23,9 +23,13 @@ middleware/     auth, psychologist-only
 ## Primeiros passos
 ```bash
 cp .env.example .env   # aponte API_URL para a acolhe-api
-npm install
-npm run dev            # http://localhost:3000
+pnpm install
+pnpm dev               # http://localhost:3000
 ```
+
+> Usa **pnpm** (fixado em `packageManager` no `package.json`). O
+> `pnpm-workspace.yaml` libera os build scripts de `esbuild`/`@parcel/watcher`
+> (senão o pnpm 10+ falha com `ERR_PNPM_IGNORED_BUILDS`).
 
 ## Deploy (Cloudflare Pages)
 
@@ -44,9 +48,12 @@ do Pages — Production e Preview:
 
 **Config de build:**
 - Framework preset: **Nuxt.js**
-- Build command: `npm run build`
+- Build command: `pnpm run build`
 - Build output directory: `dist`
 - Node version: 20+ (variável `NODE_VERSION=20` se precisar forçar)
+
+> A Cloudflare detecta o `pnpm-lock.yaml` + `packageManager` e usa pnpm via
+> corepack automaticamente na instalação.
 
 **Variáveis de ambiente** (Settings → Variables and Secrets). O Pages tem escopo
 separado **Production** vs **Preview** — é assim que cada ambiente aponta pra API
