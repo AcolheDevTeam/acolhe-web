@@ -1,0 +1,6 @@
+# Permite que estas deps rodem seus build scripts (postinstall). Sem isto o pnpm 10+
+# ignora e o build do Nuxt falha (ERR_PNPM_IGNORED_BUILDS). esbuild é usado pelo
+# Vite/Nuxt no build; @parcel/watcher é usado pelo dev server.
+allowBuilds:
+  '@parcel/watcher': true
+  esbuild: true
