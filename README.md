@@ -34,26 +34,32 @@ Workers (preset `cloudflare-pages` no `nuxt.config.ts`). Sem Terraform e sem
 GitHub Actions: a integração Git nativa do Pages builda e faz deploy sozinha.
 
 Fluxo (espelha a acolhe-api): `develop` → staging, `main` → production.
-Usamos **dois projetos Pages** para ter URL estável e env vars por ambiente:
+Usamos **um único projeto Pages** (`acolhe-web`) com os dois ambientes nativos
+do Pages — Production e Preview:
 
-| Projeto Pages       | Production branch | Ambiente   |
-|---------------------|-------------------|------------|
-| `acolhe-web-staging`| `develop`         | staging    |
-| `acolhe-web`        | `main`            | production |
+| Ambiente Pages | Branch                    | URL                              |
+|----------------|---------------------------|----------------------------------|
+| Production     | `main`                    | `acolhe-web.pages.dev`           |
+| Preview        | `develop` (e outras)      | `develop.acolhe-web.pages.dev`   |
 
-**Config de build (igual nos dois projetos):**
-- Framework preset: **Nuxt**
+**Config de build:**
+- Framework preset: **Nuxt.js**
 - Build command: `npm run build`
 - Build output directory: `dist`
 - Node version: 20+ (variável `NODE_VERSION=20` se precisar forçar)
 
-**Variáveis de ambiente** (dashboard → Settings → Environment variables).
-São *server-only* — nunca use prefixo `NUXT_PUBLIC_`, senão vazam pro cliente (LGPD):
+**Variáveis de ambiente** (Settings → Variables and Secrets). O Pages tem escopo
+separado **Production** vs **Preview** — é assim que cada ambiente aponta pra API
+certa. São *server-only*: nunca use prefixo `NUXT_PUBLIC_`, senão vazam pro
+cliente (LGPD).
 
-| Variável     | staging (`acolhe-web-staging`)         | production (`acolhe-web`)              |
-|--------------|----------------------------------------|----------------------------------------|
-| `API_URL`    | `https://136.248.118.237.nip.io`       | `https://163.176.228.171.nip.io`       |
-| `API_SECRET` | (o mesmo segredo configurado na API)   | (o mesmo segredo configurado na API)   |
+| Variável  | Production (`main`)                | Preview (`develop`)               |
+|-----------|-----------------------------------|-----------------------------------|
+| `API_URL` | `https://163.176.228.171.nip.io`  | `https://136.248.118.237.nip.io`  |
+
+> `API_SECRET` existe no `runtimeConfig` como gancho, mas hoje a API Go **não
+> valida segredo compartilhado** (só JWT) — então não precisa configurar. Adicionar
+> quando houver auth serviço-a-serviço.
 
 > Como o browser só fala com o próprio Nuxt (padrão BFF), a API Go **não precisa
 > de CORS** para o frontend.
