@@ -6,7 +6,7 @@ Frontend do Acolhe — Nuxt 3, SSR-first, LGPD-compliant.
 - **Nuxt 3** — roteamento, SSR, server routes
 - **Pinia** — estado global (perfil, rascunho clínico, preferências)
 - **VeeValidate + Zod** — validação de formulários
-- **Tailwind CSS** — estilo
+- **shadcn-vue** — design system (sobre Tailwind CSS)
 - `$fetch` / `useFetch` — requisições (nativo do Nuxt)
 
 ## Estrutura
