@@ -42,7 +42,7 @@ export interface Patient {
 }
 
 export type SessionModality = 'online' | 'in_person'
-export type SessionStatus = 'scheduled' | 'done' | 'missed'
+export type SessionStatus = 'pending' | 'completed'
 
 export interface Session {
   id: string
@@ -50,14 +50,14 @@ export interface Session {
   patientName?: string
   number?: number // S-28
   occurredAt: string
-  modality: SessionModality | string
-  durationMin: number
+  modality?: SessionModality | string
+  durationMin?: number
   status: SessionStatus | string
   notes?: string
 }
 
 export type ActivityType = 'record' | 'scale' | 'checklist' | 'checkin'
-export type ActivityStatus = 'assigned' | 'responded' | 'reviewed' | 'overdue'
+export type ActivityStatus = 'pending' | 'in_progress' | 'submitted' | 'reviewed' | 'expired' | 'canceled'
 
 export interface Activity {
   id: string
@@ -73,7 +73,7 @@ export interface Activity {
 
 export interface ActivityTemplate {
   id: string
-  name: string
+  title: string
   type: ActivityType | string
 }
 

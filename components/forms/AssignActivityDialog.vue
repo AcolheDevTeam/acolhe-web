@@ -56,6 +56,7 @@ const onSubmit = handleSubmit(async (values) => {
     open.value = false
     resetForm()
     dueLocal.value = ''
+    if (patientId) setFieldValue('patientId', patientId)
     await refreshNuxtData(`activities-${values.patientId}`)
     await refreshNuxtData('activities-all')
   } catch {
@@ -90,7 +91,7 @@ const onSubmit = handleSubmit(async (values) => {
               <SelectContent>
                 <SelectGroup>
                   <SelectItem v-for="t in templates" :key="t.id" :value="t.id">
-                    {{ t.name }}
+                    {{ t.title }}
                   </SelectItem>
                 </SelectGroup>
               </SelectContent>

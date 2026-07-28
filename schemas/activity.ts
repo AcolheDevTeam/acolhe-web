@@ -6,4 +6,8 @@ export const assignActivitySchema = z.object({
   dueAt: z.string().datetime().optional(),
 })
 
+export const reviewActivitySchema = z.object({
+  status: z.literal('reviewed'),
+})
+
 export type AssignActivityInput = z.infer<typeof assignActivitySchema>

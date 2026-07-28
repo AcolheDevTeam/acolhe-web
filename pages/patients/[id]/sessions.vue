@@ -43,7 +43,10 @@ const ordered = computed(() =>
           <div class="min-w-0 flex-1">
             <p class="text-sm font-medium">{{ formatDate(s.occurredAt) }}</p>
             <p class="text-xs text-muted-foreground">
-              {{ modalityLabel(s.modality) }} · {{ s.durationMin }} min
+              <template v-if="s.modality || s.durationMin">
+                {{ modalityLabel(s.modality) }}<template v-if="s.durationMin"> · {{ s.durationMin }} min</template>
+              </template>
+              <template v-else>Sessão clínica</template>
             </p>
           </div>
           <ChevronRight class="size-4 text-muted-foreground" />

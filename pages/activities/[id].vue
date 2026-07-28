@@ -49,7 +49,7 @@ async function markReviewed() {
     </template>
     <template #actions>
       <Button
-        v-if="activity && activity.status !== 'reviewed'"
+        v-if="activity?.status === 'submitted'"
         size="sm"
         :disabled="reviewing"
         @click="markReviewed"
@@ -77,7 +77,9 @@ async function markReviewed() {
       <section class="flex flex-col gap-2">
         <p class="label-mono">Resposta</p>
         <p class="whitespace-pre-line text-sm leading-relaxed text-muted-foreground">
-          {{ activity.summary || 'A paciente ainda não respondeu esta atividade.' }}
+          {{ activity.summary || (activity.status === 'submitted' || activity.status === 'reviewed'
+            ? 'Resposta submetida. O conteúdo estruturado ainda não está disponível nesta tela.'
+            : 'A paciente ainda não respondeu esta atividade.') }}
         </p>
       </section>
     </div>

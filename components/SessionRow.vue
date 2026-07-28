@@ -21,7 +21,10 @@ const meta = computed(() => sessionStatusMeta(session.status))
     <div class="min-w-0 flex-1">
       <p class="truncate text-sm font-medium">{{ session.patientName ?? 'Paciente' }}</p>
       <p class="text-xs text-muted-foreground">
-        {{ modalityLabel(session.modality) }} · {{ session.durationMin }}min
+        <template v-if="session.modality || session.durationMin">
+          {{ modalityLabel(session.modality) }}<template v-if="session.durationMin"> · {{ session.durationMin }}min</template>
+        </template>
+        <template v-else>Sessão clínica</template>
       </p>
     </div>
     <Badge :variant="meta.variant">{{ meta.label }}</Badge>

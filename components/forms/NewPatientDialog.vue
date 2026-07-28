@@ -46,7 +46,7 @@ const onSubmit = handleSubmit(async (values) => {
       <DialogHeader>
         <DialogTitle class="font-serif text-2xl font-normal">Novo paciente</DialogTitle>
         <DialogDescription>
-          Cadastro mínimo. Dados sensíveis (CPF) são armazenados com criptografia column-level.
+          Cadastre os dados básicos para iniciar o acompanhamento.
         </DialogDescription>
       </DialogHeader>
 
@@ -66,16 +66,6 @@ const onSubmit = handleSubmit(async (values) => {
             <FormLabel>Data de nascimento</FormLabel>
             <FormControl>
               <Input type="date" v-bind="componentField" />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        </FormField>
-
-        <FormField v-slot="{ componentField }" name="cpf">
-          <FormItem>
-            <FormLabel>CPF <span class="text-muted-foreground">(opcional)</span></FormLabel>
-            <FormControl>
-              <Input type="text" inputmode="numeric" placeholder="Somente números" v-bind="componentField" />
             </FormControl>
             <FormMessage />
           </FormItem>

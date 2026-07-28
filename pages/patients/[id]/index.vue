@@ -14,7 +14,7 @@ const { data: activities } = usePatientActivities(patientId)
 const { data: timeline } = usePatientTimeline(patientId)
 
 const activeActivities = computed(() =>
-  (activities.value ?? []).filter((a) => a.status === 'assigned' || a.status === 'responded'),
+  (activities.value ?? []).filter((a) => ['pending', 'in_progress', 'submitted'].includes(a.status)),
 )
 const identity = computed(() => {
   const p = patient.value
