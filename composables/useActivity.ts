@@ -1,4 +1,5 @@
 import type { Activity } from '~/types'
+import type { ActivityReviewDetail } from '~/schemas/activity'
 
 // Atividades de um paciente — chave por paciente para não misturar dados (LGPD).
 export function usePatientActivities(patientId: MaybeRefOrGetter<string>) {
@@ -11,7 +12,7 @@ export function usePatientActivities(patientId: MaybeRefOrGetter<string>) {
 
 export function useActivity(activityId: MaybeRefOrGetter<string>) {
   const id = toRef(activityId)
-  return useFetch<Activity>(() => `/api/activities/${id.value}`, {
+  return useFetch<ActivityReviewDetail>(() => `/api/activities/${id.value}`, {
     key: () => `activity-${id.value}`,
   })
 }
