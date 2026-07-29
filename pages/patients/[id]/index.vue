@@ -10,8 +10,6 @@ const patientId = computed(() => route.params.id as string)
 
 const { data: patient } = usePatient(patientId)
 const { data: activities } = usePatientActivities(patientId)
-// Timeline é leitura pura — lazy para não hidratar à toa (base da ACO-21).
-const { data: timeline } = usePatientTimeline(patientId)
 
 const activeActivities = computed(() =>
   (activities.value ?? []).filter((a) => ['pending', 'in_progress', 'submitted'].includes(a.status)),
@@ -65,29 +63,14 @@ const identity = computed(() => {
         </Card>
       </div>
 
-      <section class="flex flex-col gap-3">
-        <p class="label-mono">Linha do tempo</p>
-        <ol v-if="timeline?.length" class="flex flex-col">
-          <li
-            v-for="(ev, i) in timeline"
-            :key="ev.id"
-            class="flex gap-4 border-l border-border pb-6 pl-4 last:pb-0"
-            :class="{ 'border-transparent': i === timeline.length - 1 }"
-          >
-            <div class="flex flex-col gap-0.5">
-              <div class="flex items-center gap-2">
-                <span class="text-sm font-medium">{{ ev.title }}</span>
-                <span class="text-xs text-muted-foreground">{{ formatDateTime(ev.at) }}</span>
-              </div>
-              <p v-if="ev.description" class="text-sm text-muted-foreground">{{ ev.description }}</p>
-              <p v-if="ev.by" class="text-xs text-muted-foreground">por {{ ev.by }}</p>
-            </div>
-          </li>
-        </ol>
-        <p v-else class="rounded-lg border border-dashed px-4 py-8 text-center text-sm text-muted-foreground">
-          Ainda não há eventos na linha do tempo.
-        </p>
-      </section>
+      <NuxtIsland name="PatientTimeline" lazy :props="{ patientId }">
+        <template #fallback>
+          <section class="flex flex-col gap-3">
+            <p class="label-mono">Linha do tempo</p>
+            <div class="h-24 animate-pulse rounded-lg bg-muted" />
+          </section>
+        </template>
+      </NuxtIsland>
     </div>
 
     <!-- Coluna lateral -->

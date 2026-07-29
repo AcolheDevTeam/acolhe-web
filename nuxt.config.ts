@@ -3,6 +3,10 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-01-01',
   devtools: { enabled: true },
 
+  experimental: {
+    componentIslands: true,
+  },
+
   modules: [
     '@pinia/nuxt',
     'pinia-plugin-persistedstate/nuxt',
