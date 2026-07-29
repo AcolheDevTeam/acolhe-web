@@ -1,7 +1,7 @@
-import { createAppointmentSchema } from '~/schemas/appointment'
-import type { Appointment } from '~/types'
+import { appointmentSchema, createAppointmentSchema } from '~/schemas/appointment'
 
 export default defineEventHandler(async (event) => {
   const body = await readValidatedBody(event, value => createAppointmentSchema.parse(value))
-  return await apiFetch<Appointment>(event, '/appointments', { method: 'POST', body })
+  const response = await apiFetch<unknown>(event, '/appointments', { method: 'POST', body })
+  return appointmentSchema.parse(response)
 })

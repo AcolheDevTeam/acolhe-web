@@ -1,5 +1,6 @@
-import type { Appointment } from '~/types'
+import { appointmentSchema } from '~/schemas/appointment'
 
 export default defineEventHandler(async (event) => {
-  return await apiFetch<Appointment[]>(event, '/appointments')
+  const response = await apiFetch<unknown>(event, '/appointments')
+  return appointmentSchema.array().parse(response)
 })
