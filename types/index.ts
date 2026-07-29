@@ -87,3 +87,39 @@ export interface TimelineEvent {
   at: string
   by?: string
 }
+
+export interface Appointment {
+  id: string
+  patientId: string
+  psychologistId: string
+  scheduledFor: string
+  durationMinutes: number
+  modality: SessionModality | string
+  status: string
+  createdAt: string
+}
+
+export interface Checkin {
+  id: string
+  patientId: string
+  mood: number
+  note?: string | null
+  createdAt: string
+}
+
+export interface ClinicalDocument {
+  id: string
+  patientId: string
+  psychologistId: string
+  type: string
+  pdfUrl?: string | null
+  createdAt: string
+}
+
+export interface ActivityResponse {
+  id: string
+  assignmentId: string
+  submittedAt?: string | null
+  isDraft: boolean
+  createdAt: string
+}

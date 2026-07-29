@@ -1,8 +1,11 @@
-import type { Patient } from '~/types'
 import { idParamSchema } from '~/schemas/common'
+import type { ActivityResponse } from '~/types'
 
-// Ficha do paciente — proxy autenticado para a API Go.
 export default defineEventHandler(async (event) => {
   const { id } = await getValidatedRouterParams(event, value => idParamSchema.parse(value))
-  return await apiFetch<Patient>(event, `/patients/${id}`)
+  return await apiFetch<ActivityResponse>(
+    event,
+    `/activities/assignments/${id}/responses`,
+    { method: 'POST' },
+  )
 })

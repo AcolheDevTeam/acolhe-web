@@ -16,9 +16,8 @@ const reviewing = ref(false)
 async function markReviewed() {
   reviewing.value = true
   try {
-    await $fetch(`/api/activities/${activityId.value}`, {
-      method: 'PATCH',
-      body: { status: 'reviewed' },
+    await $fetch(`/api/activities/${activityId.value}/review`, {
+      method: 'PUT',
     })
     toast.success('Atividade marcada como revisada.')
     await refreshNuxtData(`activity-${activityId.value}`)
