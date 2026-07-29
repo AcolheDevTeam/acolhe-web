@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { FileText, MoreHorizontal, Plus } from 'lucide-vue-next'
+import { Clock3, FileText, MoreHorizontal, Plus } from 'lucide-vue-next'
 import type { Patient } from '~/types'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -21,7 +22,11 @@ const tabs = computed(() => [
   { key: 'overview', label: 'Visão geral', to: `/patients/${patientId}` },
   { key: 'sessions', label: 'Prontuário', to: `/patients/${patientId}/sessions` },
   { key: 'activities', label: 'Atividades', to: `/patients/${patientId}/activities` },
-])
+].filter(tab => isActive.value || tab.key === 'overview'))
+
+const isActive = computed(() =>
+  patient?.status === 'active' && patient?.relationshipStatus === 'active',
+)
 
 const meta = computed(() => {
   const p = patient
@@ -44,19 +49,23 @@ const meta = computed(() => {
       </nav>
     </template>
     <template #actions>
-      <NewSessionDialog :patient-id="patientId">
+      <Badge v-if="patient && !isActive" variant="secondary" class="gap-1.5">
+        <Clock3 class="size-3" />
+        Aguardando consentimento
+      </Badge>
+      <NewSessionDialog v-if="isActive" :patient-id="patientId">
         <Button variant="outline" size="sm">
           <FileText />
           Nova sessão
         </Button>
       </NewSessionDialog>
-      <AssignActivityDialog :patient-id="patientId">
+      <AssignActivityDialog v-if="isActive" :patient-id="patientId">
         <Button variant="outline" size="sm">
           <Plus />
           Atribuir atividade
         </Button>
       </AssignActivityDialog>
-      <DropdownMenu>
+      <DropdownMenu v-if="isActive">
         <DropdownMenuTrigger as-child>
           <Button variant="ghost" size="icon">
             <MoreHorizontal />
@@ -86,6 +95,17 @@ const meta = computed(() => {
           <span class="text-muted-foreground"> {{ patient.demand }}</span>
         </p>
       </div>
+    </div>
+
+    <div
+      v-if="patient && !isActive"
+      class="mt-6 flex items-start gap-3 rounded-lg border bg-muted/40 px-4 py-3 text-sm"
+    >
+      <Clock3 class="mt-0.5 size-4 shrink-0 text-muted-foreground" />
+      <p class="text-muted-foreground">
+        <span class="font-medium text-foreground">Vínculo ainda não ativado.</span>
+        Sessões e atividades serão liberadas somente depois que a paciente aceitar o consentimento.
+      </p>
     </div>
 
     <!-- Navegação (abas) -->

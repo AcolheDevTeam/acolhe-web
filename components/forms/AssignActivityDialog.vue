@@ -33,6 +33,10 @@ const { data: patients } = await useFetch<Patient[]>('/api/patients', {
   key: 'patients-list',
   default: () => [],
 })
+const activePatients = computed(() =>
+  (patients.value ?? []).filter(patient =>
+    patient.status === 'active' && patient.relationshipStatus === 'active'),
+)
 const { data: templates } = await useFetch<ActivityTemplate[]>('/api/templates', {
   key: 'templates-list',
   default: () => [],
@@ -111,7 +115,7 @@ const onSubmit = handleSubmit(async (values) => {
               </FormControl>
               <SelectContent>
                 <SelectGroup>
-                  <SelectItem v-for="p in patients" :key="p.id" :value="p.id">
+                  <SelectItem v-for="p in activePatients" :key="p.id" :value="p.id">
                     {{ p.fullName }}
                   </SelectItem>
                 </SelectGroup>

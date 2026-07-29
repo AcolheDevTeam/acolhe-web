@@ -16,11 +16,20 @@ export interface Organization {
 }
 
 export type PatientStatus = 'active' | 'onboarding' | 'archived'
+export type RelationshipStatus = 'pending' | 'active' | 'paused' | 'ended' | 'transferred'
+
+export interface PatientInvitation {
+  email: string
+  url: string
+  expiresAt: string
+}
 
 export interface Patient {
   id: string
   fullName: string
   status: PatientStatus | string
+  relationshipStatus: RelationshipStatus | string
+  invitation?: PatientInvitation
   createdAt: string
   // Campos clínicos (podem não vir na listagem enxuta).
   age?: number
