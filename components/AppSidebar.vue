@@ -10,11 +10,18 @@ import {
   Settings,
   Users,
 } from 'lucide-vue-next'
+import type { Patient, UserRole } from '~/types'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 
 const { user } = defineProps<{
-  user?: { email?: string; name?: string; crp?: string } | null
+  user?: { email?: string; name?: string; crp?: string; role?: UserRole } | null
 }>()
+
+const { data: patients } = await useFetch<Patient[]>('/api/patients', {
+  key: 'patients-list',
+  default: () => [],
+  immediate: user?.role === 'psychologist',
+})
 
 type NavItem = {
   label: string
@@ -23,13 +30,18 @@ type NavItem = {
   count?: number
 }
 
-const main: NavItem[] = [
+const main = computed<NavItem[]>(() => [
   { label: 'Início', to: '/dashboard', icon: Home },
-  { label: 'Pacientes', to: '/patients', icon: Users, count: 14 },
+  {
+    label: 'Pacientes',
+    to: '/patients',
+    icon: Users,
+    count: user?.role === 'psychologist' ? patients.value.length : undefined,
+  },
   { label: 'Agenda', to: '/agenda', icon: CalendarDays },
   { label: 'Atividades', to: '/activities', icon: ClipboardList },
   { label: 'Documentos', to: '/documents', icon: FileText },
-]
+])
 
 const personal: NavItem[] = [
   { label: 'Registro Documental', to: '/registry', icon: FileLock2 },
@@ -75,7 +87,7 @@ const initials = computed(() =>
       >
         <component :is="item.icon" class="size-4 shrink-0" :stroke-width="1.75" />
         <span class="flex-1">{{ item.label }}</span>
-        <span v-if="item.count" class="text-xs tabular-nums text-muted-foreground">
+        <span v-if="item.count !== undefined" class="text-xs tabular-nums text-muted-foreground">
           {{ item.count }}
         </span>
       </NuxtLink>
