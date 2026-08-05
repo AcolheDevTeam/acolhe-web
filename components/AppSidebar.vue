@@ -28,6 +28,7 @@ type NavItem = {
   to: string
   icon: Component
   count?: number
+  disabled?: boolean
 }
 
 const main = computed<NavItem[]>(() => [
@@ -38,17 +39,18 @@ const main = computed<NavItem[]>(() => [
     icon: Users,
     count: user?.role === 'psychologist' ? patients.value.length : undefined,
   },
-  { label: 'Agenda', to: '/agenda', icon: CalendarDays },
+  { label: 'Agenda', to: '/agenda', icon: CalendarDays, disabled: true },
   { label: 'Atividades', to: '/activities', icon: ClipboardList },
-  { label: 'Documentos', to: '/documents', icon: FileText },
+  { label: 'Documentos', to: '/documents', icon: FileText, disabled: true },
 ])
 
 const personal: NavItem[] = [
-  { label: 'Registro Documental', to: '/registry', icon: FileLock2 },
-  { label: 'Templates', to: '/templates', icon: BookMarked },
+  { label: 'Registro Documental', to: '/registry', icon: FileLock2, disabled: true },
+  { label: 'Templates', to: '/templates', icon: BookMarked, disabled: true },
 ]
 
 const route = useRoute()
+const NuxtLinkComponent = resolveComponent('NuxtLink')
 function isActive(to: string) {
   return route.path === to || route.path.startsWith(`${to}/`)
 }
@@ -74,13 +76,18 @@ const initials = computed(() =>
     </div>
 
     <nav class="flex flex-1 flex-col gap-0.5 overflow-y-auto px-3 pb-4">
-      <NuxtLink
+      <component
+        :is="item.disabled ? 'span' : NuxtLinkComponent"
         v-for="item in main"
         :key="item.to"
-        :to="item.to"
+        :to="item.disabled ? undefined : item.to"
+        :aria-disabled="item.disabled || undefined"
+        :title="item.disabled ? 'Em breve' : undefined"
         :class="[
           'flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors',
-          isActive(item.to)
+          item.disabled
+            ? 'cursor-not-allowed text-muted-foreground/45'
+            : isActive(item.to)
             ? 'bg-accent font-medium text-accent-foreground'
             : 'text-muted-foreground hover:bg-accent/60 hover:text-foreground',
         ]"
@@ -90,34 +97,40 @@ const initials = computed(() =>
         <span v-if="item.count !== undefined" class="text-xs tabular-nums text-muted-foreground">
           {{ item.count }}
         </span>
-      </NuxtLink>
+      </component>
 
       <p class="label-mono px-3 pb-2 pt-6">Espaço pessoal</p>
 
-      <NuxtLink
+      <component
+        :is="item.disabled ? 'span' : NuxtLinkComponent"
         v-for="item in personal"
         :key="item.to"
-        :to="item.to"
+        :to="item.disabled ? undefined : item.to"
+        :aria-disabled="item.disabled || undefined"
+        :title="item.disabled ? 'Em breve' : undefined"
         :class="[
           'flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors',
-          isActive(item.to)
+          item.disabled
+            ? 'cursor-not-allowed text-muted-foreground/45'
+            : isActive(item.to)
             ? 'bg-accent font-medium text-accent-foreground'
             : 'text-muted-foreground hover:bg-accent/60 hover:text-foreground',
         ]"
       >
         <component :is="item.icon" class="size-4 shrink-0" :stroke-width="1.75" />
         <span class="flex-1">{{ item.label }}</span>
-      </NuxtLink>
+      </component>
     </nav>
 
     <div class="mt-auto flex flex-col gap-1 border-t p-3">
-      <NuxtLink
-        to="/settings"
-        class="flex items-center gap-3 rounded-md px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-accent/60 hover:text-foreground"
+      <span
+        aria-disabled="true"
+        title="Em breve"
+        class="flex cursor-not-allowed items-center gap-3 rounded-md px-3 py-2 text-sm text-muted-foreground/45"
       >
         <Settings class="size-4" :stroke-width="1.75" />
         <span>Ajustes</span>
-      </NuxtLink>
+      </span>
       <div class="flex items-center gap-3 rounded-md px-3 py-2">
         <Avatar class="size-8">
           <AvatarFallback class="bg-secondary text-xs">{{ initials }}</AvatarFallback>
