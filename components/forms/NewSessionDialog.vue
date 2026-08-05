@@ -3,7 +3,7 @@ import { toTypedSchema } from '@vee-validate/zod'
 import { useForm } from 'vee-validate'
 import { toast } from 'vue-sonner'
 import { createSessionSchema } from '~/schemas/session'
-import type { Patient, Session, User } from '~/types'
+import type { Patient, Session } from '~/types'
 import {
   Dialog,
   DialogContent,
@@ -31,19 +31,20 @@ const { patientId } = defineProps<{ patientId?: string }>()
 
 const open = ref(false)
 
-const { data: me } = await useFetch<User>('/api/me', { key: 'me' })
 const { data: patients } = await useFetch<Patient[]>('/api/patients', {
   key: 'patients-list',
   default: () => [],
 })
+const activePatients = computed(() =>
+  (patients.value ?? []).filter(patient =>
+    patient.status === 'active' && patient.relationshipStatus === 'active'),
+)
 
 const { handleSubmit, isSubmitting, setFieldValue, resetForm } = useForm({
   validationSchema: toTypedSchema(createSessionSchema),
 })
 
-// psychologistId vem do usuário logado; patientId pode vir travado por prop.
 watchEffect(() => {
-  if (me.value?.id) setFieldValue('psychologistId', me.value.id)
   if (patientId) setFieldValue('patientId', patientId)
 })
 
@@ -92,7 +93,7 @@ const onSubmit = handleSubmit(async (values) => {
               </FormControl>
               <SelectContent>
                 <SelectGroup>
-                  <SelectItem v-for="p in patients" :key="p.id" :value="p.id">
+                  <SelectItem v-for="p in activePatients" :key="p.id" :value="p.id">
                     {{ p.fullName }}
                   </SelectItem>
                 </SelectGroup>

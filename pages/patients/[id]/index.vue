@@ -10,11 +10,12 @@ const patientId = computed(() => route.params.id as string)
 
 const { data: patient } = usePatient(patientId)
 const { data: activities } = usePatientActivities(patientId)
-// Timeline é leitura pura — lazy para não hidratar à toa (base da ACO-21).
-const { data: timeline } = usePatientTimeline(patientId)
+const isActive = computed(() =>
+  patient.value?.status === 'active' && patient.value?.relationshipStatus === 'active',
+)
 
 const activeActivities = computed(() =>
-  (activities.value ?? []).filter((a) => a.status === 'assigned' || a.status === 'responded'),
+  (activities.value ?? []).filter((a) => ['pending', 'in_progress', 'submitted'].includes(a.status)),
 )
 const identity = computed(() => {
   const p = patient.value
@@ -33,7 +34,7 @@ const identity = computed(() => {
 <template>
   <PatientShell :patient="patient ?? null" :patient-id="patientId" active="overview">
     <!-- Visão geral -->
-    <div class="flex flex-col gap-8">
+    <div v-if="isActive" class="flex flex-col gap-8">
       <div class="grid gap-4 sm:grid-cols-2">
         <Card>
           <CardContent class="flex flex-col gap-3 pt-6">
@@ -65,34 +66,28 @@ const identity = computed(() => {
         </Card>
       </div>
 
-      <section class="flex flex-col gap-3">
-        <p class="label-mono">Linha do tempo</p>
-        <ol v-if="timeline?.length" class="flex flex-col">
-          <li
-            v-for="(ev, i) in timeline"
-            :key="ev.id"
-            class="flex gap-4 border-l border-border pb-6 pl-4 last:pb-0"
-            :class="{ 'border-transparent': i === timeline.length - 1 }"
-          >
-            <div class="flex flex-col gap-0.5">
-              <div class="flex items-center gap-2">
-                <span class="text-sm font-medium">{{ ev.title }}</span>
-                <span class="text-xs text-muted-foreground">{{ formatDateTime(ev.at) }}</span>
-              </div>
-              <p v-if="ev.description" class="text-sm text-muted-foreground">{{ ev.description }}</p>
-              <p v-if="ev.by" class="text-xs text-muted-foreground">por {{ ev.by }}</p>
-            </div>
-          </li>
-        </ol>
-        <p v-else class="rounded-lg border border-dashed px-4 py-8 text-center text-sm text-muted-foreground">
-          Ainda não há eventos na linha do tempo.
-        </p>
-      </section>
+      <NuxtIsland name="PatientTimeline" lazy :props="{ patientId }">
+        <template #fallback>
+          <section class="flex flex-col gap-3">
+            <p class="label-mono">Linha do tempo</p>
+            <div class="h-24 animate-pulse rounded-lg bg-muted" />
+          </section>
+        </template>
+      </NuxtIsland>
+    </div>
+    <div
+      v-else
+      class="rounded-xl border border-dashed px-6 py-12 text-center"
+    >
+      <p class="font-serif text-2xl">Aguardando aceite</p>
+      <p class="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
+        Os dados clínicos permanecem indisponíveis enquanto o convite e o consentimento estiverem pendentes.
+      </p>
     </div>
 
     <!-- Coluna lateral -->
     <template #aside>
-      <Card v-if="patient?.nextSession">
+      <Card v-if="isActive && patient?.nextSession">
         <CardContent class="flex flex-col gap-3 pt-6">
           <p class="label-mono">Próxima sessão</p>
           <p class="font-serif text-2xl leading-tight">{{ formatDateTime(patient.nextSession.occurredAt) }}</p>
@@ -106,7 +101,7 @@ const identity = computed(() => {
         </CardContent>
       </Card>
 
-      <section class="flex flex-col gap-3">
+      <section v-if="isActive" class="flex flex-col gap-3">
         <p class="label-mono">Atividades ativas · {{ activeActivities.length }}</p>
         <div v-if="activeActivities.length" class="flex flex-col gap-3">
           <NuxtLink

@@ -5,11 +5,11 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Separator } from '@/components/ui/separator'
 
-definePageMeta({ middleware: ['auth'] })
+definePageMeta({ middleware: ['auth', 'psychologist-only'] })
 
 const { data: me } = await useFetch<User>('/api/me', { key: 'me' })
-const { data: todaySessions } = useSessions(() => ({ scope: 'today' }))
-const { data: reviewQueue } = useActivities(() => ({ status: 'responded' }))
+const { data: allSessions } = useSessions()
+const { data: allActivities } = useActivities()
 const { data: patients } = await useFetch<Patient[]>('/api/patients', {
   key: 'patients-list',
   default: () => [],
@@ -29,8 +29,16 @@ const today = computed(() => {
   return s.charAt(0).toUpperCase() + s.slice(1)
 })
 
-const sessionsToday = computed(() => todaySessions.value ?? [])
-const reviews = computed(() => reviewQueue.value ?? [])
+const sessionsToday = computed(() => {
+  const now = new Date()
+  return (allSessions.value ?? []).filter((session) => {
+    const occurredAt = new Date(session.occurredAt)
+    return occurredAt.getFullYear() === now.getFullYear()
+      && occurredAt.getMonth() === now.getMonth()
+      && occurredAt.getDate() === now.getDate()
+  })
+})
+const reviews = computed(() => (allActivities.value ?? []).filter(activity => activity.status === 'submitted'))
 const activePatients = computed(() => (patients.value ?? []).filter((p) => p.status === 'active'))
 const avgAdherence = computed(() => {
   const vals = (patients.value ?? []).map((p) => p.adherence).filter((v): v is number => v != null)

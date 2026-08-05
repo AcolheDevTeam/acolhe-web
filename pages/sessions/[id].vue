@@ -46,7 +46,8 @@ const { data: session } = useSession(sessionId)
           Sessão {{ session.number ?? '' }} · {{ formatDate(session.occurredAt) }}
         </h1>
         <p class="text-sm text-muted-foreground">
-          {{ modalityLabel(session.modality) }} · {{ session.durationMin }} min ·
+          <template v-if="session.modality">{{ modalityLabel(session.modality) }} · </template>
+          <template v-if="session.durationMin">{{ session.durationMin }} min · </template>
           {{ formatTime(session.occurredAt) }}
         </p>
       </div>

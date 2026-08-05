@@ -16,11 +16,20 @@ export interface Organization {
 }
 
 export type PatientStatus = 'active' | 'onboarding' | 'archived'
+export type RelationshipStatus = 'pending' | 'active' | 'paused' | 'ended' | 'transferred'
+
+export interface PatientInvitation {
+  email: string
+  url: string
+  expiresAt: string
+}
 
 export interface Patient {
   id: string
   fullName: string
   status: PatientStatus | string
+  relationshipStatus: RelationshipStatus | string
+  invitation?: PatientInvitation
   createdAt: string
   // Campos clínicos (podem não vir na listagem enxuta).
   age?: number
@@ -42,7 +51,7 @@ export interface Patient {
 }
 
 export type SessionModality = 'online' | 'in_person'
-export type SessionStatus = 'scheduled' | 'done' | 'missed'
+export type SessionStatus = 'pending' | 'completed'
 
 export interface Session {
   id: string
@@ -50,14 +59,14 @@ export interface Session {
   patientName?: string
   number?: number // S-28
   occurredAt: string
-  modality: SessionModality | string
-  durationMin: number
+  modality?: SessionModality | string
+  durationMin?: number
   status: SessionStatus | string
   notes?: string
 }
 
 export type ActivityType = 'record' | 'scale' | 'checklist' | 'checkin'
-export type ActivityStatus = 'assigned' | 'responded' | 'reviewed' | 'overdue'
+export type ActivityStatus = 'pending' | 'in_progress' | 'submitted' | 'reviewed' | 'expired' | 'canceled'
 
 export interface Activity {
   id: string
@@ -73,7 +82,7 @@ export interface Activity {
 
 export interface ActivityTemplate {
   id: string
-  name: string
+  title: string
   type: ActivityType | string
 }
 
@@ -86,4 +95,40 @@ export interface TimelineEvent {
   description?: string
   at: string
   by?: string
+}
+
+export interface Appointment {
+  id: string
+  patientId: string
+  psychologistId: string
+  scheduledFor: string
+  durationMinutes: number
+  modality: SessionModality | string
+  status: string
+  createdAt: string
+}
+
+export interface Checkin {
+  id: string
+  patientId: string
+  mood: number
+  note?: string | null
+  createdAt: string
+}
+
+export interface ClinicalDocument {
+  id: string
+  patientId: string
+  psychologistId: string
+  type: string
+  pdfUrl?: string | null
+  createdAt: string
+}
+
+export interface ActivityResponse {
+  id: string
+  assignmentId: string
+  submittedAt?: string | null
+  isDraft: boolean
+  createdAt: string
 }

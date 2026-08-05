@@ -36,11 +36,9 @@ type BadgeVariant = 'default' | 'secondary' | 'destructive' | 'outline'
 
 export function sessionStatusMeta(status?: string): { label: string, variant: BadgeVariant } {
   switch (status) {
-    case 'done':
+    case 'completed':
       return { label: 'Realizada', variant: 'secondary' }
-    case 'missed':
-      return { label: 'Falta', variant: 'destructive' }
-    case 'scheduled':
+    case 'pending':
       return { label: 'Agendada', variant: 'outline' }
     default:
       return { label: status ?? '—', variant: 'outline' }
@@ -49,13 +47,13 @@ export function sessionStatusMeta(status?: string): { label: string, variant: Ba
 
 export function activityStatusMeta(status?: string): { label: string, variant: BadgeVariant } {
   switch (status) {
-    case 'responded':
+    case 'submitted':
       return { label: 'Respondida', variant: 'secondary' }
     case 'reviewed':
       return { label: 'Revisada', variant: 'outline' }
-    case 'assigned':
+    case 'pending':
       return { label: 'Atribuída', variant: 'outline' }
-    case 'overdue':
+    case 'expired':
       return { label: 'Atrasada', variant: 'destructive' }
     default:
       return { label: status ?? '—', variant: 'outline' }

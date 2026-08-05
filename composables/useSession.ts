@@ -5,7 +5,7 @@ import type { Session } from '~/types'
 export function usePatientSessions(patientId: MaybeRefOrGetter<string>) {
   const id = toRef(patientId)
   return useFetch<Session[]>('/api/sessions', {
-    query: { patient: id },
+    query: { patientId: id },
     key: () => `sessions-${id.value}`,
   })
 }
@@ -21,6 +21,6 @@ export function useSession(sessionId: MaybeRefOrGetter<string>) {
 export function useSessions(query?: MaybeRefOrGetter<Record<string, unknown>>) {
   return useFetch<Session[]>('/api/sessions', {
     query: query ? toRef(query) : undefined,
-    key: 'sessions-all',
+    key: () => query ? `sessions-${JSON.stringify(toValue(query))}` : 'sessions-all',
   })
 }

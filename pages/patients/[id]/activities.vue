@@ -18,7 +18,10 @@ const list = computed(() => activities.value ?? [])
     <div class="flex flex-col gap-4">
       <div class="flex items-center justify-between">
         <p class="label-mono">Atividades · {{ list.length }}</p>
-        <AssignActivityDialog :patient-id="patientId">
+        <AssignActivityDialog
+          v-if="patient?.status === 'active' && patient.relationshipStatus === 'active'"
+          :patient-id="patientId"
+        >
           <Button variant="outline" size="sm">
             <Plus />
             Atribuir atividade
