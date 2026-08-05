@@ -18,6 +18,11 @@ const { patient, patientId, active } = defineProps<{
   active: 'overview' | 'sessions' | 'activities'
 }>()
 
+const config = useRuntimeConfig()
+const lgpdExportEnabled = computed(() =>
+  String(config.public.lgpdExportEnabled).toLowerCase() === 'true',
+)
+
 const tabs = computed(() => [
   { key: 'overview', label: 'Visão geral', to: `/patients/${patientId}` },
   { key: 'sessions', label: 'Prontuário', to: `/patients/${patientId}/sessions` },
@@ -73,7 +78,7 @@ const meta = computed(() => {
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuGroup>
-            <DropdownMenuItem>Exportar dados (LGPD)</DropdownMenuItem>
+            <DropdownMenuItem v-if="lgpdExportEnabled">Exportar dados (LGPD)</DropdownMenuItem>
             <DropdownMenuItem>Arquivar paciente</DropdownMenuItem>
           </DropdownMenuGroup>
         </DropdownMenuContent>
