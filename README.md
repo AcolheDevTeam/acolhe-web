@@ -57,12 +57,18 @@ do Pages — Production e Preview:
 
 **Variáveis de ambiente** (Settings → Variables and Secrets). O Pages tem escopo
 separado **Production** vs **Preview** — é assim que cada ambiente aponta pra API
-certa. São *server-only*: nunca use prefixo `NUXT_PUBLIC_`, senão vazam pro
-cliente (LGPD).
+certa. `API_URL` é *server-only*: nunca use prefixo `NUXT_PUBLIC_` em valores
+sensíveis, senão eles vazam para o cliente (LGPD).
 
-| Variável  | Production (`main`)                | Preview (`develop`)               |
-|-----------|-----------------------------------|-----------------------------------|
-| `API_URL` | `https://163.176.228.171.nip.io`  | `https://136.248.118.237.nip.io`  |
+| Variável                          | Production (`main`)               | Preview (`develop`)              |
+|-----------------------------------|-----------------------------------|----------------------------------|
+| `API_URL`                         | `https://163.176.228.171.nip.io`  | `https://136.248.118.237.nip.io` |
+| `NUXT_PUBLIC_LGPD_EXPORT_ENABLED` | `false`                           | `false`                          |
+
+`NUXT_PUBLIC_LGPD_EXPORT_ENABLED` é uma feature flag pública e não contém dados
+sensíveis. Quando estiver ausente ou definida como `false`, a ação de exportação
+LGPD fica oculta. Altere para `true` somente nos ambientes em que o envio do link
+privado por e-mail estiver operacional.
 
 > `API_SECRET` existe no `runtimeConfig` como gancho, mas hoje a API Go **não
 > valida segredo compartilhado** (só JWT) — então não precisa configurar. Adicionar

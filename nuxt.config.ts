@@ -53,7 +53,7 @@ export default defineNuxtConfig({
     apiSecret: process.env.API_SECRET || '',
     apiUrl: process.env.API_URL || 'http://localhost:8080',
     public: {
-      // valores que podem ir ao cliente
+      lgpdExportEnabled: process.env.NUXT_PUBLIC_LGPD_EXPORT_ENABLED === 'true',
     },
   },
 })
