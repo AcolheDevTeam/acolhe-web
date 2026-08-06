@@ -1,7 +1,11 @@
 <script setup lang="ts">
+import { Check, Copy, LoaderCircle } from 'lucide-vue-next'
+import { toast } from 'vue-sonner'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
 import { Separator } from '@/components/ui/separator'
+import type { PatientInvitation } from '~/types'
 
 definePageMeta({ middleware: ['auth', 'psychologist-only'] })
 
@@ -13,6 +17,45 @@ const { data: activities } = usePatientActivities(patientId)
 const isActive = computed(() =>
   patient.value?.status === 'active' && patient.value?.relationshipStatus === 'active',
 )
+const isPending = computed(() => patient.value?.relationshipStatus === 'pending')
+const invitation = ref<PatientInvitation>()
+const isGeneratingInvitation = ref(false)
+const invitationCopied = ref(false)
+
+async function copyInvitationUrl(url: string) {
+  try {
+    await navigator.clipboard.writeText(url)
+    invitationCopied.value = true
+    toast.success('Link do convite copiado.')
+  }
+  catch {
+    toast.error('Não foi possível copiar automaticamente. Selecione o link exibido.')
+  }
+}
+
+async function generateAndCopyInvitation() {
+  if (!isPending.value || isGeneratingInvitation.value) return
+  isGeneratingInvitation.value = true
+  invitationCopied.value = false
+  try {
+    const generated = await $fetch<PatientInvitation>(`/api/patients/${patientId.value}/invitation`, {
+      method: 'POST',
+    })
+    invitation.value = generated
+    await copyInvitationUrl(generated.url)
+  }
+  catch {
+    toast.error('Não foi possível gerar um novo link de convite.')
+  }
+  finally {
+    isGeneratingInvitation.value = false
+  }
+}
+
+watch(patientId, () => {
+  invitation.value = undefined
+  invitationCopied.value = false
+})
 
 const activeActivities = computed(() =>
   (activities.value ?? []).filter((a) => ['pending', 'in_progress', 'submitted'].includes(a.status)),
@@ -83,6 +126,38 @@ const identity = computed(() => {
       <p class="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
         Os dados clínicos permanecem indisponíveis enquanto o convite e o consentimento estiverem pendentes.
       </p>
+      <div v-if="isPending" class="mx-auto mt-6 flex max-w-md flex-col items-center gap-3">
+        <p v-if="!invitation" class="text-xs text-muted-foreground">
+          Ao copiar, um novo link será gerado e qualquer link anterior deixará de funcionar.
+        </p>
+        <Button
+          v-if="!invitation"
+          type="button"
+          variant="outline"
+          :disabled="isGeneratingInvitation"
+          @click="generateAndCopyInvitation"
+        >
+          <LoaderCircle v-if="isGeneratingInvitation" class="animate-spin" />
+          <Copy v-else />
+          Copiar convite
+        </Button>
+        <div v-else class="flex w-full gap-2">
+          <Input :model-value="invitation.url" readonly class="min-w-0 text-xs" />
+          <Button
+            type="button"
+            variant="outline"
+            size="icon"
+            aria-label="Copiar convite"
+            @click="copyInvitationUrl(invitation.url)"
+          >
+            <Check v-if="invitationCopied" />
+            <Copy v-else />
+          </Button>
+        </div>
+        <p v-if="invitation" class="text-xs text-muted-foreground">
+          Válido até {{ formatDateTime(invitation.expiresAt) }}.
+        </p>
+      </div>
     </div>
 
     <!-- Coluna lateral -->
