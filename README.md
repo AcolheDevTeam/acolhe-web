@@ -22,10 +22,15 @@ middleware/     auth, psychologist-only
 
 ## Primeiros passos
 ```bash
-cp .env.example .env   # aponte API_URL para a acolhe-api
 pnpm install
-pnpm dev               # http://localhost:3000
+pnpm dev               # API local
+pnpm dev:staging       # API de staging
+pnpm dev:production    # API de producao
 ```
+
+Cada comando carrega, respectivamente, `.env.development`, `.env.staging` ou
+`.env.production`. Todos iniciam o Nuxt localmente em `http://localhost:3000`;
+o que muda e o ambiente da API consumida.
 
 > Usa **pnpm** (fixado em `packageManager` no `package.json`). O
 > `pnpm-workspace.yaml` libera os build scripts de `esbuild`/`@parcel/watcher`

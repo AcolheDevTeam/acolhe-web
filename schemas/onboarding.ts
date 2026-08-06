@@ -12,7 +12,7 @@ export const consentDocumentSchema = z.object({
   content: z.string(),
   contentSha256: z.string().regex(/^[0-9a-f]{64}$/),
   required: z.boolean(),
-  publishedAt: z.string().datetime(),
+  publishedAt: z.string().datetime({ offset: true }),
 })
 
 export const invitationSchema = z.object({
@@ -20,7 +20,7 @@ export const invitationSchema = z.object({
   psychologistName: z.string(),
   psychologistCrp: z.string(),
   email: z.string().email(),
-  expiresAt: z.string().datetime(),
+  expiresAt: z.string().datetime({ offset: true }),
   documents: consentDocumentSchema.array().min(1),
 })
 

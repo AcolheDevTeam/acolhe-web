@@ -19,15 +19,17 @@ export const patientSchema = z.object({
   fullName: z.string(),
   status: z.enum(['onboarding', 'active', 'archived', 'deleted']),
   relationshipStatus: z.enum(['pending', 'active', 'paused', 'ended', 'transferred']),
-  createdAt: z.string().datetime(),
+  createdAt: z.string().datetime({ offset: true }),
 }).passthrough()
 
+export const patientInvitationAPISchema = z.object({
+  token: z.string().regex(/^[A-Za-z0-9_-]{43}$/),
+  email: z.string().email(),
+  expiresAt: z.string().datetime({ offset: true }),
+})
+
 export const createdPatientAPISchema = patientSchema.extend({
-  invitation: z.object({
-    token: z.string().regex(/^[A-Za-z0-9_-]{43}$/),
-    email: z.string().email(),
-    expiresAt: z.string().datetime(),
-  }),
+  invitation: patientInvitationAPISchema,
 })
 
 export type CreatePatientInput = z.infer<typeof createPatientSchema>
