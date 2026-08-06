@@ -4,7 +4,9 @@
   "type": "module",
   "packageManager": "pnpm@11.3.0",
   "scripts": {
-    "dev": "nuxt dev",
+    "dev": "nuxt dev --dotenv .env.development",
+    "dev:staging": "nuxt dev --dotenv .env.staging",
+    "dev:production": "nuxt dev --dotenv .env.production",
     "build": "nuxt build",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
