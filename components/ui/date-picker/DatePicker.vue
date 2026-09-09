@@ -113,7 +113,7 @@ const displayValue = computed(() =>
         <CalendarIcon class="size-4 shrink-0 opacity-50" />
       </button>
     </PopoverTrigger>
-    <PopoverContent align="start" class="w-auto p-0">
+    <PopoverContent align="start" class="w-[19.5rem] max-w-[calc(100vw-2rem)] p-0">
       <CalendarRoot
         v-slot="{ grid, weekDays }"
         v-model:placeholder="placeholderDate"
@@ -154,15 +154,15 @@ const displayValue = computed(() =>
         <CalendarGrid v-for="month in grid" :key="month.value.toString()" class="mt-3">
           <CalendarGridHead>
             <CalendarGridRow>
-              <CalendarHeadCell v-for="day in weekDays" :key="day" class="capitalize">
+              <CalendarHeadCell v-for="day in weekDays" :key="day" class="w-auto flex-1 capitalize">
                 {{ day.replace('.', '') }}
               </CalendarHeadCell>
             </CalendarGridRow>
           </CalendarGridHead>
           <CalendarGridBody>
             <CalendarGridRow v-for="(weekDates, index) in month.rows" :key="`week-${index}`" class="mt-1 w-full">
-              <CalendarCell v-for="weekDate in weekDates" :key="weekDate.toString()" :date="weekDate">
-                <CalendarCellTrigger :day="weekDate" :month="month.value" />
+              <CalendarCell v-for="weekDate in weekDates" :key="weekDate.toString()" :date="weekDate" class="flex-1">
+                <CalendarCellTrigger :day="weekDate" :month="month.value" class="w-full" />
               </CalendarCell>
             </CalendarGridRow>
           </CalendarGridBody>
