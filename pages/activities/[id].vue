@@ -64,7 +64,7 @@ async function markReviewed() {
 <template>
   <PageHeader>
     <template #title>
-      <nav class="flex items-center gap-2 text-sm text-muted-foreground">
+      <nav class="flex min-w-0 items-center gap-2 text-sm text-muted-foreground">
         <!-- No celular só o trecho final do caminho aparece. -->
         <NuxtLink to="/patients" class="hidden hover:text-foreground sm:inline">Pacientes</NuxtLink>
         <span class="hidden sm:inline">/</span>
@@ -76,7 +76,7 @@ async function markReviewed() {
           {{ activity?.patientName ?? 'Paciente' }}
         </NuxtLink>
         <span>/</span>
-        <span class="font-medium text-foreground">Atividade</span>
+        <span class="min-w-0 truncate font-medium text-foreground">Atividade</span>
       </nav>
     </template>
     <template #actions>
