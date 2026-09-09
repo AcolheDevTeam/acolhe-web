@@ -223,3 +223,78 @@ paciente barrada em `/api/patients` (403) e em `/dashboard` (redireciona para `/
   (`deliveryStatus` no BFF, textos únicos em `utils/invitation.ts`, entrada `/invite`). Envio real
   verificado com Brevo. Observação operacional: usar `smtp-relay.sendinblue.com:587`, porque o
   certificado TLS do Brevo é emitido para esse nome.
+
+### C3. Fluxo de atividades confuso: "template" vs. "atividade" e Templates sem tela — apontado em 2026-09-09
+
+Diagnóstico (develop de 2026-09-09):
+
+- O item "Diário de pensamentos (RPD)" que aparece no dropdown do diálogo "Atribuir atividade"
+  **não é uma atividade registrada**: é um *template* da biblioteca, vindo de
+  `GET /activities/templates`. Ele não está em nenhuma migration ou seed do repositório da API;
+  foi inserido direto no banco (linha criada em 2026-09-09 15:58 UTC, ligada à organização e ao
+  usuário da Joyce, versão 1, **zero campos** em `activity_field`). Como a API não tem endpoint
+  de criação de template, só pode ter sido SQL manual ou script de teste. Sem campos, a paciente
+  não teria o que responder. Por isso a página `/activities` mostra "Nenhuma atividade no
+  momento": ainda não existe nenhuma *atribuição*, só esse template de teste.
+- Não é um seed: não existe seed de template no repositório, o que é coerente com a
+  funcionalidade ainda não estar pronta.
+- Junto com o template, a mesma inserção (mesmo segundo) criou **3 atribuições** para a paciente
+  Mariana Costa, todas `pending`, duas já vencidas (06/08 e 20/08) e uma para 13/09, atribuídas
+  por `psi@acolhe.dev`. Elas existiam no banco e a API as devolvia, mas `/activities` mostrava
+  "Nenhuma atividade no momento". Ver bug abaixo.
+- **Removido em 2026-09-09** (a pedido da Joyce): template, 3 atribuições e campos (zero)
+  apagados do banco local numa transação. Banco ficou com 0 templates e 0 atribuições.
+
+**Bug real encontrado no caminho** — `pages/activities/index.vue` agrupa a fila pelos status
+`responded`, `overdue`, `assigned` e `reviewed` (vocabulário do design), mas a API e o próprio
+tipo `ActivityStatus` em `types/index.ts` usam `pending`, `in_progress`, `submitted`, `reviewed`,
+`expired`, `canceled`. Só `reviewed` coincide. Qualquer atividade pendente ou respondida some da
+página e ela cai no vazio. Correção sugerida: mapear no web (`submitted` → "Aguardando revisão",
+`pending`/`in_progress` com `dueAt` no passado → "Atrasadas", `pending`/`in_progress` →
+"Atribuídas", `reviewed` → "Revisadas"), sem criar status novo na API. A página da paciente
+(`pages/patients/[id]/activities.vue`) não filtra por status, por isso lá elas apareceriam.
+- A parte de Templates **não está pronta**: o item "Templates" da sidebar está com
+  `disabled: true` (`components/AppSidebar.vue`), não existe `pages/templates`, e a API só expõe
+  listagem (`GET /activities/templates`). Não há endpoint nem tela para criar, editar ou arquivar
+  templates, nem para definir os campos (`activity_field`). O schema do banco já prevê tudo isso
+  (`activity_template`, `activity_field`, versionamento por `parent_template_id`).
+- Fonte da confusão: o diálogo fala em "template da biblioteca", mas a psicóloga não tem
+  nenhuma tela onde essa biblioteca exista. Do ponto de vista dela, o template aparece "do nada"
+  e a lista de atividades fica vazia depois, sem ligação visível entre as duas coisas.
+
+Sugestões para quando for atacar (a decidir com a Joyce):
+
+- Curto prazo, sem código novo de template: incluir na API um seed oficial com 2 ou 3 templates
+  globais (`organization_id IS NULL`), com campos definidos, para o ambiente não depender de
+  inserção manual. Deixar claro no diálogo que o prazo e a paciente geram a *atividade*, e que o
+  template é só o modelo.
+- Médio prazo: entregar a tela `/templates` (listar, criar, editar campos, arquivar) e destravar
+  o item da sidebar. Isso fecha o ciclo: biblioteca → atribuir → fila em `/activities` →
+  paciente responde → revisão.
+- Vazio de `/activities`: quando não há atribuição nenhuma, a mensagem poderia orientar
+  ("Nenhuma atividade atribuída. Atribua um template pelo perfil da paciente."), em vez de só
+  "Nenhuma atividade no momento".
+
+---
+
+## Parte D — Ambientes e como testar (decisão de 2026-09-09)
+
+| Ambiente | Web | API | Login de psicóloga |
+|---|---|---|---|
+| Local | http://localhost:3000 | http://localhost:8080 | `psi@acolhe.dev` / `acolhe123` (seed do compose) |
+| Staging (`develop`) | https://develop.acolhe-web.pages.dev | https://136.248.118.237.nip.io | `psi@acolhe.dev` / `acolhe123` (seed já rodado) |
+| Produção (`main`) | https://acolhe-web.pages.dev | https://163.176.228.171.nip.io | **nenhum usuário ainda** |
+
+- **Testes manuais acontecem em staging**, com o login acima. Produção só recebe os merges
+  de `main` e fica sem uso até existir cadastro de psicóloga.
+- Produção não tem psicóloga porque o seed nunca rodou lá (a imagem de produção leva só
+  `api`, `worker` e `atlas`) e o `/signup` (ACO-54/ACO-59) ainda está em desenvolvimento.
+  Quando o signup entrar, a primeira conta de produção é criada por ele; rodar seed em
+  produção fica descartado a menos que a Joyce peça.
+- E-mail (Brevo) está configurado em staging e produção via GitHub Environments da
+  `acolhe-api`; o deploy grava as chaves no `.env` da VM (ver PR #22 da API). Para trocar
+  provedor ou remetente, alterar os secrets `SMTP_*` e a variável `FRONTEND_URL` no
+  Environment e rodar um deploy.
+- O Claude Code não tem acesso SSH às VMs (bloqueado pela política de permissões). Se algo
+  precisar ser feito direto na VM, a Joyce roda o comando na sessão com o prefixo `!`, por
+  exemplo `! ssh ubuntu@163.176.228.171 '...'`.
