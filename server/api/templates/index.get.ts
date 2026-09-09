@@ -1,6 +1,7 @@
-import type { ActivityTemplate } from '~/types'
+import { activityTemplateSummarySchema } from '~/schemas/activity-template'
 
-// Templates de atividade (biblioteca) — usados no form de atribuir atividade.
+// Biblioteca de templates (só a versão mais recente de cada linhagem, sem arquivados).
 export default defineEventHandler(async (event) => {
-  return await apiFetch<ActivityTemplate[]>(event, '/activities/templates')
+  const response = await apiFetch<unknown>(event, '/activities/templates')
+  return activityTemplateSummarySchema.array().parse(response)
 })

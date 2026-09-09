@@ -131,6 +131,13 @@ export interface ActivityTemplate {
   title: string
   type: ActivityType | string
   description?: string | null
+  instructions?: string | null
+  version: number
+  isGlobal: boolean
+  ownedByMe: boolean
+  fieldCount: number
+  createdAt: string
+  updatedAt: string
 }
 
 export type TimelineEventType = 'session' | 'activity' | 'note' | 'document'

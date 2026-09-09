@@ -46,7 +46,7 @@ const main = computed<NavItem[]>(() => [
 
 const personal: NavItem[] = [
   { label: 'Registro Documental', to: '/registry', icon: FileLock2, disabled: true },
-  { label: 'Templates', to: '/templates', icon: BookMarked, disabled: true },
+  { label: 'Templates', to: '/templates', icon: BookMarked },
 ]
 
 const route = useRoute()
