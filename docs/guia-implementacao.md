@@ -107,7 +107,7 @@ levantamento de 2026-09-09; reconfira as linhas antes de editar.
 | `components/ui/custom-dropdown/` (`CustomDropdown`) | `Select` nos formulários | **Feito.** Popover + Command; busca por digitação, teclado, estado vazio, descrição opcional por item, funciona dentro de `FormControl`. |
 | `components/ui/date-picker/` (`DatePicker`) | `<Input type="date">` | **Feito.** Calendário próprio pt-BR, mês e ano por `CustomDropdown` pesquisável, `minDate`/`maxDate`, valor `YYYY-MM-DD`. |
 | `components/ui/date-time-picker/` (`DateTimePicker`) | `<Input type="datetime-local">` | **Feito.** `DatePicker` + hora e minuto em `CustomDropdown`; valor ISO UTC; empilha no mobile. |
-| Checkbox | `<input type="checkbox">` | **Pendente.** |
+| `components/ui/checkbox/` (`Checkbox`) | `<input type="checkbox">` | **Feito** (shadcn-vue sobre reka-ui; acessível, `model-value` booleano, usado com `<label for>`). |
 
 Primitivos shadcn-vue adicionados para isso: `popover`, `command`, `calendar`. Dependência
 `@internationalized/date` fixada na mesma versão usada pelo `reka-ui` (evita erro de tipos).
@@ -124,7 +124,7 @@ do usuário terminar de escolher.
 | `components/forms/NewSessionDialog.vue` | `<Input type="datetime-local">` | **Feito**, usa `DateTimePicker` com `maxDate` = hoje. |
 | `components/forms/AssignActivityDialog.vue` | `<Input type="datetime-local">` | **Feito**, usa `DateTimePicker` com `minDate` = hoje. |
 | `components/forms/NewPatientDialog.vue` | `<Input type="date">` | **Feito**, usa `DatePicker` com `maxDate` = hoje (nascimento nunca é futuro). |
-| `pages/invite/[token].vue` | `<input type="checkbox">` nos consentimentos | **Pendente** (depende do Checkbox de B1). |
+| `pages/invite/[token].vue` | `<input type="checkbox">` nos consentimentos | **Feito**, usa `Checkbox` com label associado e descrição via `aria-describedby`. |
 
 Não há `<select>` nativo hoje.
 
