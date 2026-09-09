@@ -1,9 +1,9 @@
 import { z } from 'zod'
 
 export const assignActivitySchema = z.object({
-  templateId: z.string().uuid(),
-  patientId: z.string().uuid(),
-  dueAt: z.string().datetime().optional(),
+  templateId: z.string({ required_error: 'Selecione um template' }).uuid('Selecione um template'),
+  patientId: z.string({ required_error: 'Selecione um paciente' }).uuid('Selecione um paciente'),
+  dueAt: z.string().datetime({ message: 'Informe a data e a hora do prazo' }).optional(),
 })
 
 const reviewFieldBaseSchema = z.object({

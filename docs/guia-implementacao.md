@@ -87,8 +87,8 @@ Percorra e confirme cada item. Se algum falhar, a entrega não está pronta.
 - [ ] Todo dropdown é pesquisável (A3).
 - [ ] Conferido em viewport de celular (A4).
 - [ ] Sem emojis, sem cores ou elementos fora do padrão; só tokens do projeto (A5).
-- [ ] Mensagens de validação em português (A6).
-- [ ] Erros da API traduzidos em mensagens específicas para o usuário (A6).
+- [ ] Mensagens de validação em português nos campos que toquei (A6).
+- [ ] Erros da API que meu fluxo pode receber viram mensagens específicas para o usuário (A6).
 - [ ] `pnpm typecheck` passa.
 
 ---
@@ -100,36 +100,39 @@ levantamento de 2026-09-09; reconfira as linhas antes de editar.
 
 ### B1. Criar os componentes base que faltam — regras A1, A2, A3
 
-Componentes que não existem hoje e são pré-requisito para os demais itens:
+**Status: parcialmente feito** na branch `feat/componentes-base-formulario` (2026-09-09).
 
-| Componente | Substitui | Requisitos |
+| Componente | Substitui | Situação |
 |---|---|---|
-| Combobox pesquisável | `components/ui/select/` nos formulários | digitar e filtrar, teclado, estado vazio, mobile |
-| Date picker | `<Input type="date">` | calendário próprio, pt-BR, mobile |
-| DateTime picker (ou Date + Time) | `<Input type="datetime-local">` | idem, com seleção de hora |
-| Checkbox | `<input type="checkbox">` | acessível, com label e descrição |
+| `components/ui/custom-dropdown/` (`CustomDropdown`) | `Select` nos formulários | **Feito.** Popover + Command; busca por digitação, teclado, estado vazio, descrição opcional por item, funciona dentro de `FormControl`. |
+| `components/ui/date-picker/` (`DatePicker`) | `<Input type="date">` | **Feito.** Calendário próprio pt-BR, mês e ano por `CustomDropdown` pesquisável, `minDate`/`maxDate`, valor `YYYY-MM-DD`. |
+| `components/ui/date-time-picker/` (`DateTimePicker`) | `<Input type="datetime-local">` | **Feito.** `DatePicker` + hora e minuto em `CustomDropdown`; valor ISO UTC; empilha no mobile. |
+| Checkbox | `<input type="checkbox">` | **Pendente.** |
 
-Antes de criar, verificar o que já existe em `components/ui/`: avatar, badge, button, card,
-dialog, dropdown-menu, form, input, label, progress, select, separator, skeleton, sonner,
-table, tabs, textarea.
+Primitivos shadcn-vue adicionados para isso: `popover`, `command`, `calendar`. Dependência
+`@internationalized/date` fixada na mesma versão usada pelo `reka-ui` (evita erro de tipos).
+
+Uso dentro de formulários vee-validate: usar `v-slot="{ value, handleChange }"` e ligar
+`:model-value="value ?? ''"` + `@update:model-value="handleChange"`. Não usar
+`v-bind="componentField"` nesses componentes: o `onBlur` do gatilho dispara validação antes
+do usuário terminar de escolher.
 
 ### B2. Remover controles nativos das telas — regra A2
 
-| Arquivo | Linha | Controle nativo hoje |
+| Arquivo | Controle nativo | Situação |
 |---|---|---|
-| `components/forms/NewSessionDialog.vue` | 110 | `<Input type="datetime-local">` (campo "Data e hora") |
-| `components/forms/AssignActivityDialog.vue` | 132 | `<Input type="datetime-local">` |
-| `components/forms/NewPatientDialog.vue` | 94 | `<Input type="date">` |
-| `pages/invite/[token].vue` | 141 | `<input type="checkbox">` nos consentimentos |
+| `components/forms/NewSessionDialog.vue` | `<Input type="datetime-local">` | **Feito**, usa `DateTimePicker` com `maxDate` = hoje. |
+| `components/forms/AssignActivityDialog.vue` | `<Input type="datetime-local">` | **Feito**, usa `DateTimePicker` com `minDate` = hoje. |
+| `components/forms/NewPatientDialog.vue` | `<Input type="date">` | **Feito**, usa `DatePicker` com `maxDate` = hoje (nascimento nunca é futuro). |
+| `pages/invite/[token].vue` | `<input type="checkbox">` nos consentimentos | **Pendente** (depende do Checkbox de B1). |
 
 Não há `<select>` nativo hoje.
 
 ### B3. Trocar os Selects por combobox pesquisável — regra A3
 
-| Arquivo | Linha | Situação hoje |
-|---|---|---|
-| `components/forms/NewSessionDialog.vue` | 88 | `Select` para paciente, sem busca |
-| `components/forms/AssignActivityDialog.vue` | 89 | `Select` para paciente e para template, sem busca |
+**Feito** na branch `feat/componentes-base-formulario`: paciente em `NewSessionDialog`,
+paciente e template em `AssignActivityDialog` usam `CustomDropdown`. `components/ui/select/`
+continua no repo, mas não é mais usado em formulários; não reintroduzir.
 
 ### B4. Mensagens de validação em português — regra A6
 
@@ -139,8 +142,9 @@ Estado atual:
   configurado. As mensagens saem em inglês ("Required", "Invalid email", "String must contain
   at least 2 character(s)").
 
-Direção esperada: configurar um error map global do Zod em português e, onde fizer sentido,
-mensagens específicas por campo nos schemas.
+Parcial: `schemas/session.ts`, `schemas/activity.ts` e `schemas/patient.ts` já têm mensagens
+em português por campo (feito junto com B1–B3). Falta o error map global do Zod para cobrir
+qualquer schema novo sem mensagem própria.
 
 ### B5. Erros da API traduzidos para o usuário — regra A6
 
