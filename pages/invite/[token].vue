@@ -19,7 +19,7 @@ definePageMeta({ layout: 'auth' })
 const route = useRoute()
 const token = computed(() => route.params.token as string)
 const { data: invitation, status, error } = await useFetch<InvitationPage>(
-  () => `/api/invites/${encodeURIComponent(token.value)}`,
+  () => `/api/onboarding/invitations/${encodeURIComponent(token.value)}`,
   {
     server: false,
     key: 'invitation-status',
