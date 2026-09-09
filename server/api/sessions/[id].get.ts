@@ -1,10 +1,8 @@
-// Proxy para a API Go — o token nunca chega ao cliente.
-export default defineEventHandler(async (event) => {
-  const id = getRouterParam(event, 'id')
-  const config = useRuntimeConfig()
-  const token = getCookie(event, 'acolhe_session')
+import type { Session } from '~/types'
+import { idParamSchema } from '~/schemas/common'
 
-  return await $fetch(`${config.apiUrl}/sessions/${id}`, {
-    headers: { Authorization: `Bearer ${token}` },
-  })
+// Detalhe de uma sessão — proxy autenticado para a API Go.
+export default defineEventHandler(async (event) => {
+  const { id } = await getValidatedRouterParams(event, value => idParamSchema.parse(value))
+  return await apiFetch<Session>(event, `/sessions/${id}`)
 })
