@@ -4,6 +4,7 @@ import type { User } from '~/types'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Textarea } from '@/components/ui/textarea'
+import { sessionExpired } from '~/utils/patient-portal'
 
 definePageMeta({ layout: 'patient', middleware: ['auth', 'patient-only'] })
 
@@ -16,7 +17,7 @@ const firstName = computed(() => (context.data.value?.fullName ?? me.value?.pati
 const latestCheckin = computed(() => checkins.data.value?.[0])
 
 watch(error, (value) => {
-  if (import.meta.client && (value as { statusCode?: number } | null)?.statusCode === 401) {
+  if (import.meta.client && sessionExpired(value as { statusCode?: number } | null)) {
     navigateTo('/login')
   }
 })
@@ -163,4 +164,4 @@ function formatTime(value: string) {
       </section>
     </template>
   </div>
-</template>
+</template
