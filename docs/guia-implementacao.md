@@ -142,9 +142,10 @@ Estado atual:
   configurado. As mensagens saem em inglês ("Required", "Invalid email", "String must contain
   at least 2 character(s)").
 
-Parcial: `schemas/session.ts`, `schemas/activity.ts` e `schemas/patient.ts` já têm mensagens
-em português por campo (feito junto com B1–B3). Falta o error map global do Zod para cobrir
-qualquer schema novo sem mensagem própria.
+**Feito em 2026-09-09.** `utils/zod-pt-br.ts` define o error map global em português e
+`plugins/validation.ts` o registra com `z.setErrorMap` (junto da configuração do vee-validate).
+Qualquer schema novo já sai em português; mensagens específicas por campo continuam tendo
+prioridade e devem ser usadas quando o texto genérico não explica o suficiente.
 
 ### B5. Erros da API traduzidos para o usuário — regra A6
 
@@ -159,10 +160,12 @@ Estado atual:
 - A API Go responde em português, mas com texto técnico ("id inválido", "corpo inválido",
   "não autenticado", "convite pendente não encontrado") que hoje nem chega à tela.
 
-Direção esperada: um ponto único que converta status e código de erro da API em mensagem de
-usuário em português, usado por todos os formulários. Casos a distinguir no mínimo: 400
-validação, 401 sessão expirada, 403 sem vínculo ativo, 404 não encontrado, 409 conflito de
-horário, 5xx indisponível.
+**Feito em 2026-09-09.** `utils/api-error.ts` expõe `apiErrorMessage(err, overrides)` com textos
+padrão por status (400, 401, 403, 404, 409, 410, 429, 5xx, sem rede). Cada formulário
+sobrescreve só os status com significado próprio no seu contexto (ex.: 403 em "Nova sessão" é
+vínculo não ativo; 401 no login é credencial errada). Todos os `catch` de `components/forms` e
+`pages` usam o helper. Regra para código novo: nunca `catch {}` com texto fixo; sempre
+`apiErrorMessage` com overrides do contexto.
 
 ### B6. Auditoria de mobile nas telas existentes — regra A4
 

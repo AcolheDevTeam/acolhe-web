@@ -28,8 +28,12 @@ const onSubmit = handleSubmit(async (values) => {
   try {
     const user = await $fetch<User>('/api/login', { method: 'POST', body: values })
     await navigateTo(user.role === 'patient' ? '/patient' : '/dashboard')
-  } catch {
-    loginError.value = 'E-mail ou senha inválidos.'
+  } catch (error) {
+    // Só 401 significa credencial errada; qualquer outra falha recebe a causa real.
+    loginError.value = apiErrorMessage(error, {
+      401: 'E-mail ou senha inválidos.',
+      default: 'Não foi possível entrar agora. Tente novamente em instantes.',
+    })
   }
 })
 </script>

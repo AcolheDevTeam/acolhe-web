@@ -55,8 +55,12 @@ const onSubmit = handleSubmit(async (values) => {
     await refreshNuxtData(`sessions-${values.patientId}`)
     await refreshNuxtData('sessions-all')
     if (session?.id) await navigateTo(`/sessions/${session.id}`)
-  } catch {
-    toast.error('Não foi possível registrar a sessão.')
+  } catch (error) {
+    toast.error(apiErrorMessage(error, {
+      403: 'Esta paciente ainda não aceitou o convite. A sessão só pode ser registrada com o vínculo ativo.',
+      400: 'Confira a data, a hora e o texto da evolução.',
+      default: 'Não foi possível registrar a sessão agora.',
+    }))
   }
 })
 </script>
