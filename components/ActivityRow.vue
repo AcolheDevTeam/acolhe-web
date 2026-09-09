@@ -17,7 +17,7 @@ const { activity, showPatient } = defineProps<{
     <div class="min-w-0 flex-1">
       <p class="truncate text-sm font-medium">{{ activity.title }}</p>
       <p class="truncate text-xs text-muted-foreground">
-        <template v-if="showPatient && activity.patientName">{{ activity.patientName }} · </template>{{ activity.summary }}
+        <template v-if="showPatient && activity.patientName">{{ activity.patientName }} · </template>{{ activitySummary(activity) }}
       </p>
     </div>
     <Button v-if="activity.status === 'submitted'" variant="outline" size="sm" as-child>
