@@ -1,9 +1,8 @@
 import type { User } from '~/types'
 
-// Restringe rotas clínicas a psicólogos.
 export default defineNuxtRouteMiddleware(async () => {
   const { data: user } = await useFetch<User | null>('/api/me', { key: 'me' })
-  if (user.value?.role !== 'psychologist') {
-    return navigateTo(user.value?.role === 'patient' ? '/patient' : '/login')
+  if (user.value?.role !== 'patient') {
+    return navigateTo(user.value ? '/dashboard' : '/login')
   }
 })

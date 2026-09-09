@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
+import type { User } from '~/types'
 
 definePageMeta({ layout: 'auth' })
 
@@ -25,8 +26,8 @@ const loginError = ref('')
 const onSubmit = handleSubmit(async (values) => {
   loginError.value = ''
   try {
-    await $fetch('/api/login', { method: 'POST', body: values })
-    await navigateTo('/dashboard')
+    const user = await $fetch<User>('/api/login', { method: 'POST', body: values })
+    await navigateTo(user.role === 'patient' ? '/patient' : '/dashboard')
   } catch {
     loginError.value = 'E-mail ou senha inválidos.'
   }
