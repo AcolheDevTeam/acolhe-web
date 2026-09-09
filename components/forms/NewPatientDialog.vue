@@ -4,7 +4,7 @@ import { useForm } from 'vee-validate'
 import { toast } from 'vue-sonner'
 import { createPatientSchema } from '~/schemas/patient'
 import type { Patient } from '~/types'
-import { Check, Copy, Mail } from 'lucide-vue-next'
+import { Check, Copy, Link2, MailCheck, MailWarning } from 'lucide-vue-next'
 import {
   Dialog,
   DialogContent,
@@ -24,6 +24,7 @@ const createdPatient = ref<Patient>()
 // Nascimento nunca é futuro: o calendário só oferece até hoje.
 const todayIso = new Date().toLocaleDateString('sv-SE')
 const copied = ref(false)
+const delivery = computed(() => invitationDeliveryMeta(createdPatient.value?.invitation?.deliveryStatus))
 
 const { handleSubmit, isSubmitting, resetForm } = useForm({
   validationSchema: toTypedSchema(createPatientSchema),
@@ -113,24 +114,19 @@ watch(open, (isOpen) => {
       <div v-else class="flex flex-col gap-5">
         <DialogHeader>
           <div class="mb-1 flex size-10 items-center justify-center rounded-full bg-secondary">
-            <Mail class="size-5" />
+            <MailWarning v-if="delivery.tone === 'warning'" class="size-5" />
+            <MailCheck v-else-if="!delivery.showLink" class="size-5" />
+            <Link2 v-else class="size-5" />
           </div>
-          <DialogTitle class="font-serif text-2xl font-normal">Convite pronto</DialogTitle>
-          <DialogDescription>
-            {{ createdPatient.fullName }} ficará em onboarding até aceitar o consentimento e criar a conta.
+          <DialogTitle class="font-serif text-2xl font-normal">{{ delivery.title }}</DialogTitle>
+          <DialogDescription :class="delivery.tone === 'warning' ? 'text-warning' : ''">
+            {{ delivery.description(createdPatient.fullName, createdPatient.invitation?.email) }}
           </DialogDescription>
         </DialogHeader>
 
-        <div class="rounded-lg border bg-muted/40 p-3">
-          <p class="label-mono mb-2">Próximo passo</p>
-          <p
-            class="mb-3 text-sm"
-            :class="invitationDeliveryMeta(createdPatient.invitation?.deliveryStatus).tone === 'warning'
-              ? 'text-warning'
-              : 'text-muted-foreground'"
-          >
-            {{ invitationDeliveryMeta(createdPatient.invitation?.deliveryStatus).detail(createdPatient.invitation?.email) }}
-          </p>
+        <!-- Link em destaque só quando ele é o caminho principal (falha ou envio desabilitado). -->
+        <div v-if="delivery.showLink" class="rounded-lg border bg-muted/40 p-3">
+          <p class="label-mono mb-2">Link do convite</p>
           <div class="flex gap-2">
             <Input :model-value="createdPatient.invitation?.url" readonly class="min-w-0 text-xs" />
             <Button type="button" variant="outline" size="icon" aria-label="Copiar convite" @click="copyInvitation">
@@ -138,6 +134,19 @@ watch(open, (isOpen) => {
               <Copy v-else />
             </Button>
           </div>
+          <p class="mt-2 text-xs text-muted-foreground">
+            Válido até {{ formatDateTime(createdPatient.invitation?.expiresAt) }}.
+          </p>
+        </div>
+
+        <!-- E-mail enviado: o link fica como ação secundária, sem expor a URL. -->
+        <div v-else class="flex flex-wrap items-center justify-between gap-2 rounded-lg border bg-muted/40 px-3 py-2">
+          <p class="text-xs text-muted-foreground">Não recebeu? Você pode enviar o link por outro canal.</p>
+          <Button type="button" variant="ghost" size="sm" @click="copyInvitation">
+            <Check v-if="copied" />
+            <Copy v-else />
+            Copiar link
+          </Button>
         </div>
 
         <DialogFooter>
