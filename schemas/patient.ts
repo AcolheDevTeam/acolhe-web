@@ -23,16 +23,12 @@ export const patientSchema = z.object({
 }).passthrough()
 
 export const patientInvitationSchema = z.object({
-	id: z.string().uuid(),
-	status: z.string(),
-	deliveryStatus: z.string(),
+	id: z.string().uuid().optional(),
+	status: z.string().optional(),
+	deliveryStatus: z.string().default('sent'),
+	token: z.string().regex(/^[A-Za-z0-9_-]{43}$/),
+	email: z.string().email(),
 	expiresAt: z.string().datetime({ offset: true }),
-})
-
-export const patientInvitationResultSchema = z.object({
-	patient: patientSchema,
-	invitation: patientInvitationSchema,
-	copyLink: z.string().url(),
 })
 
 export type CreatePatientInput = z.infer<typeof createPatientSchema>

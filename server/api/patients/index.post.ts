@@ -1,4 +1,5 @@
-import { createPatientSchema, patientInvitationResultSchema } from '~/schemas/patient'
+import { createPatientSchema, patientInvitationSchema, patientSchema } from '~/schemas/patient'
+import { z } from 'zod'
 
 // Cria um paciente — valida no servidor (contrato Zod) antes de repassar à API Go.
 export default defineEventHandler(async (event) => {
@@ -7,5 +8,9 @@ export default defineEventHandler(async (event) => {
 		method: 'POST',
 		body,
 	})
-	return patientInvitationResultSchema.parse(response)
+	const parsed = z.object({ invitation: patientInvitationSchema }).passthrough().parse(response)
+	const { invitation: _invitation, ...patientData } = response as Record<string, unknown>
+	const patient = patientSchema.parse(patientData)
+	const origin = getRequestURL(event).origin
+	return { patient, invitation: { id: parsed.invitation.id ?? crypto.randomUUID(), status: 'pending', deliveryStatus: parsed.invitation.deliveryStatus, expiresAt: parsed.invitation.expiresAt }, copyLink: `${origin}/invite/${encodeURIComponent(parsed.invitation.token)}` }
 })
