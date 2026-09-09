@@ -17,9 +17,12 @@ import {
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { DatePicker } from '@/components/ui/date-picker'
 
 const open = ref(false)
 const createdPatient = ref<Patient>()
+// Nascimento nunca é futuro: o calendário só oferece até hoje.
+const todayIso = new Date().toLocaleDateString('sv-SE')
 const copied = ref(false)
 
 const { handleSubmit, isSubmitting, resetForm } = useForm({
@@ -87,11 +90,16 @@ watch(open, (isOpen) => {
           </FormItem>
         </FormField>
 
-        <FormField v-slot="{ componentField }" name="birthDate">
+        <FormField v-slot="{ value, handleChange }" name="birthDate">
           <FormItem>
             <FormLabel>Data de nascimento</FormLabel>
             <FormControl>
-              <Input type="date" v-bind="componentField" />
+              <DatePicker
+                :max-date="todayIso"
+                placeholder="Selecione a data de nascimento"
+                :model-value="value ?? ''"
+                @update:model-value="handleChange"
+              />
             </FormControl>
             <FormMessage />
           </FormItem>

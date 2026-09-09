@@ -8,6 +8,21 @@ Frontend do Acolhe (SaaS de psicologia): **Nuxt 3, SSR-first, LGPD-compliant**.
 `develop` é a **source of truth** (já adaptada ao design planejado). Faça branches
 a partir dela.
 
+## Regra 0 — ler o guia de implementação antes de qualquer tarefa
+
+O arquivo **`docs/guia-implementacao.md`** é a fonte de verdade para o que a
+Joyce espera do frontend. Leia-o inteiro antes de começar e siga-o na íntegra:
+
+- **Parte A** — regras obrigatórias em toda entrega: componentes reutilizáveis,
+  nenhum controle nativo do browser, dropdowns sempre pesquisáveis, mobile em
+  toda alteração, padrão visual sem invenção, erros em português e específicos.
+  Termina com o checklist que toda entrega precisa passar.
+- **Parte B** — backlog de correções já mapeadas. **Só execute um item quando a
+  Joyce pedir explicitamente por ele.** Não implemente nada da Parte B por
+  iniciativa própria.
+
+Em caso de conflito entre este `AGENTS.md` e o guia, o guia prevalece.
+
 ## Regra 1 — sempre consultar o design antes de mexer em tela
 
 O design de referência está versionado no repo:

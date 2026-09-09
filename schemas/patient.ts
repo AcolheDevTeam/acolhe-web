@@ -3,14 +3,21 @@ import { z } from 'zod'
 const earliestBirthDate = new Date('1900-01-01T00:00:00Z')
 
 export const createPatientSchema = z.object({
-  fullName: z.string().trim().min(2).max(200),
-  email: z.string().trim().toLowerCase().email().max(320),
+  fullName: z.string({ required_error: 'Informe o nome completo' })
+    .trim()
+    .min(2, 'Informe o nome completo')
+    .max(200, 'O nome deve ter no máximo 200 caracteres'),
+  email: z.string({ required_error: 'Informe o e-mail' })
+    .trim()
+    .toLowerCase()
+    .email('Informe um e-mail válido')
+    .max(320, 'O e-mail deve ter no máximo 320 caracteres'),
   birthDate: z.preprocess(
     value => value === '' ? undefined : value,
-    z.string().date().refine((value) => {
+    z.string().date('Data de nascimento inválida').refine((value) => {
       const date = new Date(`${value}T00:00:00Z`)
       return date >= earliestBirthDate && date <= new Date()
-    }, 'Data de nascimento inválida').optional(),
+    }, 'A data de nascimento não pode ser futura').optional(),
   ),
 })
 
