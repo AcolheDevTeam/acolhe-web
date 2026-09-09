@@ -1,32 +1,47 @@
 import { z } from 'zod'
 
-export const createPatientSchema = z.object({
-  fullName: z.string().min(2).max(200),
-  email: z.string().email(),
-  birthDate: z.string().date().optional(),
-  cpf: z.string().length(11).optional(),
-})
+const earliestBirthDate = new Date('1900-01-01T00:00:00Z')
 
-export type CreatePatientInput = z.infer<typeof createPatientSchema>
+export const createPatientSchema = z.object({
+  fullName: z.string({ required_error: 'Informe o nome completo' })
+    .trim()
+    .min(2, 'Informe o nome completo')
+    .max(200, 'O nome deve ter no máximo 200 caracteres'),
+  email: z.string({ required_error: 'Informe o e-mail' })
+    .trim()
+    .toLowerCase()
+    .email('Informe um e-mail válido')
+    .max(320, 'O e-mail deve ter no máximo 320 caracteres'),
+  birthDate: z.preprocess(
+    value => value === '' ? undefined : value,
+    z.string().date('Data de nascimento inválida').refine((value) => {
+      const date = new Date(`${value}T00:00:00Z`)
+      return date >= earliestBirthDate && date <= new Date()
+    }, 'A data de nascimento não pode ser futura').optional(),
+  ),
+})
 
 export const patientSchema = z.object({
   id: z.string().uuid(),
   fullName: z.string(),
-  status: z.string(),
-  relationshipStatus: z.string().default('pending'),
-  createdAt: z.string(),
+  status: z.enum(['onboarding', 'active', 'archived', 'deleted']),
+  relationshipStatus: z.enum(['pending', 'active', 'paused', 'ended', 'transferred']),
+  createdAt: z.string().datetime({ offset: true }),
 }).passthrough()
 
 export const patientInvitationAPISchema = z.object({
+  token: z.string().regex(/^[A-Za-z0-9_-]{43}$/),
   email: z.string().email(),
-  token: z.string(),
-  expiresAt: z.string(),
+  expiresAt: z.string().datetime({ offset: true }),
 })
 
 export const createdPatientAPISchema = patientSchema.extend({
   invitation: patientInvitationAPISchema,
 })
 
+export type CreatePatientInput = z.infer<typeof createPatientSchema>
+
+// Contratos patient-scoped da área do paciente (ACO-56/ACO-58). Consumidos só pelo BFF.
 export const patientContextSchema = z.object({
   patientId: z.string().uuid(),
   fullName: z.string(),

@@ -3,6 +3,7 @@ import { ArrowRight, CalendarDays, Check, Clock3, HeartPulse, RefreshCw } from '
 import type { User } from '~/types'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Textarea } from '@/components/ui/textarea'
 
 definePageMeta({ layout: 'patient', middleware: ['auth', 'patient-only'] })
 
@@ -146,7 +147,7 @@ function formatTime(value: string) {
                 {{ value }}
               </Button>
             </div>
-            <textarea v-model="note" class="min-h-20 resize-y rounded-md border bg-background px-3 py-2 text-sm outline-none ring-offset-background placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring" placeholder="Quer deixar uma nota? (opcional)" aria-label="Nota do check-in" />
+            <Textarea v-model="note" rows="3" placeholder="Quer deixar uma nota? (opcional)" aria-label="Nota do check-in" />
             <p v-if="checkinError" class="text-sm text-destructive">{{ checkinError }}</p>
             <Button class="self-start" :disabled="!mood || checkinSubmitting" @click="submitCheckin"><Check class="size-4" />{{ checkinSubmitting ? 'Salvando…' : 'Salvar check-in' }}</Button>
           </CardContent>

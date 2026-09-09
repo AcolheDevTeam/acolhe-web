@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { LogOut } from 'lucide-vue-next'
+import { ClipboardList, HeartPulse, Home, LogOut } from 'lucide-vue-next'
 import type { User } from '~/types'
 import { Button } from '@/components/ui/button'
 
@@ -32,13 +32,13 @@ async function logout() {
     <nav class="fixed inset-x-0 bottom-0 z-20 border-t bg-card/95 px-5 py-3 backdrop-blur md:hidden" aria-label="Navegação do paciente">
       <div class="mx-auto flex max-w-md items-center justify-around text-xs text-muted-foreground">
         <NuxtLink to="/patient" class="flex flex-col items-center gap-1" active-class="font-medium text-foreground">
-          <span aria-hidden="true">⌂</span><span>Início</span>
+          <Home class="size-5" aria-hidden="true" /><span>Início</span>
         </NuxtLink>
         <NuxtLink to="/patient#activities" class="flex flex-col items-center gap-1" active-class="font-medium text-foreground">
-          <span aria-hidden="true">✓</span><span>Atividades</span>
+          <ClipboardList class="size-5" aria-hidden="true" /><span>Atividades</span>
         </NuxtLink>
         <NuxtLink to="/patient#check-in" class="flex flex-col items-center gap-1" active-class="font-medium text-foreground">
-          <span aria-hidden="true">◌</span><span>Check-in</span>
+          <HeartPulse class="size-5" aria-hidden="true" /><span>Check-in</span>
         </NuxtLink>
       </div>
     </nav>

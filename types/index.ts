@@ -125,6 +125,7 @@ export interface ActivityTemplate {
   id: string
   title: string
   type: ActivityType | string
+  description?: string | null
 }
 
 export type TimelineEventType = 'session' | 'activity' | 'note' | 'document'
