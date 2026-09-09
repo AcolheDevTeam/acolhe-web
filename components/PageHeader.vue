@@ -6,14 +6,14 @@ defineProps<{ title?: string }>()
 
 <template>
   <header
-    class="sticky top-0 z-10 flex h-16 shrink-0 items-center justify-between gap-4 border-b bg-background/80 px-8 backdrop-blur"
+    class="sticky top-0 z-10 flex h-16 shrink-0 items-center justify-between gap-3 border-b bg-background/80 px-4 backdrop-blur md:px-8"
   >
-    <div class="flex min-w-0 items-center gap-2">
+    <div class="flex min-w-0 items-center gap-2 overflow-hidden whitespace-nowrap">
       <slot name="title">
         <span class="truncate text-sm font-medium text-foreground">{{ title }}</span>
       </slot>
     </div>
-    <div class="flex items-center gap-2">
+    <div class="flex shrink-0 items-center gap-2">
       <slot name="actions" />
     </div>
   </header>

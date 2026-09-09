@@ -13,17 +13,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
+import { CustomDropdown } from '@/components/ui/custom-dropdown'
+import { DateTimePicker } from '@/components/ui/date-time-picker'
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 
 const { patientId } = defineProps<{ patientId?: string }>()
 
@@ -41,6 +34,18 @@ const { data: templates } = await useFetch<ActivityTemplate[]>('/api/templates',
   key: 'templates-list',
   default: () => [],
 })
+const patientOptions = computed(() =>
+  activePatients.value.map(patient => ({ value: patient.id, label: patient.fullName })),
+)
+const templateOptions = computed(() =>
+  (templates.value ?? []).map(template => ({
+    value: template.id,
+    label: template.title,
+    description: template.description ?? undefined,
+  })),
+)
+// Prazo só faz sentido de hoje em diante.
+const todayIso = new Date().toLocaleDateString('sv-SE')
 
 const { handleSubmit, isSubmitting, setFieldValue, resetForm } = useForm({
   validationSchema: toTypedSchema(assignActivitySchema),
@@ -50,21 +55,22 @@ watchEffect(() => {
   if (patientId) setFieldValue('patientId', patientId)
 })
 
-const dueLocal = ref('')
-watch(dueLocal, (v) => setFieldValue('dueAt', v ? new Date(v).toISOString() : undefined))
-
 const onSubmit = handleSubmit(async (values) => {
   try {
     await $fetch('/api/activities', { method: 'POST', body: values })
     toast.success('Atividade atribuída.')
     open.value = false
     resetForm()
-    dueLocal.value = ''
     if (patientId) setFieldValue('patientId', patientId)
     await refreshNuxtData(`activities-${values.patientId}`)
     await refreshNuxtData('activities-all')
-  } catch {
-    toast.error('Não foi possível atribuir a atividade.')
+  } catch (error) {
+    toast.error(apiErrorMessage(error, {
+      403: 'Esta paciente ainda não aceitou o convite. Atividades só podem ser atribuídas com o vínculo ativo.',
+      404: 'Template ou paciente não encontrado. Atualize a página e tente de novo.',
+      400: 'Confira o template, a paciente e o prazo.',
+      default: 'Não foi possível atribuir a atividade agora.',
+    }))
   }
 })
 </script>
@@ -83,53 +89,49 @@ const onSubmit = handleSubmit(async (values) => {
       </DialogHeader>
 
       <form class="flex flex-col gap-4" @submit="onSubmit">
-        <FormField v-slot="{ componentField }" name="templateId">
+        <FormField v-slot="{ value, handleChange }" name="templateId">
           <FormItem>
             <FormLabel>Template</FormLabel>
-            <Select v-bind="componentField">
-              <FormControl>
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecione um template" />
-                </SelectTrigger>
-              </FormControl>
-              <SelectContent>
-                <SelectGroup>
-                  <SelectItem v-for="t in templates" :key="t.id" :value="t.id">
-                    {{ t.title }}
-                  </SelectItem>
-                </SelectGroup>
-              </SelectContent>
-            </Select>
+            <FormControl>
+              <CustomDropdown
+                :options="templateOptions"
+                placeholder="Selecione um template"
+                search-placeholder="Buscar template…"
+                empty-text="Nenhum template encontrado."
+                :model-value="value ?? ''"
+                @update:model-value="handleChange"
+              />
+            </FormControl>
             <FormMessage />
           </FormItem>
         </FormField>
 
-        <FormField v-if="!patientId" v-slot="{ componentField }" name="patientId">
+        <FormField v-if="!patientId" v-slot="{ value, handleChange }" name="patientId">
           <FormItem>
             <FormLabel>Paciente</FormLabel>
-            <Select v-bind="componentField">
-              <FormControl>
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecione um paciente" />
-                </SelectTrigger>
-              </FormControl>
-              <SelectContent>
-                <SelectGroup>
-                  <SelectItem v-for="p in activePatients" :key="p.id" :value="p.id">
-                    {{ p.fullName }}
-                  </SelectItem>
-                </SelectGroup>
-              </SelectContent>
-            </Select>
+            <FormControl>
+              <CustomDropdown
+                :options="patientOptions"
+                placeholder="Selecione um paciente"
+                search-placeholder="Buscar paciente…"
+                empty-text="Nenhum paciente encontrado."
+                :model-value="value ?? ''"
+                @update:model-value="handleChange"
+              />
+            </FormControl>
             <FormMessage />
           </FormItem>
         </FormField>
 
-        <FormField name="dueAt">
+        <FormField v-slot="{ value, handleChange }" name="dueAt">
           <FormItem>
             <FormLabel>Prazo <span class="text-muted-foreground">(opcional)</span></FormLabel>
             <FormControl>
-              <Input v-model="dueLocal" type="datetime-local" />
+              <DateTimePicker
+                :model-value="value ?? ''"
+                :min-date="todayIso"
+                @update:model-value="(v) => handleChange(v || undefined)"
+              />
             </FormControl>
             <FormMessage />
           </FormItem>

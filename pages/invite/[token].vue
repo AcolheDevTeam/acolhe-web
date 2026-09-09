@@ -5,6 +5,7 @@ import type { z } from 'zod'
 import { invitationSchema } from '~/schemas/onboarding'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
+import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 
@@ -55,8 +56,14 @@ async function accept() {
       body: { password: password.value, acceptedDocumentIds: selected.value },
     })
     completed.value = 'accepted'
-  } catch {
-    toast.error('Não foi possível concluir o aceite. Verifique se o convite ainda é válido.')
+  } catch (error) {
+    toast.error(apiErrorMessage(error, {
+      400: 'Confira a senha e os consentimentos marcados.',
+      404: 'Este convite não foi encontrado. Peça um novo link à sua psicóloga.',
+      410: 'Este convite expirou ou foi cancelado. Peça um novo link à sua psicóloga.',
+      409: 'Este convite já foi utilizado ou já existe uma conta com este e-mail. Tente entrar pela tela de login.',
+      default: 'Não foi possível concluir o aceite agora. Tente novamente em instantes.',
+    }))
   } finally {
     accepting.value = false
   }
@@ -69,8 +76,12 @@ async function decline() {
       method: 'POST',
     })
     completed.value = 'declined'
-  } catch {
-    toast.error('Não foi possível registrar a recusa.')
+  } catch (error) {
+    toast.error(apiErrorMessage(error, {
+      404: 'Este convite não foi encontrado.',
+      410: 'Este convite já não estava mais disponível.',
+      default: 'Não foi possível registrar a recusa agora.',
+    }))
   } finally {
     declining.value = false
   }
@@ -132,27 +143,31 @@ async function decline() {
               <p class="label-mono">Consentimento · LGPD Art. 11</p>
             </div>
             <div class="flex flex-col gap-4">
-              <label
+              <div
                 v-for="document in invitation.documents"
                 :key="document.id"
-                class="flex cursor-pointer items-start gap-3"
+                class="flex items-start gap-3"
               >
-                <input
-                  type="checkbox"
-                  class="mt-1 rounded border-input"
-                  :checked="selected.includes(document.id)"
-                  @change="toggleDocument(document.id, ($event.target as HTMLInputElement).checked)"
-                >
-                <span>
+                <Checkbox
+                  :id="`consent-${document.id}`"
+                  class="mt-1"
+                  :model-value="selected.includes(document.id)"
+                  :aria-describedby="`consent-${document.id}-description`"
+                  @update:model-value="(checked) => toggleDocument(document.id, checked === true)"
+                />
+                <label :for="`consent-${document.id}`" class="cursor-pointer">
                   <span class="text-sm font-medium">
                     {{ document.title }}
                     <span v-if="document.required" class="text-xs text-muted-foreground">· obrigatório</span>
                   </span>
-                  <span class="mt-0.5 block text-sm leading-relaxed text-muted-foreground">
+                  <span
+                    :id="`consent-${document.id}-description`"
+                    class="mt-0.5 block text-sm leading-relaxed text-muted-foreground"
+                  >
                     {{ document.content }}
                   </span>
-                </span>
-              </label>
+                </label>
+              </div>
             </div>
           </section>
 

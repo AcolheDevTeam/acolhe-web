@@ -7,6 +7,47 @@ export interface User {
   organizationId: string | null
   name?: string
   crp?: string
+  patient?: PatientContext
+}
+
+export interface PatientContext {
+  id: string
+  fullName: string
+  relationshipStatus: string
+  consented: boolean
+}
+
+export interface PatientPortalContext extends PatientContext {
+  patientId: string
+}
+
+export interface PatientNextSession {
+  id: string
+  scheduledFor: string
+  durationMinutes: number
+  modality: string
+  status: string
+}
+
+export interface PatientPendingActivity {
+  id: string
+  title: string
+  status: string
+  scheduledFor?: string | null
+  dueAt?: string | null
+}
+
+export interface PatientCheckin {
+  id: string
+  mood: number
+  note?: string | null
+  createdAt: string
+}
+
+export interface PatientProcessSummary {
+  sessionCount: number
+  pendingActivityCount: number
+  checkinCount: number
 }
 
 export interface Organization {
@@ -18,10 +59,15 @@ export interface Organization {
 export type PatientStatus = 'active' | 'onboarding' | 'archived'
 export type RelationshipStatus = 'pending' | 'active' | 'paused' | 'ended' | 'transferred'
 
+// Resultado do envio do convite por e-mail, informado pela API. O link existe
+// sempre: é o fallback quando o e-mail não sai.
+export type InvitationDeliveryStatus = 'sent' | 'failed' | 'disabled'
+
 export interface PatientInvitation {
   email: string
   url: string
   expiresAt: string
+  deliveryStatus: InvitationDeliveryStatus
 }
 
 export interface Patient {
@@ -84,6 +130,7 @@ export interface ActivityTemplate {
   id: string
   title: string
   type: ActivityType | string
+  description?: string | null
 }
 
 export type TimelineEventType = 'session' | 'activity' | 'note' | 'document'
