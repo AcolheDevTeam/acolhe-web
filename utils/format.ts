@@ -52,9 +52,12 @@ export function activityStatusMeta(status?: string): { label: string, variant: B
     case 'reviewed':
       return { label: 'Revisada', variant: 'outline' }
     case 'pending':
+    case 'in_progress':
       return { label: 'Atribuída', variant: 'outline' }
     case 'expired':
-      return { label: 'Atrasada', variant: 'destructive' }
+      return { label: 'Prazo encerrado', variant: 'destructive' }
+    case 'canceled':
+      return { label: 'Cancelada', variant: 'outline' }
     default:
       return { label: status ?? '—', variant: 'outline' }
   }

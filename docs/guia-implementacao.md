@@ -223,8 +223,13 @@ paciente barrada em `/api/patients` (403) e em `/dashboard` (redireciona para `/
   (`deliveryStatus` no BFF, textos únicos em `utils/invitation.ts`, entrada `/invite`). Envio real
   verificado com Brevo. Observação operacional: usar `smtp-relay.sendinblue.com:587`, porque o
   certificado TLS do Brevo é emitido para esse nome.
+- **Confirmado em staging pela Joyce (2026-09-09)**: convite criado em
+  https://develop.acolhe-web.pages.dev chegou por e-mail via Brevo. C2 encerrado.
 
 ### C3. Fluxo de atividades confuso: "template" vs. "atividade" e Templates sem tela — apontado em 2026-09-09
+
+Issues no Linear (2026-09-09): ACO-65 (bug dos status na fila `/activities`), ACO-66 (biblioteca de
+templates, API + tela) e ACO-67 (seed de templates globais).
 
 Diagnóstico (develop de 2026-09-09):
 
@@ -253,6 +258,12 @@ página e ela cai no vazio. Correção sugerida: mapear no web (`submitted` → 
 `pending`/`in_progress` com `dueAt` no passado → "Atrasadas", `pending`/`in_progress` →
 "Atribuídas", `reviewed` → "Revisadas"), sem criar status novo na API. A página da paciente
 (`pages/patients/[id]/activities.vue`) não filtra por status, por isso lá elas apareceriam.
+  **Feito em 2026-09-09** (ACO-65, branch `fix/aco-65-fila-atividades`): `utils/activity-queue.ts`
+  faz o mapeamento acima e ainda agrupa `expired`/`canceled` em "Encerradas sem resposta", para
+  nenhuma atividade da API sumir; a API nunca marca atraso sozinha, então "Atrasadas" é
+  calculado pelo `dueAt`. `ActivityRow` ganhou linha secundária derivada (prazo, respondida em…)
+  porque a API não manda `summary`. Vazio de `/activities` passou a orientar a psicóloga.
+  Testes unitários em `tests/activity-queue.test.ts`.
 - A parte de Templates **não está pronta**: o item "Templates" da sidebar está com
   `disabled: true` (`components/AppSidebar.vue`), não existe `pages/templates`, e a API só expõe
   listagem (`GET /activities/templates`). Não há endpoint nem tela para criar, editar ou arquivar
@@ -262,7 +273,13 @@ página e ela cai no vazio. Correção sugerida: mapear no web (`submitted` → 
   nenhuma tela onde essa biblioteca exista. Do ponto de vista dela, o template aparece "do nada"
   e a lista de atividades fica vazia depois, sem ligação visível entre as duas coisas.
 
-Sugestões para quando for atacar (a decidir com a Joyce):
+**Ordem decidida com a Joyce em 2026-09-09**: (1) ACO-65 agora, bug independente; (2) ACO-66
+como próxima feature, porque sem template não existe atividade e a tela permite à psicóloga criar os
+modelos reais; (3) ACO-67 só depois, se algum template criado pela tela merecer virar padrão do
+sistema (prioridade Low, bloqueado por ACO-66). Motivo: um seed agora exigiria inventar campos
+clínicos sem validação.
+
+Sugestões originais (anteriores à decisão acima):
 
 - Curto prazo, sem código novo de template: incluir na API um seed oficial com 2 ou 3 templates
   globais (`organization_id IS NULL`), com campos definidos, para o ambiente não depender de
