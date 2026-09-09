@@ -347,7 +347,7 @@ as perguntas do fim antes de abrir branch.
   tipada do ADR 0001 só foi implementada no lado da leitura/revisão. No web da paciente,
   `pages/patient/index.vue` apenas lista as pendências; não existe a tela 19. Ou seja, mesmo com
   a biblioteca pronta o ciclo para em "paciente responde". Precisa de issue própria (API tipada +
-  tela mobile), sugerida logo depois de ACO-66.
+  tela de resposta responsiva, como toda view do projeto), sugerida logo depois de ACO-66.
 - (b) **`activity_type` está vazia** em qualquer ambiente novo (a fixture de teste insere
   `record` na mão). Criar template exige `type_id NOT NULL`. Um seed de `activity_type` é
   vocabulário do sistema, não conteúdo clínico, e por isso não entra em ACO-67: entra em ACO-66.
@@ -397,7 +397,8 @@ pré-visualização (opcional, se sobrar tempo).
 2. Editar template: nova versão só quando já houver atribuição; sem atribuição, edita no lugar.
 3. "Tipo base" continua obrigatório, como no design (decisão de rotina, sem pergunta).
 4. Criar a issue "Paciente responde atividade (API tipada + tela 19)" e priorizá-la logo depois
-   de ACO-66.
+   de ACO-66. Criada como ACO-68. A tela é uma view web responsiva, não uma tela "mobile" à parte;
+   o design só a desenha em moldura de celular.
 5. Entrega: API primeiro (PR na acolhe-api com endpoints e testes), depois web.
 
 ---
