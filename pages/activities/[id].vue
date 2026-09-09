@@ -53,8 +53,12 @@ async function markReviewed() {
     })
     toast.success('Atividade marcada como revisada.')
     await refreshNuxtData(`activity-${activityId.value}`)
-  } catch {
-    toast.error('Não foi possível concluir a revisão.')
+  } catch (error) {
+    toast.error(apiErrorMessage(error, {
+      404: 'Esta atividade ainda não tem uma resposta completa para revisar.',
+      409: 'Esta atividade já foi revisada.',
+      default: 'Não foi possível concluir a revisão agora.',
+    }))
   } finally {
     reviewing.value = false
   }

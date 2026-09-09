@@ -36,8 +36,12 @@ const onSubmit = handleSubmit(async (values) => {
     createdPatient.value = patient
     toast.success(invitationDeliveryMeta(patient.invitation?.deliveryStatus).toast)
     await refreshNuxtData('patients-list')
-  } catch {
-    toast.error('Não foi possível criar o paciente.')
+  } catch (error) {
+    toast.error(apiErrorMessage(error, {
+      400: 'Confira o nome, o e-mail e a data de nascimento.',
+      403: 'Só psicólogas com perfil ativo podem cadastrar pacientes.',
+      default: 'Não foi possível criar o paciente agora.',
+    }))
   }
 })
 

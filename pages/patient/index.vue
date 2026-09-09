@@ -31,8 +31,12 @@ async function submitCheckin() {
     mood.value = 0
     note.value = ''
     await Promise.all([checkins.refresh(), summary.refresh()])
-  } catch {
-    checkinError.value = 'Não foi possível salvar agora. Tente novamente.'
+  } catch (error) {
+    checkinError.value = apiErrorMessage(error, {
+      400: 'Escolha uma nota de 1 a 5 e, se quiser, uma observação curta.',
+      403: 'Seu vínculo ainda não está ativo para registrar check-ins.',
+      default: 'Não foi possível salvar o check-in agora. Tente novamente.',
+    })
   } finally {
     checkinSubmitting.value = false
   }

@@ -50,8 +50,11 @@ async function reissueInvitation() {
     toast.success(meta.toast)
     if (meta.showLink) await copyInvitationUrl(generated.url)
   }
-  catch {
-    toast.error('Não foi possível gerar um novo link de convite.')
+  catch (error) {
+    toast.error(apiErrorMessage(error, {
+      404: 'Não há convite pendente para esta paciente. Ela pode já ter aceitado.',
+      default: 'Não foi possível gerar um novo convite agora.',
+    }))
   }
   finally {
     isGeneratingInvitation.value = false

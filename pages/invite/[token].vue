@@ -56,8 +56,14 @@ async function accept() {
       body: { password: password.value, acceptedDocumentIds: selected.value },
     })
     completed.value = 'accepted'
-  } catch {
-    toast.error('Não foi possível concluir o aceite. Verifique se o convite ainda é válido.')
+  } catch (error) {
+    toast.error(apiErrorMessage(error, {
+      400: 'Confira a senha e os consentimentos marcados.',
+      404: 'Este convite não foi encontrado. Peça um novo link à sua psicóloga.',
+      410: 'Este convite expirou ou foi cancelado. Peça um novo link à sua psicóloga.',
+      409: 'Este convite já foi utilizado ou já existe uma conta com este e-mail. Tente entrar pela tela de login.',
+      default: 'Não foi possível concluir o aceite agora. Tente novamente em instantes.',
+    }))
   } finally {
     accepting.value = false
   }
@@ -70,8 +76,12 @@ async function decline() {
       method: 'POST',
     })
     completed.value = 'declined'
-  } catch {
-    toast.error('Não foi possível registrar a recusa.')
+  } catch (error) {
+    toast.error(apiErrorMessage(error, {
+      404: 'Este convite não foi encontrado.',
+      410: 'Este convite já não estava mais disponível.',
+      default: 'Não foi possível registrar a recusa agora.',
+    }))
   } finally {
     declining.value = false
   }
