@@ -294,6 +294,115 @@ Sugestões originais (anteriores à decisão acima):
 
 ---
 
+### C4. Requisitos para a biblioteca de templates (ACO-66) — levantamento de 2026-09-09
+
+Base para o desenho antes de codar. Nada aqui foi implementado; a Joyce valida escopo e responde
+as perguntas do fim antes de abrir branch.
+
+**Fontes consultadas**
+
+| Fonte | Onde | O que traz |
+|---|---|---|
+| Design v0.3 | `docs/design/acolhe-telas.pdf` (mesmo arquivo de `../docs/telas.pdf`): tela 11 "Biblioteca de templates" (pág. 25), tela 12 "Form builder" (págs. 27–28), tela 13 "Atribuir atividade" (págs. 29–30), tela 14 "Revisar resposta" (págs. 31–32), tela 19 "Respondendo atividade" (págs. 43–44) | Comportamento e vocabulário esperados pela psicóloga e pela paciente |
+| ERD | `../docs/erd-e-modelo-banco.md` §1.3, regra 3 da §4, decisão 4 da §10 | Invariantes: versão imutável após atribuição; tracker/check-in são templates com `recurrence_config` |
+| ADR 0001 | `acolhe-api/docs/architecture/0001-…` | Resposta tipada por campo, versão pinada, template imutável depois de atribuído |
+| Schema real | `acolhe-api/internal/db/schema.sql` (`activity_type`, `activity_template`, `activity_field`, `activity_assignment`) | Tudo que a biblioteca precisa já existe no banco |
+| Fixture de teste | `acolhe-api/internal/app/app_integration_test.go` | Único lugar do código com `field_type` concretos: `long_text`, `scale {min,max}`, `boolean`, `datetime`, `multiple_choice {options}` |
+| Issue | ACO-66 | Escopo inicial (API + tela), fora: seed (ACO-67) |
+
+**O que o design pede**
+
+- Tela 11 (biblioteca): cards com tipo base ("Escala 1–10", "Formulário", "Checklist", "Pergunta
+  aberta", "Multi-campo", "Escala pontuada", "Upload + texto"), versão (v1…v3), resumo dos campos,
+  escopo (Pessoal / Organização / Acolhe curado global), "Em uso · N pacientes"; filtros Todos /
+  Meus / Da organização / Biblioteca Acolhe; busca; grade ou lista; botão "Novo template".
+- Tela 12 (form builder): dropdown "Tipo base"; 11 tipos de campo para adicionar: Texto curto,
+  Texto longo, Escala 1–10, Escala 1–5, Múltipla escolha, Múltiplas opções, Sim/não, Data, Hora,
+  Arquivo, Tags. Cada campo tem ordem, tipo, obrigatório, pergunta (label), texto de apoio,
+  opções (nas escolhas), arrastar para reordenar e excluir. Título e instrução editáveis.
+  Configurações: Escopo (Pessoal/Organização), Recorrência padrão, Pontuação ("Sem score";
+  o score é descritivo e nunca classifica a paciente). Pré-visualização "Como o paciente verá".
+  Ações: Descartar, Salvar rascunho, Publicar v1.
+- Tela 13 (atribuir): template com versão e escopo visíveis, recorrência, início, prazo por
+  instância, fim, mensagem opcional, aviso de notificação, contagem de instâncias.
+- Tela 19 (paciente): responde pergunta a pergunta, com progresso, rascunho e "Continuar".
+
+**O que já existe no código**
+
+- Banco: `activity_type (code, name)`, `activity_template (type_id, organization_id nulo =
+  global, author_id, parent_template_id, title, description, instructions, recurrence_config,
+  scoring_config, version, is_archived)`, `activity_field (code, label, field_type, config jsonb,
+  display_order)`; `activity_assignment` pina `template_version`.
+- API: só `GET /activities/templates` (id, título, tipo, descrição, versão; exclui arquivados;
+  inclui globais). `POST /activities` atribui e pina a versão. `GET /activities/:id` devolve a
+  revisão com valores tipados (`text`, `number`, `boolean`, `datetime`, `json`, `attachment`).
+- Web: `AssignActivityDialog` já usa `CustomDropdown` para o template; item "Templates" da
+  sidebar com `disabled: true`; `schemas/activity.ts` valida os campos da revisão;
+  `types/index.ts` tem `ActivityType = 'record' | 'scale' | 'checklist' | 'checkin'`.
+
+**Lacunas encontradas (mudam a decisão)**
+
+- (a) **A paciente não consegue responder hoje.** `POST /activities/assignments/:id/responses`
+  (`Submit` em `internal/activity/service.go`) cria uma resposta vazia, sem valores; a validação
+  tipada do ADR 0001 só foi implementada no lado da leitura/revisão. No web da paciente,
+  `pages/patient/index.vue` apenas lista as pendências; não existe a tela 19. Ou seja, mesmo com
+  a biblioteca pronta o ciclo para em "paciente responde". Precisa de issue própria (API tipada +
+  tela de resposta responsiva, como toda view do projeto), sugerida logo depois de ACO-66.
+- (b) **`activity_type` está vazia** em qualquer ambiente novo (a fixture de teste insere
+  `record` na mão). Criar template exige `type_id NOT NULL`. Um seed de `activity_type` é
+  vocabulário do sistema, não conteúdo clínico, e por isso não entra em ACO-67: entra em ACO-66.
+- (c) **Não há vocabulário fechado de `field_type`** na API nem no ADR; só a fixture. A lista
+  precisa ser fixada e validada na API para builder, revisão e futura tela da paciente falarem
+  a mesma língua.
+- (d) Recorrência, pontuação, rascunho de template, "Em uso · N", filtro "Biblioteca Acolhe" e
+  escopo Organização não existem na API. `recurrence_config`/`scoring_config` são só colunas;
+  nenhum job materializa instâncias.
+- (e) O design pressupõe clínica (escopo Organização); hoje toda organização é "solo" (ERD §3.1)
+  e workspaces são ACO-64, em backlog.
+
+**Proposta de escopo MVP para ACO-66 (a validar)**
+
+Dentro:
+
+1. Migration com seed de `activity_type`: `record` (Formulário), `scale` (Escala),
+   `checklist` (Checklist), `checkin` (Check-in). São os quatro que o web já conhece.
+2. Vocabulário de `field_type` fechado e validado na API, com `config` por tipo:
+   `short_text {maxLength}`, `long_text {maxLength}`, `scale {min, max, minLabel?, maxLabel?}`,
+   `single_choice {options[]}`, `multiple_choice {options[]}`, `boolean`, `date`, `datetime`.
+   Todo campo tem `code` (gerado a partir do label), `label`, `helpText?` (em `config`),
+   `required` (em `config`), `display_order`. Cobre 9 dos 11 tipos do design (Escala 1–10 e 1–5
+   são `scale` com `max` diferente; "Hora" vira `datetime`). Ficam de fora por enquanto
+   **Arquivo** (exige upload) e **Tags**.
+3. API: `POST /activities/templates` (título, descrição, instruções, `typeCode`, campos);
+   `GET /activities/templates/:id` (com campos); `PUT /activities/templates/:id` (se o template
+   já foi atribuído, cria nova versão com `parent_template_id` e a lista passa a mostrar só a
+   versão mais recente da linhagem; se nunca foi atribuído, edita no lugar);
+   `POST /activities/templates/:id/archive`. Só a autora edita ou arquiva; templates globais
+   (`organization_id IS NULL`) são somente leitura. Isolamento por organização e testes
+   multi-tenant como nos outros domínios.
+4. Web: `/templates` (cards como na tela 11: tipo, versão, resumo dos campos, origem
+   "Meu"/"Acolhe"; busca; filtros Todos / Meus / Biblioteca Acolhe), `/templates/novo` e
+   `/templates/:id/editar` com o builder da tela 12 (título, instrução, adicionar campo por tipo,
+   reordenar, obrigatório, opções, excluir), arquivar com confirmação, item da sidebar
+   destravado. Dropdown de "Atribuir atividade" passa a mostrar a versão. Tudo com componentes
+   de `components/ui/` (A1–A3), mobile (A4), erros em português (A6).
+
+Fora (por agora): recorrência e "N instâncias", pontuação, rascunho de template (publica
+direto), "Em uso · N pacientes", escopo Organização (até ACO-64), campos Arquivo e Tags,
+pré-visualização (opcional, se sobrar tempo).
+
+**Decisões da Joyce (2026-09-09)**
+
+1. Os 8 tipos de campo bastam para o MVP. Arquivo e Tags ficam para depois.
+2. Editar template: nova versão só quando já houver atribuição; sem atribuição, edita no lugar.
+3. "Tipo base" continua obrigatório, como no design (decisão de rotina, sem pergunta).
+4. Criar a issue "Paciente responde atividade (API tipada + tela 19)" e priorizá-la logo depois
+   de ACO-66. Criada como ACO-68. A tela é uma view web responsiva, não uma tela "mobile" à parte;
+   o design só a desenha em moldura de celular.
+5. Entrega: API primeiro (PR na acolhe-api com endpoints e testes), depois web.
+
+---
+
 ## Parte D — Ambientes e como testar (decisão de 2026-09-09)
 
 | Ambiente | Web | API | Login de psicóloga |
