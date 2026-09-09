@@ -166,8 +166,16 @@ horário, 5xx indisponível.
 
 ### B6. Auditoria de mobile nas telas existentes — regra A4
 
-Ainda sem levantamento. Todas as telas em `pages/` precisam ser conferidas em viewport de
-celular quando este item for pedido.
+**Shell feito em 2026-09-09** (branch `feat/mobile-shell`): abaixo de `md` a sidebar vira um
+menu lateral (`Sheet`) aberto por botão numa barra superior; `PageHeader` e os containers de
+página usam `px-4` no celular e `px-8` a partir de `md`; `DialogContent` cabe na tela
+(`w-[calc(100%-2rem)]`, altura máxima com rolagem); ações da ficha do paciente ficam só com
+ícone abaixo de `sm`. Conferido em 390px: dashboard, pacientes, ficha, sessões, atividades,
+`/invite`, `/patient`; sem rolagem horizontal.
+
+Pendente de auditoria fina: `pages/sessions/[id]`, `pages/activities/[id]`, tela de aceite com
+muitos documentos, e comportamento dos popovers (calendário/dropdown) em telas muito estreitas
+(&lt; 360px).
 
 ---
 

@@ -33,7 +33,7 @@ const grouped = computed(() => {
     </template>
   </PageHeader>
 
-  <div class="px-8 py-8">
+  <div class="px-4 py-6 md:px-8 md:py-8">
     <div v-if="grouped.length" class="flex flex-col gap-8">
       <section v-for="[day, rows] in grouped" :key="day" class="flex flex-col gap-3">
         <p class="label-mono">{{ day }}</p>

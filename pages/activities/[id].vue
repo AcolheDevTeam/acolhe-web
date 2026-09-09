@@ -65,8 +65,9 @@ async function markReviewed() {
   <PageHeader>
     <template #title>
       <nav class="flex items-center gap-2 text-sm text-muted-foreground">
-        <NuxtLink to="/patients" class="hover:text-foreground">Pacientes</NuxtLink>
-        <span>/</span>
+        <!-- No celular só o trecho final do caminho aparece. -->
+        <NuxtLink to="/patients" class="hidden hover:text-foreground sm:inline">Pacientes</NuxtLink>
+        <span class="hidden sm:inline">/</span>
         <NuxtLink
           v-if="activity?.patientId"
           :to="`/patients/${activity.patientId}/activities`"
@@ -91,7 +92,7 @@ async function markReviewed() {
     </template>
   </PageHeader>
 
-  <div class="mx-auto w-full max-w-3xl px-8 py-8">
+  <div class="mx-auto w-full max-w-3xl px-4 py-6 md:px-8 md:py-8">
     <div v-if="activity" class="flex flex-col gap-7">
       <div class="flex flex-col gap-2">
         <div class="flex items-center gap-3">
