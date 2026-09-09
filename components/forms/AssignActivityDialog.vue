@@ -41,7 +41,10 @@ const templateOptions = computed(() =>
   (templates.value ?? []).map(template => ({
     value: template.id,
     label: template.title,
-    description: template.description ?? undefined,
+    // Versão visível como na tela 13 do design ("v2 · Pessoal").
+    description: [`v${template.version}`, templateOriginLabel(template), template.description]
+      .filter(Boolean)
+      .join(' · '),
   })),
 )
 // Prazo só faz sentido de hoje em diante.
