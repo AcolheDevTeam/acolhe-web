@@ -33,7 +33,7 @@ const onSubmit = handleSubmit(async (values) => {
   try {
     const patient = await $fetch<Patient>('/api/patients', { method: 'POST', body: values })
     createdPatient.value = patient
-    toast.success('Convite pronto para compartilhar.')
+    toast.success(invitationDeliveryMeta(patient.invitation?.deliveryStatus).toast)
     await refreshNuxtData('patients-list')
   } catch {
     toast.error('Não foi possível criar o paciente.')
@@ -123,8 +123,13 @@ watch(open, (isOpen) => {
 
         <div class="rounded-lg border bg-muted/40 p-3">
           <p class="label-mono mb-2">Próximo passo</p>
-          <p class="mb-3 text-sm text-muted-foreground">
-            Envie este link manualmente para {{ createdPatient.invitation?.email }}.
+          <p
+            class="mb-3 text-sm"
+            :class="invitationDeliveryMeta(createdPatient.invitation?.deliveryStatus).tone === 'warning'
+              ? 'text-warning'
+              : 'text-muted-foreground'"
+          >
+            {{ invitationDeliveryMeta(createdPatient.invitation?.deliveryStatus).detail(createdPatient.invitation?.email) }}
           </p>
           <div class="flex gap-2">
             <Input :model-value="createdPatient.invitation?.url" readonly class="min-w-0 text-xs" />

@@ -14,6 +14,7 @@ export default defineEventHandler(async (event) => {
   return {
     email: invitation.email,
     expiresAt: invitation.expiresAt,
+    deliveryStatus: invitation.deliveryStatus,
     url: `${origin}/invite/${encodeURIComponent(invitation.token)}`,
   } satisfies PatientInvitation
 })
