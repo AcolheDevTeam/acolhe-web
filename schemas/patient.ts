@@ -29,10 +29,14 @@ export const patientSchema = z.object({
   createdAt: z.string().datetime({ offset: true }),
 }).passthrough()
 
+export const invitationDeliveryStatusSchema = z.enum(['sent', 'failed', 'disabled'])
+
 export const patientInvitationAPISchema = z.object({
   token: z.string().regex(/^[A-Za-z0-9_-]{43}$/),
   email: z.string().email(),
   expiresAt: z.string().datetime({ offset: true }),
+  // APIs anteriores ao envio por e-mail não informam o campo: tratar como desabilitado.
+  deliveryStatus: invitationDeliveryStatusSchema.default('disabled'),
 })
 
 export const createdPatientAPISchema = patientSchema.extend({

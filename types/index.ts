@@ -59,10 +59,15 @@ export interface Organization {
 export type PatientStatus = 'active' | 'onboarding' | 'archived'
 export type RelationshipStatus = 'pending' | 'active' | 'paused' | 'ended' | 'transferred'
 
+// Resultado do envio do convite por e-mail, informado pela API. O link existe
+// sempre: é o fallback quando o e-mail não sai.
+export type InvitationDeliveryStatus = 'sent' | 'failed' | 'disabled'
+
 export interface PatientInvitation {
   email: string
   url: string
   expiresAt: string
+  deliveryStatus: InvitationDeliveryStatus
 }
 
 export interface Patient {

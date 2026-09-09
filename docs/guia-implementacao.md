@@ -173,4 +173,42 @@ celular quando este item for pedido.
 
 ## Parte C — Itens ainda não registrados
 
-_(a preencher conforme a revisão da Joyce continuar)_
+### C1. Paciente não consegue entrar após aceitar o convite — apontado em 2026-09-09
+
+Diagnóstico (main/develop de 2026-09-09): link, aceite e login funcionam. O que quebra é o
+pós-login: `pages/login.vue` sempre navega para `/dashboard`, e o middleware
+`psychologist-only` redireciona quem não é psicólogo para `/dashboard` de novo, gerando loop
+de redirecionamento e erro 500. Como o `navigateTo` está dentro do mesmo `try` da chamada de
+login, a falha de navegação cai no `catch` e a tela mostra "E-mail ou senha inválidos", mesmo
+com a senha correta (login na API responde 200). Exemplo concreto da regra A6: mensagem
+genérica escondendo a causa real. Não corrigir em `pages/login.vue` fora do PR #16, que já
+altera esse arquivo (evitar conflito).
+
+**Resolvido em 2026-09-09** com o merge do PR #17 (acolhe-api, contexto e endpoints do
+paciente) e do PR #16 (acolhe-web, redirecionamento por papel, layout e home em `/patient`).
+Verificado localmente: criar paciente, aceitar convite, logar pela tela e cair em `/patient`;
+paciente barrada em `/api/patients` (403) e em `/dashboard` (redireciona para `/patient`).
+
+### C2. Substituir o envio manual do convite por e-mail transacional — apontado em 2026-09-09
+
+- Hoje o diálogo "Novo paciente" só mostra o link para copiar ("mock" de envio).
+- Requisito: serviço gratuito por enquanto, usando o e-mail pessoal da Joyce como remetente, e
+  depois trocar por um domínio pago sem reescrever o envio.
+- Implementação já em andamento: PR #18 da acolhe-api (ACO-55, entrega por SMTP com
+  `SMTP_HOST`, `SMTP_PORT`, `SMTP_USERNAME`, `SMTP_PASSWORD`, `SMTP_FROM`, `FRONTEND_URL`) e
+  PR #15 do acolhe-web (ACO-57, status real de entrega e fallback de cópia).
+- Provedor escolhido: **Brevo** via SMTP (`smtp-relay.brevo.com:587`, STARTTLS), remetente
+  pessoal verificado; depois troca para domínio próprio só mudando `SMTP_FROM`.
+- Revisão de 2026-09-09: PR #18 (API) devolvia 503 e fazia rollback do paciente quando o
+  e-mail falhava, sem link de fallback, e não enviava no reenvio; PR #15 (web) chamava rotas
+  `/invites` inexistentes e removia a lista de documentos de consentimento (quebra o aceite e a
+  tela da Figura 3). Ambos fechados; refeitos em novos PRs a partir de `develop`.
+- Regras para a implementação: criar o paciente sempre; tentar enviar; devolver
+  `deliveryStatus` (`sent`/`failed`/`disabled`) e manter o link copiável; enviar também no
+  reenvio; texto do e-mail em português com nome da psicóloga, validade e link; nunca registrar
+  o token em log.
+- **Feito em 2026-09-09**: PR #20 da acolhe-api (pacote `internal/mailer`, envio na criação e no
+  reenvio, `FRONTEND_URL`) e PR do acolhe-web na branch `feat/aco-57-convite-email-web`
+  (`deliveryStatus` no BFF, textos únicos em `utils/invitation.ts`, entrada `/invite`). Envio real
+  verificado com Brevo. Observação operacional: usar `smtp-relay.sendinblue.com:587`, porque o
+  certificado TLS do Brevo é emitido para esse nome.

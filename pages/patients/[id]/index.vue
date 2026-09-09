@@ -42,6 +42,7 @@ async function generateAndCopyInvitation() {
       method: 'POST',
     })
     invitation.value = generated
+    toast.success(invitationDeliveryMeta(generated.deliveryStatus).toast)
     await copyInvitationUrl(generated.url)
   }
   catch {
@@ -154,8 +155,13 @@ const identity = computed(() => {
             <Copy v-else />
           </Button>
         </div>
-        <p v-if="invitation" class="text-xs text-muted-foreground">
-          Válido até {{ formatDateTime(invitation.expiresAt) }}.
+        <p
+          v-if="invitation"
+          class="text-xs"
+          :class="invitationDeliveryMeta(invitation.deliveryStatus).tone === 'warning' ? 'text-warning' : 'text-muted-foreground'"
+        >
+          {{ invitationDeliveryMeta(invitation.deliveryStatus).short }} Válido até {{ formatDateTime(invitation.expiresAt) }}.
+          O link anterior deixou de valer.
         </p>
       </div>
     </div>
