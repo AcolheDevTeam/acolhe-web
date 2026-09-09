@@ -6,11 +6,19 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import type { PatientInvitation } from '~/types'
 
+type InvitationDocument = {
+  id: string
+  title: string
+  content: string
+  required: boolean
+}
+type InvitationPage = PatientInvitation & { documents: InvitationDocument[] }
+
 definePageMeta({ layout: 'auth' })
 
 const route = useRoute()
 const token = computed(() => route.params.token as string)
-const { data: invitation, status, error } = await useFetch<PatientInvitation>(
+const { data: invitation, status, error } = await useFetch<InvitationPage>(
   () => `/api/invites/${encodeURIComponent(token.value)}`,
   {
     server: false,
@@ -20,18 +28,25 @@ const { data: invitation, status, error } = await useFetch<PatientInvitation>(
 )
 const password = ref('')
 const confirmation = ref('')
-const consent = ref(false)
+const acceptedDocuments = ref<Record<string, boolean>>({})
 const accepting = ref(false)
 const completed = ref(false)
 const acceptError = ref('')
-const canAccept = computed(() => consent.value && password.value.length >= 8 && password.value === confirmation.value)
+const acceptedDocumentIds = computed(() => Object.entries(acceptedDocuments.value).filter(([, accepted]) => accepted).map(([id]) => id))
+const canAccept = computed(() => {
+  const requiredAccepted = invitation.value?.documents.every(document => !document.required || acceptedDocuments.value[document.id])
+  return Boolean(requiredAccepted) && password.value.length >= 8 && password.value === confirmation.value
+})
 
 async function accept() {
   if (!canAccept.value) return
   accepting.value = true
   acceptError.value = ''
   try {
-    await $fetch(`/api/invites/${encodeURIComponent(token.value)}/accept`, { method: 'POST', body: { password: password.value } })
+    await $fetch(`/api/onboarding/invitations/${encodeURIComponent(token.value)}/accept`, {
+      method: 'POST',
+      body: { password: password.value, acceptedDocumentIds: acceptedDocumentIds.value },
+    })
     completed.value = true
   } catch {
     acceptError.value = 'Não foi possível concluir. O convite pode ter expirado ou já ter sido utilizado.'
@@ -61,10 +76,16 @@ async function accept() {
           <Button class="mt-6" as-child><NuxtLink to="/login">Entrar</NuxtLink></Button>
         </div>
         <form v-else class="flex flex-col gap-6" @submit.prevent="accept">
-          <div><p class="label-mono">Convite</p><h1 class="mt-2 font-serif text-3xl">Crie sua senha de acesso.</h1><p class="mt-2 text-sm text-muted-foreground">Leia as orientações do consultório e confirme para continuar.</p></div>
+           <div><p class="label-mono">Convite</p><h1 class="mt-2 font-serif text-3xl">Crie sua senha de acesso.</h1><p class="mt-2 text-sm text-muted-foreground">Leia as orientações do consultório e confirme para continuar.</p></div>
+           <section class="flex flex-col gap-4" aria-labelledby="consent-heading">
+             <h2 id="consent-heading" class="font-medium">Documentos e consentimentos</h2>
+             <label v-for="document in invitation.documents" :key="document.id" class="flex items-start gap-3 text-sm">
+               <input v-model="acceptedDocuments[document.id]" type="checkbox" class="mt-1 rounded border-input">
+               <span><span class="font-medium">{{ document.title }}</span><span v-if="document.required" class="text-muted-foreground"> (obrigatório)</span><span class="mt-1 block text-muted-foreground">{{ document.content }}</span></span>
+             </label>
+           </section>
           <div class="flex flex-col gap-1.5"><Label for="password">Senha</Label><Input id="password" v-model="password" type="password" autocomplete="new-password" /></div>
           <div class="flex flex-col gap-1.5"><Label for="confirmation">Confirme a senha</Label><Input id="confirmation" v-model="confirmation" type="password" autocomplete="new-password" /></div>
-          <label class="flex items-start gap-3 text-sm"><input v-model="consent" type="checkbox" class="mt-1 rounded border-input"><span>Li as orientações de privacidade e autorizo o vínculo com o consultório.</span></label>
           <p v-if="acceptError" class="text-sm text-destructive" role="alert">{{ acceptError }}</p>
           <Button type="submit" :disabled="!canAccept || accepting">{{ accepting ? 'Criando conta…' : 'Aceitar e criar conta' }}</Button>
           <p class="text-center text-xs text-muted-foreground">Válido até {{ formatDateTime(invitation.expiresAt) }}.</p>
