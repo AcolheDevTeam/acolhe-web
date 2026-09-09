@@ -7,6 +7,47 @@ export interface User {
   organizationId: string | null
   name?: string
   crp?: string
+  patient?: PatientContext
+}
+
+export interface PatientContext {
+  id: string
+  fullName: string
+  relationshipStatus: string
+  consented: boolean
+}
+
+export interface PatientPortalContext extends PatientContext {
+  patientId: string
+}
+
+export interface PatientNextSession {
+  id: string
+  scheduledFor: string
+  durationMinutes: number
+  modality: string
+  status: string
+}
+
+export interface PatientPendingActivity {
+  id: string
+  title: string
+  status: string
+  scheduledFor?: string | null
+  dueAt?: string | null
+}
+
+export interface PatientCheckin {
+  id: string
+  mood: number
+  note?: string | null
+  createdAt: string
+}
+
+export interface PatientProcessSummary {
+  sessionCount: number
+  pendingActivityCount: number
+  checkinCount: number
 }
 
 export interface Organization {

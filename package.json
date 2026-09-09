@@ -10,7 +10,8 @@
     "build": "nuxt build",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
-    "typecheck": "nuxt typecheck"
+    "typecheck": "nuxt typecheck",
+    "test": "vitest run"
   },
   "dependencies": {
     "@internationalized/date": "^3.12.4",
@@ -37,6 +38,7 @@
     "@types/node": "^26.0.1",
     "tailwindcss": "3.4.19",
     "typescript": "^6.0.3",
+    "vitest": "^3.2.7",
     "vue-tsc": "^2.1.10"
   }
 }
