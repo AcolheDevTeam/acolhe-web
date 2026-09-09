@@ -3,7 +3,7 @@ import { toTypedSchema } from '@vee-validate/zod'
 import { useForm } from 'vee-validate'
 import { toast } from 'vue-sonner'
 import { createPatientSchema } from '~/schemas/patient'
-import type { Patient } from '~/types'
+import type { PatientInvitationResult } from '~/types'
 import { Check, Copy, Mail } from 'lucide-vue-next'
 import {
   Dialog,
@@ -19,8 +19,14 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 
 const open = ref(false)
-const createdPatient = ref<Patient>()
+const createdResult = ref<PatientInvitationResult>()
 const copied = ref(false)
+
+function deliveryMessage(status: string) {
+  if (status === 'sent') return 'O convite foi enviado por e-mail.'
+  if (status === 'queued') return 'O convite foi colocado na fila de envio.'
+  return 'O e-mail não foi enviado.'
+}
 
 const { handleSubmit, isSubmitting, resetForm } = useForm({
   validationSchema: toTypedSchema(createPatientSchema),
@@ -28,9 +34,9 @@ const { handleSubmit, isSubmitting, resetForm } = useForm({
 
 const onSubmit = handleSubmit(async (values) => {
   try {
-    const patient = await $fetch<Patient>('/api/patients', { method: 'POST', body: values })
-    createdPatient.value = patient
-    toast.success('Convite pronto para compartilhar.')
+    const result = await $fetch<PatientInvitationResult>('/api/patients', { method: 'POST', body: values })
+    createdResult.value = result
+    toast.success(deliveryMessage(result.invitation.deliveryStatus))
     await refreshNuxtData('patients-list')
   } catch {
     toast.error('Não foi possível criar o paciente.')
@@ -38,7 +44,7 @@ const onSubmit = handleSubmit(async (values) => {
 })
 
 async function copyInvitation() {
-  const url = createdPatient.value?.invitation?.url
+  const url = createdResult.value?.copyLink
   if (!url) return
   await navigator.clipboard.writeText(url)
   copied.value = true
@@ -47,7 +53,7 @@ async function copyInvitation() {
 
 watch(open, (isOpen) => {
   if (isOpen) return
-  createdPatient.value = undefined
+  createdResult.value = undefined
   copied.value = false
   resetForm()
 })
@@ -59,14 +65,14 @@ watch(open, (isOpen) => {
       <slot />
     </DialogTrigger>
     <DialogContent class="sm:max-w-md">
-      <DialogHeader v-if="!createdPatient">
+      <DialogHeader v-if="!createdResult">
         <DialogTitle class="font-serif text-2xl font-normal">Novo paciente</DialogTitle>
         <DialogDescription>
           Cadastre os dados básicos para iniciar o acompanhamento.
         </DialogDescription>
       </DialogHeader>
 
-      <form v-if="!createdPatient" class="flex flex-col gap-4" @submit="onSubmit">
+      <form v-if="!createdResult" class="flex flex-col gap-4" @submit="onSubmit">
         <FormField v-slot="{ componentField }" name="fullName">
           <FormItem>
             <FormLabel>Nome completo</FormLabel>
@@ -109,17 +115,17 @@ watch(open, (isOpen) => {
           </div>
           <DialogTitle class="font-serif text-2xl font-normal">Convite pronto</DialogTitle>
           <DialogDescription>
-            {{ createdPatient.fullName }} ficará em onboarding até aceitar o consentimento e criar a conta.
+             {{ createdResult.patient.fullName }} ficará em onboarding até aceitar o consentimento e criar a conta.
           </DialogDescription>
         </DialogHeader>
 
         <div class="rounded-lg border bg-muted/40 p-3">
           <p class="label-mono mb-2">Próximo passo</p>
           <p class="mb-3 text-sm text-muted-foreground">
-            Envie este link manualmente para {{ createdPatient.invitation?.email }}.
+             {{ deliveryMessage(createdResult.invitation.deliveryStatus) }} Se necessário, copie o link abaixo.
           </p>
           <div class="flex gap-2">
-            <Input :model-value="createdPatient.invitation?.url" readonly class="min-w-0 text-xs" />
+             <Input :model-value="createdResult.copyLink" readonly class="min-w-0 text-xs" />
             <Button type="button" variant="outline" size="icon" aria-label="Copiar convite" @click="copyInvitation">
               <Check v-if="copied" />
               <Copy v-else />

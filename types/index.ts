@@ -19,9 +19,17 @@ export type PatientStatus = 'active' | 'onboarding' | 'archived'
 export type RelationshipStatus = 'pending' | 'active' | 'paused' | 'ended' | 'transferred'
 
 export interface PatientInvitation {
-  email: string
-  url: string
-  expiresAt: string
+	id: string
+	status: 'pending' | 'accepted' | 'expired' | 'revoked' | string
+	deliveryStatus: 'queued' | 'sending' | 'sent' | 'failed' | string
+	expiresAt: string
+	copyLink?: string
+}
+
+export interface PatientInvitationResult {
+	patient: Patient
+	invitation: PatientInvitation
+	copyLink: string
 }
 
 export interface Patient {

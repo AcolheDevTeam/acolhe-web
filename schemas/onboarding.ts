@@ -25,6 +25,10 @@ export const invitationSchema = z.object({
 })
 
 export const acceptInvitationSchema = z.object({
-  password: z.string().min(8).max(72),
-  acceptedDocumentIds: z.string().uuid().array().min(1),
+	password: z.string().min(8).max(72),
+	acceptedDocumentIds: z.string().uuid().array().min(1),
+})
+
+export const acceptInvitationPasswordSchema = z.object({
+	password: z.string().min(8).max(72),
 })

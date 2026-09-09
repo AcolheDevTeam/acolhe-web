@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Separator } from '@/components/ui/separator'
-import type { PatientInvitation } from '~/types'
+import type { PatientInvitationResult } from '~/types'
 
 definePageMeta({ middleware: ['auth', 'psychologist-only'] })
 
@@ -18,9 +18,15 @@ const isActive = computed(() =>
   patient.value?.status === 'active' && patient.value?.relationshipStatus === 'active',
 )
 const isPending = computed(() => patient.value?.relationshipStatus === 'pending')
-const invitation = ref<PatientInvitation>()
+const invitation = ref<PatientInvitationResult>()
 const isGeneratingInvitation = ref(false)
 const invitationCopied = ref(false)
+
+function invitationMessage(status: string) {
+  if (status === 'sent') return 'E-mail enviado.'
+  if (status === 'queued') return 'E-mail na fila de envio.'
+  return 'E-mail não enviado; use o link copiado.'
+}
 
 async function copyInvitationUrl(url: string) {
   try {
@@ -38,11 +44,11 @@ async function generateAndCopyInvitation() {
   isGeneratingInvitation.value = true
   invitationCopied.value = false
   try {
-    const generated = await $fetch<PatientInvitation>(`/api/patients/${patientId.value}/invitation`, {
+    const generated = await $fetch<PatientInvitationResult>(`/api/patients/${patientId.value}/invitation`, {
       method: 'POST',
     })
     invitation.value = generated
-    await copyInvitationUrl(generated.url)
+    await copyInvitationUrl(generated.copyLink)
   }
   catch {
     toast.error('Não foi possível gerar um novo link de convite.')
@@ -142,20 +148,20 @@ const identity = computed(() => {
           Copiar convite
         </Button>
         <div v-else class="flex w-full gap-2">
-          <Input :model-value="invitation.url" readonly class="min-w-0 text-xs" />
+          <Input :model-value="invitation.copyLink" readonly class="min-w-0 text-xs" />
           <Button
             type="button"
             variant="outline"
             size="icon"
             aria-label="Copiar convite"
-            @click="copyInvitationUrl(invitation.url)"
+           @click="copyInvitationUrl(invitation.copyLink)"
           >
             <Check v-if="invitationCopied" />
             <Copy v-else />
           </Button>
         </div>
         <p v-if="invitation" class="text-xs text-muted-foreground">
-          Válido até {{ formatDateTime(invitation.expiresAt) }}.
+           {{ invitationMessage(invitation.invitation.deliveryStatus) }} Válido até {{ formatDateTime(invitation.invitation.expiresAt) }}.
         </p>
       </div>
     </div>
