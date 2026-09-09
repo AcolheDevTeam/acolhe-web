@@ -391,17 +391,14 @@ Fora (por agora): recorrência e "N instâncias", pontuação, rascunho de templ
 direto), "Em uso · N pacientes", escopo Organização (até ACO-64), campos Arquivo e Tags,
 pré-visualização (opcional, se sobrar tempo).
 
-**Perguntas para a Joyce decidir**
+**Decisões da Joyce (2026-09-09)**
 
-1. O conjunto de 8 tipos de campo acima serve para o MVP, ou algum dos excluídos (Arquivo,
-   Tags) é indispensável?
-2. Editar template: nova versão só quando já houver atribuição (proposta), ou sempre?
-3. "Tipo base" (Formulário/Escala/Checklist/Check-in) continua obrigatório como no design, ou
-   deriva dos campos?
-4. Criar agora a issue da lacuna (a), "Paciente responde atividade (API tipada + tela 19)", e
-   colocá-la logo depois de ACO-66?
-5. Ordem de entrega: API primeiro (branch na acolhe-api) e depois web, ou as duas em paralelo
-   com contrato acordado antes?
+1. Os 8 tipos de campo bastam para o MVP. Arquivo e Tags ficam para depois.
+2. Editar template: nova versão só quando já houver atribuição; sem atribuição, edita no lugar.
+3. "Tipo base" continua obrigatório, como no design (decisão de rotina, sem pergunta).
+4. Criar a issue "Paciente responde atividade (API tipada + tela 19)" e priorizá-la logo depois
+   de ACO-66.
+5. Entrega: API primeiro (PR na acolhe-api com endpoints e testes), depois web.
 
 ---
 
