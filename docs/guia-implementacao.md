@@ -391,6 +391,22 @@ Fora (por agora): recorrência e "N instâncias", pontuação, rascunho de templ
 direto), "Em uso · N pacientes", escopo Organização (até ACO-64), campos Arquivo e Tags,
 pré-visualização (opcional, se sobrar tempo).
 
+**Entregue em 2026-09-09**
+
+- API: PR #24 da acolhe-api (merged em `develop`, publicado em staging). Contrato em
+  `acolhe-api/docs/activity-templates.md`.
+- Web: branch `feat/aco-66-templates-web`. Rotas `/templates` (lista com busca e filtros Todos /
+  Meus / Biblioteca Acolhe), `/templates/new` e `/templates/:id` (builder; abre em leitura quando
+  não editável, com o motivo explicado). Caminhos em inglês seguem a convenção das rotas
+  existentes (`/patients`, `/sessions`). Componentes novos e reutilizáveis: `TemplateCard`,
+  `forms/TemplateForm`, `forms/TemplateFieldEditor`, `forms/ArchiveTemplateDialog`. Sidebar
+  destravada; dropdown de "Atribuir atividade" mostra "vN · Meu". Validação Zod em português
+  espelhando os limites da API; os 400 da API (já em português e com a posição do campo) são
+  exibidos como vieram. Conferido em 390px e 1280px contra a API de staging; RPD de exemplo
+  criado em staging (7 campos) para testes.
+- Reordenação de campos por setas (subir/descer) em vez de arrastar: funciona no celular e não
+  exige biblioteca nova. Arrastar pode entrar depois, se fizer falta.
+
 **Decisões da Joyce (2026-09-09)**
 
 1. Os 8 tipos de campo bastam para o MVP. Arquivo e Tags ficam para depois.
