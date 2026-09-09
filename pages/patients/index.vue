@@ -64,7 +64,7 @@ function open(id: string) {
     </template>
   </PageHeader>
 
-  <div class="px-8 py-8">
+  <div class="px-4 py-6 md:px-8 md:py-8">
     <Tabs default-value="active">
       <TabsList>
         <TabsTrigger v-for="t in tabs" :key="t.value" :value="t.value">

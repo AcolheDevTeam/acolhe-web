@@ -56,18 +56,20 @@ const meta = computed(() => {
     <template #actions>
       <Badge v-if="patient && !isActive" variant="secondary" class="gap-1.5">
         <Clock3 class="size-3" />
-        Aguardando consentimento
+        <span class="hidden sm:inline">Aguardando consentimento</span>
+        <span class="sm:hidden">Pendente</span>
       </Badge>
+      <!-- No celular os botões ficam só com ícone para não cobrir o título. -->
       <NewSessionDialog v-if="isActive" :patient-id="patientId">
-        <Button variant="outline" size="sm">
+        <Button variant="outline" size="sm" aria-label="Nova sessão">
           <FileText />
-          Nova sessão
+          <span class="hidden sm:inline">Nova sessão</span>
         </Button>
       </NewSessionDialog>
       <AssignActivityDialog v-if="isActive" :patient-id="patientId">
-        <Button variant="outline" size="sm">
+        <Button variant="outline" size="sm" aria-label="Atribuir atividade">
           <Plus />
-          Atribuir atividade
+          <span class="hidden sm:inline">Atribuir atividade</span>
         </Button>
       </AssignActivityDialog>
       <DropdownMenu v-if="isActive">
@@ -86,7 +88,7 @@ const meta = computed(() => {
     </template>
   </PageHeader>
 
-  <div class="px-8 py-8">
+  <div class="px-4 py-6 md:px-8 md:py-8">
     <!-- Perfil -->
     <div class="flex items-start gap-4">
       <Avatar class="size-16">

@@ -13,9 +13,10 @@ const { data: session } = useSession(sessionId)
 <template>
   <PageHeader>
     <template #title>
-      <nav class="flex items-center gap-2 text-sm text-muted-foreground">
-        <NuxtLink to="/patients" class="hover:text-foreground">Pacientes</NuxtLink>
-        <span>/</span>
+      <nav class="flex min-w-0 items-center gap-2 text-sm text-muted-foreground">
+        <!-- No celular só o trecho final do caminho aparece. -->
+        <NuxtLink to="/patients" class="hidden hover:text-foreground sm:inline">Pacientes</NuxtLink>
+        <span class="hidden sm:inline">/</span>
         <NuxtLink
           v-if="session?.patientId"
           :to="`/patients/${session.patientId}/sessions`"
@@ -24,7 +25,7 @@ const { data: session } = useSession(sessionId)
           {{ session?.patientName ?? 'Paciente' }}
         </NuxtLink>
         <span>/</span>
-        <span class="font-medium text-foreground">Prontuário</span>
+        <span class="min-w-0 truncate font-medium text-foreground">Prontuário</span>
       </nav>
     </template>
     <template #actions>
@@ -39,7 +40,7 @@ const { data: session } = useSession(sessionId)
     </template>
   </PageHeader>
 
-  <div class="mx-auto w-full max-w-2xl px-8 py-8">
+  <div class="mx-auto w-full max-w-2xl px-4 py-6 md:px-8 md:py-8">
     <div v-if="session" class="flex flex-col gap-6">
       <div class="flex flex-col gap-1">
         <h1 class="display-serif text-3xl">
