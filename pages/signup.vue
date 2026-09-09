@@ -12,28 +12,28 @@ definePageMeta({ layout: 'auth' })
 const steps = ['Conta', 'CRP', 'Perfil', 'Termos']
 const step = ref(0)
 const submitError = ref('')
-const proofFile = ref<File | null>(null)
-const proofError = ref('')
 
 const { defineField, errors, handleSubmit, isSubmitting, validateField } = useForm({
   validationSchema: toTypedSchema(signupSchema),
-  initialValues: { termsVersion: signupTermsVersion, acceptTerms: false },
+  initialValues: { termsVersion: signupTermsVersion, privacyVersion: signupTermsVersion, acceptTerms: false, acceptPrivacy: false },
 })
 
 const [email, emailAttrs] = defineField('email')
 const [password, passwordAttrs] = defineField('password')
+const [confirmPassword, confirmPasswordAttrs] = defineField('confirmPassword')
 const [fullName, fullNameAttrs] = defineField('fullName')
 const [crpNumber, crpNumberAttrs] = defineField('crpNumber')
 const [crpState, crpStateAttrs] = defineField('crpState')
 const [cpf, cpfAttrs] = defineField('cpf')
 const [approach, approachAttrs] = defineField('approach')
 const [acceptTerms, acceptTermsAttrs] = defineField('acceptTerms')
+const [acceptPrivacy, acceptPrivacyAttrs] = defineField('acceptPrivacy')
 
 const fieldsByStep = [
-  ['email', 'password'],
+  ['email', 'password', 'confirmPassword'],
   ['crpNumber', 'crpState', 'cpf'],
   ['fullName', 'approach'],
-  ['acceptTerms'],
+  ['acceptTerms', 'acceptPrivacy'],
 ] as const
 
 async function nextStep() {
@@ -46,25 +46,11 @@ function previousStep() {
   submitError.value = ''
 }
 
-function onProofSelected(event: Event) {
-  proofError.value = ''
-  const file = (event.target as HTMLInputElement).files?.[0]
-  if (!file) {
-    proofFile.value = null
-    return
-  }
-  if (!['application/pdf', 'image/jpeg', 'image/png'].includes(file.type) || file.size > 5 * 1024 * 1024) {
-    proofFile.value = null
-    proofError.value = 'Envie JPG, PNG ou PDF de até 5 MB.'
-    return
-  }
-  proofFile.value = file
-}
-
 const onSubmit = handleSubmit(async (values) => {
   submitError.value = ''
+  const { confirmPassword: _confirmPassword, ...apiPayload } = values
   try {
-    await $fetch('/api/signup', { method: 'POST', body: values })
+    await $fetch('/api/signup', { method: 'POST', body: apiPayload })
     await navigateTo('/dashboard')
   } catch (error: unknown) {
     const status = (error as { statusCode?: number }).statusCode
@@ -109,6 +95,11 @@ const onSubmit = handleSubmit(async (values) => {
               <Input id="password" v-model="password" v-bind="passwordAttrs" type="password" autocomplete="new-password" :aria-invalid="!!errors.password" />
               <p v-if="errors.password" class="text-xs text-destructive">{{ errors.password }}</p>
             </div>
+            <div class="flex flex-col gap-1.5">
+              <Label for="confirmPassword">Confirme sua senha</Label>
+              <Input id="confirmPassword" v-model="confirmPassword" v-bind="confirmPasswordAttrs" type="password" autocomplete="new-password" :aria-invalid="!!errors.confirmPassword" />
+              <p v-if="errors.confirmPassword" class="text-xs text-destructive">{{ errors.confirmPassword }}</p>
+            </div>
           </fieldset>
 
           <fieldset v-else-if="step === 1" class="flex flex-col gap-4">
@@ -119,7 +110,7 @@ const onSubmit = handleSubmit(async (values) => {
               <div class="flex flex-col gap-1.5"><Label for="crpState">Região</Label><Input id="crpState" v-model="crpState" v-bind="crpStateAttrs" placeholder="06" maxlength="2" /><p v-if="errors.crpState" class="text-xs text-destructive">{{ errors.crpState }}</p></div>
             </div>
             <div class="flex flex-col gap-1.5"><Label for="cpf">CPF <span class="text-muted-foreground">(opcional)</span></Label><Input id="cpf" v-model="cpf" v-bind="cpfAttrs" placeholder="•••.•••.•••-••" inputmode="numeric" autocomplete="off" /><p v-if="errors.cpf" class="text-xs text-destructive">{{ errors.cpf }}</p></div>
-            <div class="flex flex-col gap-1.5"><Label for="proof">Comprovante CRP <span class="text-muted-foreground">(opcional)</span></Label><Input id="proof" type="file" accept="application/pdf,image/jpeg,image/png" @change="onProofSelected" /><p class="text-xs text-muted-foreground">{{ proofFile ? `${proofFile.name} selecionado` : 'JPG, PNG ou PDF · até 5 MB' }}</p><p v-if="proofError" class="text-xs text-destructive">{{ proofError }}</p></div>
+            <p class="border border-dashed p-3 text-xs leading-relaxed text-muted-foreground">Comprovante CRP: upload indisponível nesta etapa. O arquivo não é aceito, enviado nem armazenado até existir um fluxo privado com varredura, limite e expiração.</p>
           </fieldset>
 
           <fieldset v-else-if="step === 2" class="flex flex-col gap-4">
@@ -131,9 +122,10 @@ const onSubmit = handleSubmit(async (values) => {
           <fieldset v-else class="flex flex-col gap-4">
             <legend class="display-serif text-2xl">Leia com calma</legend>
             <p class="text-sm leading-relaxed text-muted-foreground">Ao continuar, você concorda com os Termos de Uso e a Política de Privacidade (versão 0.3). Seu consentimento fica registrado com data, IP e versão exata do documento.</p>
-            <label class="flex items-start gap-3 text-sm"><input v-model="acceptTerms" v-bind="acceptTermsAttrs" type="checkbox" class="mt-1 rounded border-input" /><span>Aceito os Termos de Uso e a Política de Privacidade.</span></label>
+            <label class="flex items-start gap-3 text-sm"><input v-model="acceptTerms" v-bind="acceptTermsAttrs" type="checkbox" class="mt-1 rounded border-input" /><span>Aceito os Termos de Uso (versão 0.3).</span></label>
             <p v-if="errors.acceptTerms" class="text-xs text-destructive">{{ errors.acceptTerms }}</p>
-            <p v-if="proofFile" class="text-xs text-muted-foreground">O comprovante ficará apenas nesta sessão até existir um upload seguro disponível.</p>
+            <label class="flex items-start gap-3 text-sm"><input v-model="acceptPrivacy" v-bind="acceptPrivacyAttrs" type="checkbox" class="mt-1 rounded border-input" /><span>Aceito a Política de Privacidade (versão 0.3).</span></label>
+            <p v-if="errors.acceptPrivacy" class="text-xs text-destructive">{{ errors.acceptPrivacy }}</p>
             <p v-if="submitError" class="text-sm text-destructive" role="alert">{{ submitError }}</p>
           </fieldset>
 

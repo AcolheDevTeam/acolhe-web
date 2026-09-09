@@ -1,4 +1,20 @@
 import { signupSchema } from '~/schemas/signup'
+import { z } from 'zod'
+
+const signupResponseSchema = z.object({
+  token: z.string().min(1),
+  user: z.object({
+    id: z.string().uuid(),
+    email: z.string().email(),
+    role: z.string(),
+    organizationId: z.string().uuid().nullable(),
+  }),
+  psychologistId: z.string().uuid(),
+  crpStatus: z.literal('pending'),
+  onboardingStatus: z.string(),
+  termsVersion: z.literal('0.3'),
+  privacyVersion: z.literal('0.3'),
+})
 
 // O token fica exclusivamente no cookie HttpOnly; o browser recebe apenas a projeção pública.
 export default defineEventHandler(async (event) => {
@@ -10,17 +26,11 @@ export default defineEventHandler(async (event) => {
 
   const config = useRuntimeConfig()
   try {
-    const result = await $fetch<{
-      token: string
-      user: unknown
-      psychologistId: string
-      crpStatus: string
-      onboardingStatus: string
-      termsVersion: string
-    }>(`${config.apiUrl}/signup`, {
+    const response = await $fetch<unknown>(`${config.apiUrl}/signup`, {
       method: 'POST',
       body: parsed.data,
     })
+    const result = signupResponseSchema.parse(response)
 
     setCookie(event, 'acolhe_session', result.token, {
       httpOnly: true,
@@ -36,6 +46,7 @@ export default defineEventHandler(async (event) => {
       crpStatus: result.crpStatus,
       onboardingStatus: result.onboardingStatus,
       termsVersion: result.termsVersion,
+      privacyVersion: result.privacyVersion,
     }
   } catch (error: unknown) {
     const statusCode = (error as { response?: { status?: number } }).response?.status
