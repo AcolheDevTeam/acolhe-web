@@ -419,6 +419,123 @@ pré-visualização (opcional, se sobrar tempo).
 
 ---
 
+### C5. Cadastro do psicólogo (ACO-54/59): entregue, mas não funcionava — apontado em 2026-09-12
+
+O `/signup` foi mergeado em 11/09 (PR #15 da API, PR #14 do web) e as duas issues foram para
+Done. Nenhum cadastro jamais concluiu: havia **dois** defeitos em série, um em cada lado, e
+nenhum dos dois era visível em revisão de arquivo isolado.
+
+**Defeito do web (ACO-70).** `pages/signup.vue:51` remove `confirmPassword` antes do `$fetch`,
+mas `server/api/signup.post.ts` validava o corpo com o **mesmo** `signupSchema` do formulário,
+que exige o campo. O parse falhava sempre → 400 no BFF → "Não foi possível concluir o cadastro
+agora" na tela, **sem nunca chamar a API Go**. Junto vinha um segundo problema: `cpf` era
+obrigatório no schema, mas a API documenta CPF como opcional e a página não define
+`initialValues` para ele — quem não preenchesse ficava com `undefined` e era barrado no passo
+"CRP", num campo opcional.
+
+**Feito em 2026-09-12** (PR #28 do web): `signupPayloadSchema` passa a ser o contrato de
+`POST /signup` — o que a página envia e o BFF valida — e `signupSchema` é ele estendido com
+`confirmPassword` e a checagem de igualdade, que só existem na tela. `cpf` vira opcional.
+`tests/signup-contract.test.ts` valida o payload exato que a página envia; não havia **nenhum**
+teste de signup no repositório.
+
+**Regra que fica:** rota do BFF nunca valida com o schema do formulário. Campo que só existe na
+tela (confirmação de senha, aceite visual, máscara) fica fora do contrato, e o contrato é o que
+o BFF e a API compartilham. `confirmPassword` era o único campo só-de-UI nos `schemas/`, e
+nenhuma outra rota do BFF reusa schema de formulário com campo extra — mas vale conferir ao
+criar rota nova.
+
+**Defeito da API (ACO-71).** Com o BFF corrigido, a API respondia **503**. `Service.Signup`
+mandava os quatro `INSERT` do cadastro num único `tx.Exec` com parâmetros, e o pgx usa o
+protocolo estendido, que recusa múltiplos comandos num statement preparado
+(`cannot insert multiple commands into a prepared statement`, SQLSTATE 42601). O erro caía no
+`default` do handler e virava "cadastro indisponível". **Feito em 2026-09-12** (PR #26 da API):
+um `Exec` por comando, na mesma transação — a atomicidade vem da transação, não do agrupamento.
+
+Verificado ponta a ponta com API e web locais: `POST /signup` devolve 201, cria organização,
+usuário, perfil e os 2 consentimentos; pelo BFF vem 200 com cookie `acolhe_session` `HttpOnly`
+e o token fora do corpo; a conta criada loga.
+
+**Ainda não entregue no signup:** a verificação real de e-mail (ACO-61 e ACO-63 seguem em
+Backlog). Hoje qualquer e-mail inventado cria conta. Como o Brevo já está configurado nos dois
+ambientes, o custo é baixo — e é o que destrava criar a primeira conta de produção pelo
+`/signup`, que é o plano registrado na Parte D.
+
+---
+
+### C6. Deploy de staging quebrado pela migration do signup (ACO-69) — apontado em 2026-09-12
+
+A API de staging ficou **502 por cerca de 17 horas**, de 11/09 21:44 UTC até o conserto.
+Produção seguiu no ar porque `main` ainda não tinha a migration.
+
+A migration de consentimentos do signup entrou como `20260909170000_..._signup_consents.sql`
+com dois defeitos: **não estava no `atlas.sum`** (o `atlas migrate apply` confere a integridade
+do diretório antes de aplicar e aborta) e **ordenava antes** de
+`20260909210000_seed_activity_types.sql`, que já estava aplicada em staging desde o deploy de
+09/09 22:07 — o Atlas recusa migration nova que ordene antes da última aplicada. Como `api` e
+`worker` têm `depends_on: migrate: service_completed_successfully`
+(`deploy/docker-compose.yml:93,121`), o migrate falhar derrubou os dois containers.
+
+**Feito em 2026-09-12** (PR #25 da API): renomeada para `20260912150000_...` e `atlas.sum`
+regerado. O SQL não mudou. Cada cenário foi reproduzido contra um Postgres real: com o
+diretório como estava, `checksum mismatch`; só regerando o hash, `added out of order` (ou seja,
+rehash sozinho não resolvia); com a correção, aplica 1 migration sobre o estado de staging e as
+11 num banco novo.
+
+**Regra que fica:** toda migration nova precisa de timestamp posterior ao da última já
+publicada em `develop` (não só em `main`), e de `atlas migrate hash` no mesmo commit. O CI
+passou a validar isso — ver C7.
+
+**Achado lateral, não corrigido:** existe divergência de nome de constraint entre as migrations
+e o `schema.sql` — `appointment_status_allowed` nas migrations, `appointment_status_check` no
+`schema.sql`. Hoje é cosmético, mas uma migration futura gerada por `atlas migrate diff` a
+partir do `schema.sql` pode tentar dropar um nome que não existe nos ambientes reais. Vale um
+alinhamento quando alguém encostar em `appointment`.
+
+---
+
+### C7. O CI não enxergava nada nos dois repositórios — apontado em 2026-09-12
+
+Os dois defeitos de C5 e o de C6 passaram verdes. Não foi coincidência.
+
+**acolhe-api (ACO-72).** Todo teste que sobe Postgres com testcontainers está atrás de
+`//go:build integration`, e o `ci.yml` rodava `go test ./...` **sem a tag**: nenhum deles jamais
+executou. Ficaram dark justamente os testes de isolamento multi-tenant e de contrato HTTP — a
+cobertura de ACO-16 e ACO-24, as duas marcadas como Done. Rodando com a tag apareciam **5
+falhas**: as 3 do signup (bug real, ACO-71 — os testes estavam certos) e 2 de fixture defasada.
+
+As duas fixtures: `TestGetSessionsByPatient_OrgIsolation` inseria `session` sem vínculo ativo,
+violando o gate de consentimento criado na migration `20260729011635` (produto correto, teste
+anterior ao trigger); `TestPatientInvitationLoginMeAndPortalIsolation` afirmava sobre
+`patientId` no corpo do check-in, que `patient.PatientCheckin` **não expõe de propósito**. Neste
+segundo caso o produto está correto e seguro — `CheckinRequest` só tem `mood` e `note`, então um
+`patientId` no corpo já era ignorado no bind; a propriedade valia, só não era observável pelo
+corpo. Passou a ser verificada no banco.
+
+**acolhe-web (ACO-73).** O repositório **não tinha workflow nenhum**: sem `.github/`, sem
+nenhuma execução no Actions. `pnpm test` e `pnpm run typecheck` só rodavam quando alguém
+lembrava de rodar na máquina. O deploy pelo Cloudflare Pages é via integração com o Git e só
+percebe erro de *build*. Foi exatamente por aí que ACO-70 chegou na develop.
+
+**Feito em 2026-09-12:**
+
+- API (PR #25): job `migrations` — valida o `atlas.sum`, aplica num banco novo e confere que
+  nenhuma migration nova ordene antes da última publicada em `main` **e** em `develop`. O
+  replay precisa incluir `develop`: contra `main` apenas, o caso de C6 passaria. É comparação
+  por nome, não replay do diretório da base num banco, para que um PR não fique barrado quando
+  a base já estiver quebrada — inclusive o PR que a conserta.
+- API (PR #26): job `integration` rodando `go test -tags integration ./...`, mais as correções
+  das duas fixtures. Suíte de integração verde no runner.
+- Web (PR #29): workflow de CI com `typecheck` e `test` em PR para `develop` e push de
+  `develop`/`main`. Primeira execução do repositório.
+
+**Anotação de ambiente:** o `pnpm` 11.3.0 fixado em `packageManager` **não roda em Node 20**
+(`ERR_UNKNOWN_BUILTIN_MODULE`), então o CI do web usa Node 22. A seção de deploy do README ainda
+recomenda `NODE_VERSION=20`; essa linha está defasada — com Node 20 nem o build do Pages
+passaria. Vale corrigir o README e conferir qual versão o Pages usa de fato.
+
+---
+
 ## Parte D — Ambientes e como testar (decisão de 2026-09-09)
 
 | Ambiente | Web | API | Login de psicóloga |
