@@ -1,0 +1,46 @@
+name: CI
+
+# Gate de qualidade do acolhe-web: tipagem e testes. Até ACO-73 este repositório
+# não tinha workflow nenhum — pnpm test e pnpm typecheck só rodavam na máquina de
+# quem lembrasse, e o deploy pelo Cloudflare Pages só percebe erro de build.
+# Foi assim que ACO-70 (cadastro quebrado para todo mundo) chegou na develop.
+on:
+  pull_request:
+    branches: [develop]
+  push:
+    branches: [develop, main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: typecheck + testes
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # A versão vem do campo packageManager do package.json.
+      - uses: pnpm/action-setup@v4
+
+      # Node 22: o pnpm 11.3.0 fixado em packageManager não roda em Node 20
+      # (ERR_UNKNOWN_BUILTIN_MODULE). O README ainda diz "Node 20+ / NODE_VERSION=20"
+      # na seção de deploy — essa linha está defasada, porque com Node 20 nem o
+      # build do Cloudflare Pages passaria. Ver ACO-73.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Instalar dependências
+        run: pnpm install --frozen-lockfile
+
+      - name: Typecheck
+        run: pnpm run typecheck
+
+      - name: Testes
+        run: pnpm test
