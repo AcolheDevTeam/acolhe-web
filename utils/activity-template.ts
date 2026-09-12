@@ -43,6 +43,28 @@ export function templateTypeLabel(code: string): string {
   return TEMPLATE_TYPE_META[code as TemplateTypeCode] ?? code
 }
 
+// Opções do filtro por tipo em /templates (ACO-74). "Todos" é o valor vazio.
+export const TEMPLATE_TYPE_FILTER_OPTIONS: CustomDropdownOption[] = [
+  { value: '', label: 'Todos os tipos' },
+  ...(Object.keys(TEMPLATE_TYPE_META) as TemplateTypeCode[])
+    .map((value) => ({ value, label: TEMPLATE_TYPE_META[value] })),
+]
+
+// Busca por título/descrição e filtro por tipo base. Puro, para ser testável
+// sem montar a página.
+export function filterTemplates<T extends { title: string, description?: string | null, type: string }>(
+  templates: T[],
+  { search = '', typeCode = '' }: { search?: string, typeCode?: string },
+): T[] {
+  const term = search.trim().toLowerCase()
+  return templates.filter((template) => {
+    if (typeCode && template.type !== typeCode) return false
+    if (!term) return true
+    return template.title.toLowerCase().includes(term)
+      || (template.description ?? '').toLowerCase().includes(term)
+  })
+}
+
 export function templateOriginLabel(template: { isGlobal: boolean, ownedByMe: boolean }): string {
   if (template.isGlobal) return 'Acolhe'
   return template.ownedByMe ? 'Meu' : 'Da organização'
@@ -72,6 +94,52 @@ export function emptyField(fieldType: FieldType): TemplateFieldInput {
 
 export function emptyTemplateForm(): TemplateFormValues {
   return { title: '', typeCode: 'record', fields: [] }
+}
+
+// Campos sugeridos ao escolher o tipo base ao CRIAR um template (ACO-74). Até
+// aqui o tipo base só virava etiqueta no card: os quatro se comportavam igual.
+// São sugestões — a psicóloga adiciona, remove e troca o que quiser depois — e
+// nunca se aplicam na edição, para não mexer em template já montado.
+export function templateTypePreset(typeCode: TemplateTypeCode): TemplateFieldInput[] {
+  switch (typeCode) {
+    case 'scale':
+      return [{
+        ...emptyField('scale'),
+        label: 'Intensidade',
+        min: 1,
+        max: 10,
+        minLabel: 'leve',
+        maxLabel: 'intensa',
+      }]
+    case 'checklist':
+      return [{ ...emptyField('boolean'), label: 'Concluí a tarefa combinada' }]
+    case 'checkin':
+      // Mesma faixa do check-in de humor que a paciente já usa na home.
+      return [{
+        ...emptyField('scale'),
+        label: 'Como você está se sentindo hoje?',
+        min: 1,
+        max: 5,
+        minLabel: 'muito mal',
+        maxLabel: 'muito bem',
+      }]
+    case 'record':
+    default:
+      return []
+  }
+}
+
+// Verdadeiro quando a lista de campos ainda é exatamente o preset de `typeCode`,
+// ou seja, a psicóloga não mexeu nela. Só nesse caso trocar o tipo pode
+// substituir os campos: caso contrário a troca destruiria trabalho dela.
+export function fieldsAreUntouchedPreset(
+  fields: TemplateFieldInput[],
+  typeCode: TemplateTypeCode,
+): boolean {
+  if (!fields.length) return true
+  const preset = templateTypePreset(typeCode)
+  if (fields.length !== preset.length) return false
+  return JSON.stringify(fields) === JSON.stringify(preset)
 }
 
 // Converte o detalhe da API nos valores iniciais do builder (edição).

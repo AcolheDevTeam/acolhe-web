@@ -2,7 +2,7 @@
 import { toTypedSchema } from '@vee-validate/zod'
 import { Plus } from 'lucide-vue-next'
 import { useFieldArray, useForm } from 'vee-validate'
-import type { FieldType, TemplateFieldInput, TemplateFormValues, TemplateRequest } from '~/schemas/activity-template'
+import type { FieldType, TemplateFieldInput, TemplateFormValues, TemplateRequest, TemplateTypeCode } from '~/schemas/activity-template'
 import { templateRequestSchema } from '~/schemas/activity-template'
 import { Button } from '@/components/ui/button'
 import { CustomDropdown } from '@/components/ui/custom-dropdown'
@@ -16,18 +16,20 @@ import { Textarea } from '@/components/ui/textarea'
 const props = defineProps<{
   initial: TemplateFormValues
   readonly?: boolean
+  /** Sugere campos ao escolher o tipo base. Só na criação (ACO-74). */
+  presets?: boolean
 }>()
 
 const emit = defineEmits<{
   submit: [values: TemplateRequest]
 }>()
 
-const { handleSubmit, errors } = useForm<TemplateFormValues>({
+const { handleSubmit, errors, values } = useForm<TemplateFormValues>({
   validationSchema: toTypedSchema(templateRequestSchema),
   initialValues: props.initial,
 })
 
-const { fields, push, remove, move, update } = useFieldArray<TemplateFieldInput>('fields')
+const { fields, push, remove, move, update, replace } = useFieldArray<TemplateFieldInput>('fields')
 const fieldsError = computed(() => (errors.value as Record<string, string | undefined>).fields)
 
 function addField(fieldType: FieldType) {
@@ -45,8 +47,23 @@ function changeType(index: number, fieldType: FieldType) {
   })
 }
 
-const onSubmit = handleSubmit((values) => {
-  emit('submit', values as TemplateRequest)
+// Trocar o tipo base sugere os campos daquele tipo, mas só enquanto a lista
+// continua sendo o preset anterior (ou está vazia). Se a psicóloga já mexeu nos
+// campos, a troca de tipo não encosta neles — trocar de rótulo não pode apagar
+// trabalho. Roda só na criação: em edição os campos já existem e são versionados.
+const previousType = ref<TemplateTypeCode>(props.initial.typeCode as TemplateTypeCode)
+
+watch(() => values.typeCode as TemplateTypeCode | undefined, (typeCode) => {
+  if (!props.presets || props.readonly || !typeCode || typeCode === previousType.value) return
+  const current = fields.value.map((field) => field.value)
+  if (fieldsAreUntouchedPreset(current, previousType.value)) {
+    replace(templateTypePreset(typeCode))
+  }
+  previousType.value = typeCode
+})
+
+const onSubmit = handleSubmit((formValues) => {
+  emit('submit', formValues as TemplateRequest)
 })
 </script>
 
