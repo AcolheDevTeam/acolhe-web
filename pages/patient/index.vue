@@ -123,7 +123,12 @@ function formatTime(value: string) {
         </div>
         <Card v-if="activities.data.value.length">
           <CardContent class="divide-y p-0">
-            <div v-for="activity in activities.data.value" :key="activity.id" class="flex items-center justify-between gap-4 p-5">
+            <NuxtLink
+              v-for="activity in activities.data.value"
+              :key="activity.id"
+              :to="`/patient/activities/${activity.id}`"
+              class="flex items-center justify-between gap-4 p-5 transition-colors hover:bg-muted"
+            >
               <div class="min-w-0">
                 <p class="truncate font-medium">{{ activity.title }}</p>
                 <p class="mt-1 text-xs text-muted-foreground">
@@ -131,7 +136,7 @@ function formatTime(value: string) {
                 </p>
               </div>
               <ArrowRight class="size-4 shrink-0 text-muted-foreground" />
-            </div>
+            </NuxtLink>
           </CardContent>
         </Card>
         <p v-else class="rounded-xl border border-dashed px-5 py-8 text-center text-sm text-muted-foreground">
