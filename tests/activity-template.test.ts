@@ -8,8 +8,11 @@ import {
 } from '~/schemas/activity-template'
 import {
   emptyField,
+  fieldsAreUntouchedPreset,
+  filterTemplates,
   summarizeFields,
   templateApiErrorMessage,
+  templateTypePreset,
   templateOriginLabel,
   templateToFormValues,
 } from '~/utils/activity-template'
@@ -127,5 +130,82 @@ describe('helpers do builder', () => {
     expect(templateApiErrorMessage(err(409, 'existe uma versão mais nova deste template'), 'x'))
       .toContain('versão mais nova')
     expect(templateApiErrorMessage(err(500, 'boom'), 'Não deu.')).toBe('Não deu.')
+  })
+})
+
+describe('tipo base com consequência (ACO-74)', () => {
+  it('sugere campos coerentes com cada tipo base', () => {
+    expect(templateTypePreset('record')).toEqual([])
+
+    const escala = templateTypePreset('scale')
+    expect(escala).toHaveLength(1)
+    expect(escala[0].fieldType).toBe('scale')
+    expect(escala[0].min).toBe(1)
+    expect(escala[0].max).toBe(10)
+
+    const checklist = templateTypePreset('checklist')
+    expect(checklist).toHaveLength(1)
+    expect(checklist[0].fieldType).toBe('boolean')
+
+    const checkin = templateTypePreset('checkin')
+    expect(checkin).toHaveLength(1)
+    expect(checkin[0].fieldType).toBe('scale')
+    // mesma faixa do check-in de humor que a paciente já usa
+    expect(checkin[0].max).toBe(5)
+  })
+
+  it('os presets passam na validação do template', () => {
+    for (const type of ['scale', 'checklist', 'checkin'] as const) {
+      const parsed = templateRequestSchema.safeParse({
+        title: 'Teste', typeCode: type, fields: templateTypePreset(type),
+      })
+      expect(parsed.success, `preset de ${type} precisa ser válido`).toBe(true)
+    }
+  })
+
+  it('reconhece lista vazia e preset intocado como substituíveis', () => {
+    expect(fieldsAreUntouchedPreset([], 'scale')).toBe(true)
+    expect(fieldsAreUntouchedPreset(templateTypePreset('scale'), 'scale')).toBe(true)
+    expect(fieldsAreUntouchedPreset(templateTypePreset('checkin'), 'checkin')).toBe(true)
+  })
+
+  it('protege campos que a psicóloga já mexeu', () => {
+    // Trocar o tipo base não pode apagar trabalho: basta um rótulo editado.
+    const editado = templateTypePreset('scale').map((f) => ({ ...f, label: 'Minha pergunta' }))
+    expect(fieldsAreUntouchedPreset(editado, 'scale')).toBe(false)
+
+    const comCampoExtra = [...templateTypePreset('scale'), emptyField('long_text')]
+    expect(fieldsAreUntouchedPreset(comCampoExtra, 'scale')).toBe(false)
+
+    // Campo montado do zero num template "Formulário" também é trabalho.
+    expect(fieldsAreUntouchedPreset([emptyField('short_text')], 'record')).toBe(false)
+  })
+
+  it('filtra a biblioteca por tipo base', () => {
+    const lista = [
+      { title: 'Diário', description: 'situação e pensamento', type: 'record' },
+      { title: 'Humor', description: null, type: 'scale' },
+      { title: 'Tarefas', description: null, type: 'checklist' },
+    ]
+    expect(filterTemplates(lista, { typeCode: 'scale' }).map((t) => t.title)).toEqual(['Humor'])
+    expect(filterTemplates(lista, { typeCode: '' })).toHaveLength(3)
+    expect(filterTemplates(lista, {})).toHaveLength(3)
+  })
+
+  it('combina busca e tipo', () => {
+    const lista = [
+      { title: 'Diário de humor', description: null, type: 'record' },
+      { title: 'Escala de humor', description: null, type: 'scale' },
+    ]
+    expect(filterTemplates(lista, { search: 'humor' })).toHaveLength(2)
+    expect(filterTemplates(lista, { search: 'humor', typeCode: 'scale' }).map((t) => t.title))
+      .toEqual(['Escala de humor'])
+    expect(filterTemplates(lista, { search: 'inexistente', typeCode: 'scale' })).toHaveLength(0)
+  })
+
+  it('busca também na descrição, ignorando maiúsculas', () => {
+    const lista = [{ title: 'Diário', description: 'Situação e Pensamento', type: 'record' }]
+    expect(filterTemplates(lista, { search: 'PENSAMENTO' })).toHaveLength(1)
+    expect(filterTemplates(lista, { search: '  diário  ' })).toHaveLength(1)
   })
 })
