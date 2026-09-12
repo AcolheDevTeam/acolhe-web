@@ -1,4 +1,4 @@
-import { signupSchema } from '~/schemas/signup'
+import { signupPayloadSchema } from '~/schemas/signup'
 import { z } from 'zod'
 
 const signupResponseSchema = z.object({
@@ -19,7 +19,7 @@ const signupResponseSchema = z.object({
 // O token fica exclusivamente no cookie HttpOnly; o browser recebe apenas a projeção pública.
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
-  const parsed = signupSchema.safeParse(body)
+  const parsed = signupPayloadSchema.safeParse(body)
   if (!parsed.success) {
     throw createError({ statusCode: 400, statusMessage: 'Dados de cadastro inválidos.' })
   }
