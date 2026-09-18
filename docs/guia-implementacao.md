@@ -534,6 +534,54 @@ percebe erro de *build*. Foi exatamente por aí que ACO-70 chegou na develop.
 recomenda `NODE_VERSION=20`; essa linha está defasada — com Node 20 nem o build do Pages
 passaria. Vale corrigir o README e conferir qual versão o Pages usa de fato.
 
+### C8. Nenhuma paciente conseguia criar conta: o convite quebrado pela migration do signup (ACO-75) — apontado em 2026-09-18
+
+A Joyce não conseguia entrar em nenhum perfil de paciente. Qualquer `/invite/:token`, mesmo
+válido e dentro da validade, mostrava **"Convite indisponível — O link pode ter expirado, sido
+recusado ou já ter sido utilizado"**.
+
+A causa está na API, não no web: a migration `20260912150000_add_psychologist_signup_consents.sql`
+(ACO-54/59) publicou `terms_of_use` e `privacy_policy` em `consent_document` com
+`required = true`. Essa tabela é **compartilhada** entre o cadastro do psicólogo e o aceite da
+paciente, e nenhum dos dois consumidores filtrava por escopo. Deu dois defeitos em série — de
+novo um escondendo o outro, como em C5.
+
+**Defeito 1 — listagem (500 disfarçado de link expirado).** `ListPublishedConsentDocuments`
+passou a devolver 5 documentos. O BFF valida a resposta com
+`consentDocumentSchema.scope = z.enum(['health_data','communications','aggregate_statistics'])`
+(`schemas/onboarding.ts:11`); o parse estoura, o Nitro devolve 500 e
+`pages/invite/[token].vue:102` cai no branch genérico de erro.
+
+**Defeito 2 — aceite (409 disfarçado de conta duplicada).** Mesmo com a listagem corrigida,
+`accept_patient_invitation` exigia **todos** os documentos `required` publicados. Como os dois
+do signup nunca são oferecidos no convite, a paciente não tinha como marcá-los e todo aceite
+morria com `23514` → 409 → toast "Este convite já foi utilizado ou já existe uma conta com este
+e-mail." Esse segundo defeito **só apareceu depois** de corrigir o primeiro e rodar o teste de
+integração; sozinho, o fix da listagem não destravaria o fluxo.
+
+**Feito em 2026-09-18** (PR #30 da API): os dois pontos passam a filtrar pelos escopos da
+paciente, mais a gravação em `consent` (para que um `document_id` de outro escopo enviado pelo
+cliente não vire evidência de consentimento). A fixture `setupPool` agora semeia também os
+documentos do signup — ela semeava só os 3 da paciente, e é por isso que o CI passava verde
+enquanto staging estava quebrado — e o teste assere os escopos devolvidos pelo convite.
+
+**Ainda em aberto, do lado do web — regra A6.** `pages/invite/[token].vue` colapsa qualquer
+falha do `useFetch` numa só frase, que afirma uma causa ("expirado, recusado ou já utilizado")
+que o código não verificou. Um 500 de contrato aparece para a usuária como link vencido, e foi
+exatamente isso que escondeu o bug. O `apiErrorMessage` de B5 já cobre os `catch` de aceite e
+recusa (`:58` e `:72`), mas **não** o carregamento inicial da página. Falta distinguir ali 404
+(convite inexistente), 410 (expirado/recusado/usado) e 5xx (erro nosso — "não foi possível
+carregar o convite agora, tente novamente em instantes"), e só afirmar a causa quando a API
+tiver dito qual é.
+
+**Padrão que se repete — terceira ocorrência.** C5 (ACO-70), C6 (ACO-69) e agora C8 são todos
+mudança no backend rompendo em silêncio um contrato Zod do BFF, com a tela mostrando uma
+mensagem que aponta para a causa errada. O CI não pega porque as fixtures de teste são mais
+pobres que o banco real. Vale tratar "fixture tem que reproduzir o estado de produção" como
+regra, não como detalhe de cada PR.
+
+---
+
 ---
 
 ## Parte D — Ambientes e como testar (decisão de 2026-09-09)
