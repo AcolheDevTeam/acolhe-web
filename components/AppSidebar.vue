@@ -7,11 +7,15 @@ import {
   FileLock2,
   FileText,
   Home,
+  LogOut,
   Settings,
   Users,
 } from 'lucide-vue-next'
+import { toast } from 'vue-sonner'
 import type { Patient, UserRole } from '~/types'
+import { logoutRedirect } from '~/utils/patient-portal'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { Button } from '@/components/ui/button'
 
 const { user } = defineProps<{
   user?: { email?: string; name?: string; crp?: string; role?: UserRole } | null
@@ -53,6 +57,27 @@ const route = useRoute()
 const NuxtLinkComponent = resolveComponent('NuxtLink')
 function isActive(to: string) {
   return route.path === to || route.path.startsWith(`${to}/`)
+}
+
+const isLoggingOut = ref(false)
+
+// Sai da conta e recarrega a aplicação. O recarregamento é proposital: descarta
+// o cache em memória do useFetch (lista de pacientes, /me, timelines), que de
+// outro modo continuaria visível para quem entrasse em seguida no mesmo
+// navegador — mesmo motivo da chave de cache por paciente da Regra 3.
+async function logout() {
+  if (isLoggingOut.value) return
+  isLoggingOut.value = true
+  try {
+    await $fetch('/api/logout', { method: 'POST' })
+    await navigateTo(logoutRedirect(), { replace: true, external: true })
+  }
+  catch (error) {
+    isLoggingOut.value = false
+    toast.error(apiErrorMessage(error, {
+      default: 'Não foi possível sair agora. Tente novamente em instantes.',
+    }))
+  }
 }
 
 const displayName = computed(() => user?.name ?? user?.email ?? 'Minha conta')
@@ -131,6 +156,15 @@ const initials = computed(() =>
         <Settings class="size-4" :stroke-width="1.75" />
         <span>Ajustes</span>
       </span>
+      <Button
+        variant="ghost"
+        class="h-auto w-full justify-start gap-3 rounded-md px-3 py-2 text-sm font-normal text-muted-foreground hover:bg-accent/60 hover:text-foreground"
+        :disabled="isLoggingOut"
+        @click="logout"
+      >
+        <LogOut class="size-4 shrink-0" :stroke-width="1.75" />
+        <span>{{ isLoggingOut ? 'Saindo…' : 'Sair' }}</span>
+      </Button>
       <div class="flex items-center gap-3 rounded-md px-3 py-2">
         <Avatar class="size-8">
           <AvatarFallback class="bg-secondary text-xs">{{ initials }}</AvatarFallback>
