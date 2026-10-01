@@ -59,7 +59,11 @@ const onSubmit = handleSubmit(async (values) => {
     const result = await $fetch<Appointment>(appointment ? `/api/appointments/${appointment.id}` : '/api/appointments', {
       method: appointment ? 'PUT' : 'POST', body: appointment ? schedule : values,
     })
-    toast.success(appointment ? 'Sessão reagendada. A presença precisa ser confirmada novamente.' : 'Sessão agendada.')
+    toast.success(appointment
+      ? result.status === 'confirmed'
+        ? 'Sessão reagendada e presença confirmada automaticamente.'
+        : 'Sessão reagendada. A presença precisa ser confirmada novamente.'
+      : 'Sessão agendada.')
     open.value = false
     resetForm()
     await refreshNuxtData(['appointments-all', `appointments-${selectedPatient}`, `appointment-${result.id}`])
