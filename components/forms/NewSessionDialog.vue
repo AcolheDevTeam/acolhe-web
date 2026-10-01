@@ -2,8 +2,8 @@
 import { toTypedSchema } from '@vee-validate/zod'
 import { useForm } from 'vee-validate'
 import { toast } from 'vue-sonner'
-import { createSessionSchema } from '~/schemas/session'
-import type { Patient, Session } from '~/types'
+import { createAppointmentSchema } from '~/schemas/appointment'
+import type { Patient, Appointment } from '~/types'
 import {
   Dialog,
   DialogContent,
@@ -17,10 +17,10 @@ import { CustomDropdown } from '@/components/ui/custom-dropdown'
 import { DateTimePicker } from '@/components/ui/date-time-picker'
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Button } from '@/components/ui/button'
-import { Textarea } from '@/components/ui/textarea'
 
 // patientId trava o paciente (ex.: aberto a partir da ficha do paciente).
-const { patientId } = defineProps<{ patientId?: string }>()
+const { patientId, appointment } = defineProps<{ patientId?: string, appointment?: Appointment }>()
+const emit = defineEmits<{ saved: [appointment: Appointment] }>()
 
 const open = ref(false)
 
@@ -35,31 +35,47 @@ const activePatients = computed(() =>
 const patientOptions = computed(() =>
   activePatients.value.map(patient => ({ value: patient.id, label: patient.fullName })),
 )
-// Sessões são registradas no passado ou agora; o schema rejeita datas futuras.
-const todayIso = new Date().toLocaleDateString('sv-SE')
-
-const { handleSubmit, isSubmitting, setFieldValue, resetForm } = useForm({
-  validationSchema: toTypedSchema(createSessionSchema),
+const { handleSubmit, isSubmitting, resetForm } = useForm({
+  validationSchema: toTypedSchema(createAppointmentSchema),
+  initialValues: { patientId: patientId ?? appointment?.patientId, durationMinutes: 50, modality: 'in_person' },
 })
 
-watchEffect(() => {
-  if (patientId) setFieldValue('patientId', patientId)
+watch(open, (isOpen) => {
+  if (isOpen) resetForm({ values: {
+    patientId: patientId ?? appointment?.patientId,
+    scheduledFor: appointment?.scheduledFor,
+    durationMinutes: appointment?.durationMinutes ?? 50,
+    modality: (appointment?.modality as 'in_person' | 'online' | undefined) ?? 'in_person',
+  } })
 })
+
+const durationOptions = computed(() => [...new Set([15, 30, 45, 50, 60, 75, 90, 120, 180, 240, 480, appointment?.durationMinutes ?? 50])]
+  .sort((a, b) => a - b).map(minutes => ({ value: String(minutes), label: `${minutes} minutos` })))
+const modalityOptions = [{ value: 'in_person', label: 'Presencial' }, { value: 'online', label: 'Online' }]
 
 const onSubmit = handleSubmit(async (values) => {
   try {
-    const session = await $fetch<Session>('/api/sessions', { method: 'POST', body: values })
-    toast.success('Sessão registrada.')
+    const { patientId: selectedPatient, ...schedule } = values
+    const result = await $fetch<Appointment>(appointment ? `/api/appointments/${appointment.id}` : '/api/appointments', {
+      method: appointment ? 'PUT' : 'POST', body: appointment ? schedule : values,
+    })
+    toast.success(appointment
+      ? result.status === 'confirmed'
+        ? 'Sessão reagendada e presença confirmada automaticamente.'
+        : 'Sessão reagendada. A presença precisa ser confirmada novamente.'
+      : 'Sessão agendada.')
     open.value = false
     resetForm()
-    await refreshNuxtData(`sessions-${values.patientId}`)
-    await refreshNuxtData('sessions-all')
-    if (session?.id) await navigateTo(`/sessions/${session.id}`)
+    await refreshNuxtData(['appointments-all', `appointments-${selectedPatient}`, `appointment-${result.id}`])
+    emit('saved', result)
+    if (!appointment) await navigateTo(`/appointments/${result.id}`)
   } catch (error) {
     toast.error(apiErrorMessage(error, {
-      403: 'Esta paciente ainda não aceitou o convite. A sessão só pode ser registrada com o vínculo ativo.',
-      400: 'Confira a data, a hora e o texto da evolução.',
-      default: 'Não foi possível registrar a sessão agora.',
+      403: 'Você não tem permissão para agendar para esta paciente.',
+      400: 'Confira a data, a hora, a duração e a modalidade.',
+      404: 'Esta paciente ou este agendamento não está disponível para você.',
+      409: 'Não foi possível agendar: há conflito de horário ou o atendimento já foi encerrado.',
+      default: 'Não foi possível salvar o agendamento agora.',
     }))
   }
 })
@@ -72,14 +88,14 @@ const onSubmit = handleSubmit(async (values) => {
     </DialogTrigger>
     <DialogContent class="sm:max-w-lg">
       <DialogHeader>
-        <DialogTitle class="font-serif text-2xl font-normal">Nova sessão</DialogTitle>
+        <DialogTitle class="font-serif text-2xl font-normal">{{ appointment ? 'Reagendar sessão' : 'Agendar sessão' }}</DialogTitle>
         <DialogDescription>
-          Registre apenas o necessário ao cumprimento dos objetivos do trabalho (Art. 5º, II — Res. CFP 01/2009).
+          Escolha a data e o horário. A evolução pode ser registrada depois do atendimento.
         </DialogDescription>
       </DialogHeader>
 
       <form class="flex flex-col gap-4" @submit="onSubmit">
-        <FormField v-if="!patientId" v-slot="{ value, handleChange }" name="patientId">
+        <FormField v-if="!patientId && !appointment" v-slot="{ value, handleChange }" name="patientId">
           <FormItem>
             <FormLabel>Paciente</FormLabel>
             <FormControl>
@@ -96,13 +112,12 @@ const onSubmit = handleSubmit(async (values) => {
           </FormItem>
         </FormField>
 
-        <FormField v-slot="{ value, handleChange }" name="occurredAt">
+        <FormField v-slot="{ value, handleChange }" name="scheduledFor">
           <FormItem>
             <FormLabel>Data e hora</FormLabel>
             <FormControl>
               <DateTimePicker
                 :model-value="value ?? ''"
-                :max-date="todayIso"
                 @update:model-value="handleChange"
               />
             </FormControl>
@@ -110,18 +125,29 @@ const onSubmit = handleSubmit(async (values) => {
           </FormItem>
         </FormField>
 
-        <FormField v-slot="{ componentField }" name="notes">
+        <FormField v-slot="{ value, handleChange }" name="durationMinutes">
           <FormItem>
-            <FormLabel>Evolução da sessão</FormLabel>
+            <FormLabel>Duração</FormLabel>
             <FormControl>
-              <Textarea rows="6" placeholder="Registro clínico…" v-bind="componentField" />
+              <CustomDropdown :options="durationOptions" :model-value="String(value ?? 50)"
+                search-placeholder="Buscar duração…" @update:model-value="handleChange(Number($event))" />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        </FormField>
+        <FormField v-slot="{ value, handleChange }" name="modality">
+          <FormItem>
+            <FormLabel>Modalidade</FormLabel>
+            <FormControl>
+              <CustomDropdown :options="modalityOptions" :model-value="value ?? 'in_person'"
+                search-placeholder="Buscar modalidade…" @update:model-value="handleChange" />
             </FormControl>
             <FormMessage />
           </FormItem>
         </FormField>
 
         <DialogFooter>
-          <Button type="submit" :disabled="isSubmitting">Registrar sessão</Button>
+          <Button type="submit" :disabled="isSubmitting">{{ appointment ? 'Salvar novo horário' : 'Agendar sessão' }}</Button>
         </DialogFooter>
       </form>
     </DialogContent>

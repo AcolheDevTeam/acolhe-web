@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Clock3, FileText, MoreHorizontal, Plus } from 'lucide-vue-next'
+import { CalendarDays, Clock3, MoreHorizontal, Plus } from 'lucide-vue-next'
 import type { Patient } from '~/types'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
@@ -61,9 +61,9 @@ const meta = computed(() => {
       </Badge>
       <!-- No celular os botões ficam só com ícone para não cobrir o título. -->
       <NewSessionDialog v-if="isActive" :patient-id="patientId">
-        <Button variant="outline" size="sm" aria-label="Nova sessão">
-          <FileText />
-          <span class="hidden sm:inline">Nova sessão</span>
+        <Button variant="outline" size="sm" aria-label="Agendar sessão">
+          <CalendarDays />
+          <span class="hidden sm:inline">Agendar sessão</span>
         </Button>
       </NewSessionDialog>
       <AssignActivityDialog v-if="isActive" :patient-id="patientId">

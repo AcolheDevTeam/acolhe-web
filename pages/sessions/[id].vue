@@ -7,7 +7,7 @@ definePageMeta({ middleware: ['auth', 'psychologist-only'] })
 
 const route = useRoute()
 const sessionId = computed(() => route.params.id as string)
-const { data: session } = useSession(sessionId)
+const { data: session, error, refresh } = useSession(sessionId)
 </script>
 
 <template>
@@ -29,9 +29,9 @@ const { data: session } = useSession(sessionId)
       </nav>
     </template>
     <template #actions>
-      <Badge variant="secondary" class="gap-1">
+      <Badge v-if="session" variant="secondary" class="gap-1">
         <Check class="size-3" />
-        Salvo
+        Prontuário
       </Badge>
       <Button variant="outline" size="sm">
         <Download />
@@ -53,14 +53,16 @@ const { data: session } = useSession(sessionId)
         </p>
       </div>
 
-      <section class="flex flex-col gap-2">
-        <p class="label-mono">Evolução da sessão</p>
-        <p class="whitespace-pre-line text-sm leading-relaxed">
-          {{ session.notes || 'Sem registro para esta sessão.' }}
-        </p>
-      </section>
+      <Button v-if="session.appointmentId" variant="outline" class="self-start" as-child>
+        <NuxtLink :to="`/appointments/${session.appointmentId}`">Ver agendamento</NuxtLink>
+      </Button>
+      <SessionNotesForm :key="session.id" :session="session" @saved="session = $event" @reload="refresh()" />
     </div>
 
+    <div v-else-if="error" class="text-sm">
+      <p>{{ apiErrorMessage(error, { 404: 'Sessão não encontrada.', default: 'Não foi possível carregar a sessão agora.' }) }}</p>
+      <Button variant="outline" class="mt-3" @click="refresh()">Tentar novamente</Button>
+    </div>
     <div v-else class="flex flex-col gap-3">
       <Skeleton class="h-8 w-64" />
       <Skeleton class="h-4 w-40" />

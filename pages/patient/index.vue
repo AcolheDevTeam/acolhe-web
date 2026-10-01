@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ArrowRight, CalendarDays, Check, Clock3, HeartPulse, RefreshCw } from 'lucide-vue-next'
-import type { User } from '~/types'
+import { useNow } from '@vueuse/core'
+import type { PatientNextSession } from '~/types'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Textarea } from '@/components/ui/textarea'
@@ -9,6 +10,33 @@ import { sessionExpired } from '~/utils/patient-portal'
 definePageMeta({ layout: 'patient', middleware: ['auth', 'patient-only'] })
 
 const { me, context, nextSession, activities, checkins, summary, pending, error } = usePatientPortal()
+const confirmationSubmitting = ref(false)
+const confirmationError = ref('')
+const now = useNow({ interval: 60000 })
+const canConfirm = computed(() => nextSession.data.value?.status === 'scheduled'
+  && new Date(nextSession.data.value.scheduledFor) > now.value)
+watch(() => nextSession.data.value?.id, () => { confirmationError.value = '' })
+
+async function confirmAppointment() {
+  const appointment = nextSession.data.value
+  if (!appointment || !canConfirm.value || confirmationSubmitting.value) return
+  confirmationSubmitting.value = true
+  confirmationError.value = ''
+  try {
+    const confirmed = await $fetch<PatientNextSession>(`/api/patient/appointments/${appointment.id}/confirm`, { method: 'POST' })
+    nextSession.data.value = confirmed
+    await nextSession.refresh()
+  } catch (error) {
+    confirmationError.value = apiErrorMessage(error, {
+      403: 'Seu vínculo precisa estar ativo para confirmar a presença.',
+      404: 'Este agendamento não está mais disponível para você.',
+      409: 'Este agendamento foi encerrado ou o horário do atendimento já chegou.',
+      default: 'Não foi possível confirmar sua presença agora. Tente novamente.',
+    })
+    await nextSession.refresh()
+  } finally { confirmationSubmitting.value = false }
+}
+
 const mood = ref(0)
 const note = ref('')
 const checkinSubmitting = ref(false)
@@ -95,11 +123,16 @@ function formatTime(value: string) {
               <template v-else>Quando houver uma nova sessão, ela aparecerá aqui.</template>
             </CardDescription>
           </CardHeader>
-          <CardContent class="p-6 pt-3">
+          <CardContent class="flex flex-col gap-4 p-6 pt-3">
             <div class="flex items-center gap-2 text-sm text-primary-foreground/75">
               <Clock3 class="size-4" />
               <span>{{ nextSession.data.value ? 'Acompanhe seu próximo encontro' : 'Sem agenda por enquanto' }}</span>
             </div>
+            <p v-if="nextSession.data.value?.status === 'confirmed'" class="flex items-center gap-2 text-sm" role="status"><Check class="size-4" />Presença confirmada</p>
+            <Button v-else-if="canConfirm" variant="secondary" class="w-full sm:w-auto sm:self-start" :disabled="confirmationSubmitting" @click="confirmAppointment">
+              {{ confirmationSubmitting ? 'Confirmando…' : 'Confirmar presença' }}
+            </Button>
+            <p v-if="confirmationError" class="text-sm text-primary-foreground" role="alert">{{ confirmationError }}</p>
           </CardContent>
         </Card>
 
