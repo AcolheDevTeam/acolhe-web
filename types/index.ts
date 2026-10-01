@@ -38,6 +38,8 @@ export interface PatientPendingActivity {
 }
 
 export interface PatientCheckin {
+  day: string
+  updatedAt: string
   id: string
   mood: number
   note?: string | null
@@ -168,6 +170,8 @@ export interface Appointment {
 }
 
 export interface Checkin {
+  day: string
+  updatedAt: string
   id: string
   patientId: string
   mood: number

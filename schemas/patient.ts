@@ -70,6 +70,8 @@ export const patientPendingActivitySchema = z.array(z.object({
 }))
 
 export const patientCheckinSchema = z.object({
+  day: z.string().date(),
+  updatedAt: z.string().datetime({ offset: true }),
   id: z.string().uuid(),
   mood: z.number().int().min(1).max(5),
   note: z.string().nullable().optional(),
@@ -86,5 +88,5 @@ export const patientProcessSummarySchema = z.object({
 
 export const patientCheckinInputSchema = z.object({
   mood: z.number().int().min(1).max(5),
-  note: z.string().max(1000).optional(),
+  note: z.string().trim().max(1000, 'A observação deve ter no máximo 1.000 caracteres').optional(),
 }).strict()
