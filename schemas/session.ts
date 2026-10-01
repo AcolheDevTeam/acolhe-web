@@ -16,7 +16,8 @@ export const createSessionSchema = z.object({
   occurredAt: z.string({ required_error: 'Informe a data e a hora da sessão' })
     .datetime({ message: 'Informe a data e a hora da sessão' })
     .refine(value => new Date(value) >= new Date('1900-01-01T00:00:00Z'),
-      'A data da sessão deve ser a partir de 01/01/1900'),
+      'A data da sessão deve ser a partir de 01/01/1900')
+    .refine(value => new Date(value) <= new Date(), 'Para uma sessão futura, crie um agendamento'),
   notes: sessionNotesSchema,
 })
 
