@@ -35,9 +35,6 @@ const activePatients = computed(() =>
 const patientOptions = computed(() =>
   activePatients.value.map(patient => ({ value: patient.id, label: patient.fullName })),
 )
-// Sessões são registradas no passado ou agora; o schema rejeita datas futuras.
-const todayIso = new Date().toLocaleDateString('sv-SE')
-
 const { handleSubmit, isSubmitting, setFieldValue, resetForm } = useForm({
   validationSchema: toTypedSchema(createSessionSchema),
 })
@@ -102,7 +99,6 @@ const onSubmit = handleSubmit(async (values) => {
             <FormControl>
               <DateTimePicker
                 :model-value="value ?? ''"
-                :max-date="todayIso"
                 @update:model-value="handleChange"
               />
             </FormControl>
@@ -112,7 +108,7 @@ const onSubmit = handleSubmit(async (values) => {
 
         <FormField v-slot="{ componentField }" name="notes">
           <FormItem>
-            <FormLabel>Evolução da sessão</FormLabel>
+            <FormLabel>Evolução da sessão (opcional)</FormLabel>
             <FormControl>
               <Textarea rows="6" placeholder="Registro clínico…" v-bind="componentField" />
             </FormControl>
