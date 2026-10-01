@@ -15,7 +15,7 @@ import {
 const { patient, patientId, active } = defineProps<{
   patient: Patient | null
   patientId: string
-  active: 'overview' | 'sessions' | 'activities'
+  active: 'overview' | 'sessions' | 'activities' | 'checkins'
 }>()
 
 const config = useRuntimeConfig()
@@ -27,6 +27,7 @@ const tabs = computed(() => [
   { key: 'overview', label: 'Visão geral', to: `/patients/${patientId}` },
   { key: 'sessions', label: 'Prontuário', to: `/patients/${patientId}/sessions` },
   { key: 'activities', label: 'Atividades', to: `/patients/${patientId}/activities` },
+  { key: 'checkins', label: 'Check-ins', to: `/patients/${patientId}/checkins` },
 ].filter(tab => isActive.value || tab.key === 'overview'))
 
 const isActive = computed(() =>
@@ -116,7 +117,7 @@ const meta = computed(() => {
     </div>
 
     <!-- Navegação (abas) -->
-    <nav class="mt-6 flex gap-6 border-b">
+    <nav class="mt-6 flex gap-6 overflow-x-auto whitespace-nowrap border-b">
       <NuxtLink
         v-for="t in tabs"
         :key="t.key"
