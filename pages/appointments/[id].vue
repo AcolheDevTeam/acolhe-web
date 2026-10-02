@@ -8,13 +8,16 @@ definePageMeta({ middleware: ['auth', 'psychologist-only'] })
 const route = useRoute()
 const appointmentId = computed(() => route.params.id as string)
 const { data: appointment, error, refresh } = useAppointment(appointmentId)
-const busy = ref(false)
+const changingStatus = ref(false)
+const { opening, openRecord: openAppointmentRecord } = useOpenAppointmentRecord()
+const busy = computed(() => changingStatus.value || opening.value !== null)
 const now = useNow({ interval: 60000 })
 const active = computed(() => ['scheduled', 'confirmed'].includes(appointment.value?.status ?? ''))
 const hasStarted = computed(() => appointment.value && new Date(appointment.value.scheduledFor) <= now.value)
 
 async function changeStatus(status: string) {
-  busy.value = true
+  if (busy.value) return
+  changingStatus.value = true
   try {
     await $fetch(`/api/appointments/${appointmentId.value}/status`, { method: 'PUT', body: { status } })
     await refresh()
@@ -22,11 +25,10 @@ async function changeStatus(status: string) {
     toast.success('Agendamento atualizado.')
   } catch (error) {
     toast.error(apiErrorMessage(error, { 404: 'Este agendamento não está disponível para você.', 409: 'O status mudou ou esta ação não é permitida. Recarregue o agendamento.', default: 'Não foi possível atualizar o agendamento.' }))
-  } finally { busy.value = false }
+  } finally { changingStatus.value = false }
 }
-const { opening, openRecord: openAppointmentRecord } = useOpenAppointmentRecord()
 async function openRecord() {
-  if (appointment.value) await openAppointmentRecord(appointment.value)
+  if (!busy.value && appointment.value) await openAppointmentRecord(appointment.value)
 }
 
 </script>

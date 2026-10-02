@@ -27,16 +27,6 @@ const { data: patients, execute: loadPatients, error: patientsError } = await us
   immediate: false,
   default: () => [],
 })
-watch(open, async (isOpen) => {
-  if (!isOpen) return
-  if (!patientId) {
-    await loadPatients()
-    if (patientsError.value) toast.error(apiErrorMessage(patientsError.value, { default: 'Não foi possível carregar os pacientes. Feche e abra o formulário para tentar novamente.' }))
-  }
-  await loadTemplates()
-  if (templatesError.value) toast.error(apiErrorMessage(templatesError.value, { default: 'Não foi possível carregar os templates. Feche e abra o formulário para tentar novamente.' }))
-})
-
 const activePatients = computed(() =>
   (patients.value ?? []).filter(patient =>
     patient.status === 'active' && patient.relationshipStatus === 'active'),
@@ -46,6 +36,14 @@ const { data: templates, execute: loadTemplates, error: templatesError } = await
   immediate: false,
   default: () => [],
 })
+watch(open, async (isOpen) => {
+  if (!isOpen) return
+  await Promise.all([...(patientId ? [] : [loadPatients()]), loadTemplates()])
+  if (!open.value) return
+  if (!patientId && patientsError.value) toast.error(apiErrorMessage(patientsError.value, { default: 'Não foi possível carregar os pacientes. Feche e abra o formulário para tentar novamente.' }))
+  if (templatesError.value) toast.error(apiErrorMessage(templatesError.value, { default: 'Não foi possível carregar os templates. Feche e abra o formulário para tentar novamente.' }))
+})
+
 const patientOptions = computed(() =>
   activePatients.value.map(patient => ({ value: patient.id, label: patient.fullName })),
 )
