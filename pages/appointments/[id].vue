@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { useNow } from '@vueuse/core'
 import { toast } from 'vue-sonner'
-import type { Session } from '~/types'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 
@@ -25,18 +24,11 @@ async function changeStatus(status: string) {
     toast.error(apiErrorMessage(error, { 404: 'Este agendamento não está disponível para você.', 409: 'O status mudou ou esta ação não é permitida. Recarregue o agendamento.', default: 'Não foi possível atualizar o agendamento.' }))
   } finally { busy.value = false }
 }
+const { opening, openRecord: openAppointmentRecord } = useOpenAppointmentRecord()
 async function openRecord() {
-  if (!appointment.value) return
-  if (appointment.value.sessionId) return navigateTo(`/sessions/${appointment.value.sessionId}`)
-  busy.value = true
-  try {
-    const session = await $fetch<Session>(`/api/appointments/${appointmentId.value}/session`, { method: 'POST' })
-    await refreshNuxtData([`sessions-${session.patientId}`, 'sessions-all', `appointment-${appointmentId.value}`])
-    await navigateTo(`/sessions/${session.id}`)
-  } catch (error) {
-    toast.error(apiErrorMessage(error, { 403: 'O vínculo com esta paciente precisa estar ativo para registrar a evolução.', 404: 'Este agendamento não está disponível para você.', 409: 'A evolução pode ser registrada a partir do horário de um atendimento não cancelado.', default: 'Não foi possível abrir o prontuário agora.' }))
-  } finally { busy.value = false }
+  if (appointment.value) await openAppointmentRecord(appointment.value)
 }
+
 </script>
 
 <template>
