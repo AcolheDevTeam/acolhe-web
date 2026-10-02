@@ -27,6 +27,7 @@ const onSubmit = handleSubmit(async (values) => {
   loginError.value = ''
   try {
     const user = await $fetch<User>('/api/login', { method: 'POST', body: values })
+    clearNuxtData()
     await navigateTo(user.role === 'patient' ? '/patient' : '/dashboard')
   } catch (error) {
     // Só 401 significa credencial errada; qualquer outra falha recebe a causa real.

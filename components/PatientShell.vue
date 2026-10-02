@@ -15,7 +15,7 @@ import {
 const { patient, patientId, active } = defineProps<{
   patient: Patient | null
   patientId: string
-  active: 'overview' | 'sessions' | 'activities' | 'checkins'
+  active: 'overview' | 'sessions' | 'activities' | 'checkins' | 'registry'
 }>()
 
 const config = useRuntimeConfig()
@@ -28,7 +28,8 @@ const tabs = computed(() => [
   { key: 'sessions', label: 'Prontuário', to: `/patients/${patientId}/sessions` },
   { key: 'activities', label: 'Atividades', to: `/patients/${patientId}/activities` },
   { key: 'checkins', label: 'Check-ins', to: `/patients/${patientId}/checkins` },
-].filter(tab => isActive.value || tab.key === 'overview'))
+  { key: 'registry', label: 'Registro Documental', to: `/patients/${patientId}/registry` },
+].filter(tab => isActive.value || tab.key === 'overview' || tab.key === 'registry'))
 
 const isActive = computed(() =>
   patient?.status === 'active' && patient?.relationshipStatus === 'active',
@@ -134,7 +135,7 @@ const meta = computed(() => {
     </nav>
 
     <!-- Conteúdo -->
-    <div class="mt-8 grid gap-10 lg:grid-cols-[1fr_300px]">
+    <div class="mt-8 grid gap-10" :class="$slots.aside ? 'lg:grid-cols-[1fr_300px]' : ''">
       <div class="min-w-0">
         <slot />
       </div>
