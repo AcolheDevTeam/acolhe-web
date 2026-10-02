@@ -13,10 +13,10 @@ describe('agendamentos acessíveis pelo prontuário', () => {
       appointment('absent', { status: 'no_show' }), appointment('other', { patientId: 'patient-b' })]
     expect(pendingRecordAppointments(rows, [], 'patient-a', now).map(a => a.id)).toEqual(['past', 'completed', 'scheduled'])
   })
-  it('não duplica sessões e mantém acesso a uma sessão recém-criada ainda ausente da lista', () => {
+  it('não classifica como sem sessão um agendamento vinculado, mesmo com a lista de sessões desatualizada', () => {
     const sessions = [{ id: 'session-a' }, { id: 'session-b', appointmentId: 'linked' }] as Session[]
     const rows = [appointment('existing', { sessionId: 'session-a' }), appointment('linked'), appointment('new', { sessionId: 'session-new' })]
-    expect(pendingRecordAppointments(rows, sessions, 'patient-a', now).map(a => a.id)).toEqual(['new'])
+    expect(pendingRecordAppointments(rows, sessions, 'patient-a', now).map(a => a.id)).toEqual([])
   })
   it('ordena pelos horários mais recentes e inclui o horário atual', () => {
     const rows = [appointment('old'), appointment('now', { scheduledFor: new Date(now).toISOString() })]
