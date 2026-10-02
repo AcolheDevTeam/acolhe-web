@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Check, Download } from 'lucide-vue-next'
+import { Check } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 
@@ -33,10 +33,7 @@ const { data: session, error, refresh } = useSession(sessionId)
         <Check class="size-3" />
         Prontuário
       </Badge>
-      <Button variant="outline" size="sm">
-        <Download />
-        Exportar
-      </Button>
+      <RecordExportButton />
     </template>
   </PageHeader>
 
