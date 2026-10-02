@@ -32,7 +32,7 @@ const ordered = computed(() =>
       <div class="flex items-start gap-3 rounded-lg border bg-muted/40 px-4 py-3 text-sm">
         <Eye class="mt-0.5 size-4 shrink-0 text-muted-foreground" />
         <p class="text-muted-foreground">
-          <span class="font-medium text-foreground">Prontuário acessível à paciente.</span>
+          <span class="font-medium text-foreground">A paciente tem direito de acesso às informações deste prontuário.</span>
           Registre apenas o necessário ao cumprimento dos objetivos do trabalho (Art. 5º, II —
           Res. CFP 01/2009). Para hipóteses e impressões, use o Registro Documental.
         </p>
@@ -56,7 +56,10 @@ const ordered = computed(() =>
         </div>
       </template>
 
-      <p class="label-mono">Sessões · {{ ordered.length }}</p>
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <p class="label-mono">Sessões · {{ ordered.length }}</p>
+        <RecordExportButton />
+      </div>
 
       <div v-if="ordered.length" class="overflow-hidden rounded-xl border bg-card">
         <NuxtLink
