@@ -45,7 +45,7 @@ const main = computed<NavItem[]>(() => [
 ])
 
 const personal: NavItem[] = [
-  { label: 'Registro Documental', to: '/registry', icon: FileLock2, disabled: true },
+  { label: 'Registro Documental', to: '/registry', icon: FileLock2 },
   { label: 'Templates', to: '/templates', icon: BookMarked },
 ]
 
