@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { useNow } from '@vueuse/core'
 import { toast } from 'vue-sonner'
-import type { Session } from '~/types'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 
@@ -9,13 +8,16 @@ definePageMeta({ middleware: ['auth', 'psychologist-only'] })
 const route = useRoute()
 const appointmentId = computed(() => route.params.id as string)
 const { data: appointment, error, refresh } = useAppointment(appointmentId)
-const busy = ref(false)
+const changingStatus = ref(false)
+const { opening, openRecord: openAppointmentRecord } = useOpenAppointmentRecord()
+const busy = computed(() => changingStatus.value || opening.value !== null)
 const now = useNow({ interval: 60000 })
 const active = computed(() => ['scheduled', 'confirmed'].includes(appointment.value?.status ?? ''))
 const hasStarted = computed(() => appointment.value && new Date(appointment.value.scheduledFor) <= now.value)
 
 async function changeStatus(status: string) {
-  busy.value = true
+  if (busy.value) return
+  changingStatus.value = true
   try {
     await $fetch(`/api/appointments/${appointmentId.value}/status`, { method: 'PUT', body: { status } })
     await refresh()
@@ -23,20 +25,12 @@ async function changeStatus(status: string) {
     toast.success('Agendamento atualizado.')
   } catch (error) {
     toast.error(apiErrorMessage(error, { 404: 'Este agendamento não está disponível para você.', 409: 'O status mudou ou esta ação não é permitida. Recarregue o agendamento.', default: 'Não foi possível atualizar o agendamento.' }))
-  } finally { busy.value = false }
+  } finally { changingStatus.value = false }
 }
 async function openRecord() {
-  if (!appointment.value) return
-  if (appointment.value.sessionId) return navigateTo(`/sessions/${appointment.value.sessionId}`)
-  busy.value = true
-  try {
-    const session = await $fetch<Session>(`/api/appointments/${appointmentId.value}/session`, { method: 'POST' })
-    await refreshNuxtData([`sessions-${session.patientId}`, 'sessions-all', `appointment-${appointmentId.value}`])
-    await navigateTo(`/sessions/${session.id}`)
-  } catch (error) {
-    toast.error(apiErrorMessage(error, { 403: 'O vínculo com esta paciente precisa estar ativo para registrar a evolução.', 404: 'Este agendamento não está disponível para você.', 409: 'A evolução pode ser registrada a partir do horário de um atendimento não cancelado.', default: 'Não foi possível abrir o prontuário agora.' }))
-  } finally { busy.value = false }
+  if (!busy.value && appointment.value) await openAppointmentRecord(appointment.value)
 }
+
 </script>
 
 <template>

@@ -24,10 +24,19 @@ const emit = defineEmits<{ saved: [appointment: Appointment] }>()
 
 const open = ref(false)
 
-const { data: patients } = await useFetch<Patient[]>('/api/patients', {
-  key: 'patients-list',
+const { data: patients, execute: loadPatients, error: patientsError } = await useFetch<Patient[]>('/api/patients', {
+  key: 'dialog-patients-list',
+  immediate: false,
   default: () => [],
 })
+watch(open, async (isOpen) => {
+  if (!isOpen) return
+  if (!patientId && !appointment?.patientId) {
+    await loadPatients()
+    if (patientsError.value) toast.error(apiErrorMessage(patientsError.value, { default: 'Não foi possível carregar os pacientes. Feche e abra o formulário para tentar novamente.' }))
+  }
+})
+
 const activePatients = computed(() =>
   (patients.value ?? []).filter(patient =>
     patient.status === 'active' && patient.relationshipStatus === 'active'),
