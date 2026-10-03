@@ -10,6 +10,7 @@ const isLoggingOut = ref(false)
 async function logout() {
   isLoggingOut.value = true
   await $fetch('/api/logout', { method: 'POST' })
+  clearNuxtData()
   await navigateTo(logoutRedirect())
 }
 </script>

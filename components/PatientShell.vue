@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Clock3, FileText, MoreHorizontal, Plus } from 'lucide-vue-next'
+import { CalendarDays, Clock3, MoreHorizontal, Plus } from 'lucide-vue-next'
 import type { Patient } from '~/types'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
@@ -15,7 +15,7 @@ import {
 const { patient, patientId, active } = defineProps<{
   patient: Patient | null
   patientId: string
-  active: 'overview' | 'sessions' | 'activities'
+  active: 'overview' | 'sessions' | 'activities' | 'checkins' | 'registry'
 }>()
 
 const config = useRuntimeConfig()
@@ -27,7 +27,9 @@ const tabs = computed(() => [
   { key: 'overview', label: 'Visão geral', to: `/patients/${patientId}` },
   { key: 'sessions', label: 'Prontuário', to: `/patients/${patientId}/sessions` },
   { key: 'activities', label: 'Atividades', to: `/patients/${patientId}/activities` },
-].filter(tab => isActive.value || tab.key === 'overview'))
+  { key: 'checkins', label: 'Check-ins', to: `/patients/${patientId}/checkins` },
+  { key: 'registry', label: 'Registro Documental', to: `/patients/${patientId}/registry` },
+].filter(tab => isActive.value || tab.key === 'overview' || tab.key === 'registry'))
 
 const isActive = computed(() =>
   patient?.status === 'active' && patient?.relationshipStatus === 'active',
@@ -61,9 +63,9 @@ const meta = computed(() => {
       </Badge>
       <!-- No celular os botões ficam só com ícone para não cobrir o título. -->
       <NewSessionDialog v-if="isActive" :patient-id="patientId">
-        <Button variant="outline" size="sm" aria-label="Nova sessão">
-          <FileText />
-          <span class="hidden sm:inline">Nova sessão</span>
+        <Button variant="outline" size="sm" aria-label="Agendar sessão">
+          <CalendarDays />
+          <span class="hidden sm:inline">Agendar sessão</span>
         </Button>
       </NewSessionDialog>
       <AssignActivityDialog v-if="isActive" :patient-id="patientId">
@@ -116,7 +118,7 @@ const meta = computed(() => {
     </div>
 
     <!-- Navegação (abas) -->
-    <nav class="mt-6 flex gap-6 border-b">
+    <nav class="mt-6 flex gap-6 overflow-x-auto whitespace-nowrap border-b">
       <NuxtLink
         v-for="t in tabs"
         :key="t.key"
@@ -133,7 +135,7 @@ const meta = computed(() => {
     </nav>
 
     <!-- Conteúdo -->
-    <div class="mt-8 grid gap-10 lg:grid-cols-[1fr_300px]">
+    <div class="mt-8 grid gap-10" :class="$slots.aside ? 'lg:grid-cols-[1fr_300px]' : ''">
       <div class="min-w-0">
         <slot />
       </div>

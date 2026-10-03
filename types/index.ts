@@ -38,6 +38,8 @@ export interface PatientPendingActivity {
 }
 
 export interface PatientCheckin {
+  day: string
+  updatedAt: string
   id: string
   mood: number
   note?: string | null
@@ -100,6 +102,9 @@ export type SessionModality = 'online' | 'in_person'
 export type SessionStatus = 'pending' | 'completed'
 
 export interface Session {
+  appointmentId?: string
+  version?: number
+  locked?: boolean
   id: string
   patientId: string
   patientName?: string
@@ -152,6 +157,8 @@ export interface TimelineEvent {
 }
 
 export interface Appointment {
+  patientName?: string
+  sessionId?: string | null
   id: string
   patientId: string
   psychologistId: string
@@ -163,6 +170,8 @@ export interface Appointment {
 }
 
 export interface Checkin {
+  day: string
+  updatedAt: string
   id: string
   patientId: string
   mood: number

@@ -43,13 +43,13 @@ const main = computed<NavItem[]>(() => [
     icon: Users,
     count: user?.role === 'psychologist' ? patients.value.length : undefined,
   },
-  { label: 'Agenda', to: '/agenda', icon: CalendarDays, disabled: true },
+  { label: 'Agenda', to: '/agenda', icon: CalendarDays },
   { label: 'Atividades', to: '/activities', icon: ClipboardList },
   { label: 'Documentos', to: '/documents', icon: FileText, disabled: true },
 ])
 
 const personal: NavItem[] = [
-  { label: 'Registro Documental', to: '/registry', icon: FileLock2, disabled: true },
+  { label: 'Registro Documental', to: '/registry', icon: FileLock2 },
   { label: 'Templates', to: '/templates', icon: BookMarked },
 ]
 
