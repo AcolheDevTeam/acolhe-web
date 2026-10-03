@@ -19,6 +19,7 @@ watch(() => [props.session.id, props.session.version], () => {
   dirty.value = false
 }, { immediate: true })
 const onSubmit = handleSubmit(async (values) => {
+  if (exitProtection.pending.value) return
   try {
     const saved = await $fetch<Session>(`/api/sessions/${props.session.id}/notes`, { method: 'PUT', body: values })
     resetForm({ values: { notes: saved.notes ?? '', version: saved.version ?? 1 } })
@@ -37,6 +38,23 @@ const onSubmit = handleSubmit(async (values) => {
     }))
   }
 })
+const exitProtection = useNuxtApp().$protectedLogout
+const confirmOpen = ref(false)
+let resolveConfirmation: ((discard: boolean) => void) | undefined
+function decide(discard: boolean) {
+  confirmOpen.value = false
+  resolveConfirmation?.(discard)
+  resolveConfirmation = undefined
+}
+const unregisterExit = exitProtection.register({
+  saving: isSubmitting,
+  confirm: () => {
+    if (!dirty.value) return Promise.resolve(true)
+    confirmOpen.value = true
+    return new Promise<boolean>(resolve => { resolveConfirmation = resolve })
+  },
+})
+onBeforeUnmount(() => { unregisterExit(); decide(false) })
 </script>
 
 <template>
@@ -44,15 +62,16 @@ const onSubmit = handleSubmit(async (values) => {
     <FormField v-slot="{ componentField }" name="notes">
       <FormItem>
         <FormLabel>Evolução da sessão (opcional)</FormLabel>
-        <FormControl><Textarea rows="10" placeholder="Registro clínico…" @update:model-value="dirty = true" :disabled="session.locked || isSubmitting" v-bind="componentField" /></FormControl>
+        <FormControl><Textarea rows="10" placeholder="Registro clínico…" @update:model-value="dirty = true" :disabled="session.locked || isSubmitting || exitProtection.pending.value" v-bind="componentField" /></FormControl>
         <FormMessage />
       </FormItem>
     </FormField>
     <p v-if="dirty" class="text-xs text-muted-foreground">Alterações ainda não salvas.</p>
     <p class="text-xs text-muted-foreground">{{ session.locked ? 'Este prontuário está bloqueado para edição.' : 'Você pode salvar sem texto e preencher depois. O status do atendimento é definido no agendamento.' }}</p>
     <div class="flex flex-wrap gap-2">
-      <Button type="submit" :disabled="isSubmitting || session.locked || conflict">{{ isSubmitting ? 'Salvando…' : 'Salvar evolução' }}</Button>
+      <Button type="submit" :disabled="isSubmitting || session.locked || conflict || exitProtection.pending.value">{{ isSubmitting ? 'Salvando…' : 'Salvar evolução' }}</Button>
       <Button v-if="conflict" type="button" variant="outline" @click="emit('reload')">Recarregar evolução</Button>
     </div>
   </form>
+  <UnsavedChangesDialog :open="confirmOpen" @decision="decide" />
 </template>

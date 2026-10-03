@@ -52,6 +52,9 @@ const latest = ref<Notebook | null>(null)
 const conflicted = ref(false)
 const confirmOpen = ref(false)
 let resolveConfirmation: ((value: boolean) => void) | undefined
+const exitProtection = useNuxtApp().$protectedLogout
+const unregisterExit = exitProtection.register({ saving, confirm: confirmDiscard })
+onBeforeUnmount(unregisterExit)
 const dirty = computed(() => draft.value !== (saved.value?.content ?? ''))
 const writable = computed(
   () =>
@@ -65,6 +68,7 @@ const canSave = computed(
     dirty.value &&
     writable.value &&
     !saving.value &&
+    !exitProtection.pending.value &&
     contentValid.value &&
     !conflicted.value,
 )
@@ -315,7 +319,7 @@ async function useLatest() {
   void loadHistory()
 }
 const beforeUnload = (event: BeforeUnloadEvent) => {
-  if (dirty.value || saving.value) {
+  if (!exitProtection.leaving.value && (dirty.value || saving.value)) {
     event.preventDefault()
     event.returnValue = ''
   }
@@ -385,7 +389,7 @@ watch(
           :variant="category === item.value ? 'default' : 'outline'"
           size="sm"
           :aria-pressed="category === item.value"
-          :disabled="saving"
+          :disabled="saving || exitProtection.pending.value"
           @click="changeCategory(item.value)"
           >{{ item.label }}</Button
         >
@@ -403,7 +407,7 @@ watch(
           <Textarea
             id="documentary-content"
             v-model="draft"
-            :readonly="!writable || saving"
+            :readonly="!writable || saving || exitProtection.pending.value"
             class="min-h-[360px] resize-y whitespace-pre-wrap text-base leading-relaxed"
             placeholder="Escreva suas anotações nesta categoria…"
             :aria-invalid="!contentValid"
@@ -515,11 +519,11 @@ watch(
           /><DialogFooter
             ><Button
               variant="outline"
-              :disabled="!writable || saving"
+              :disabled="!writable || saving || exitProtection.pending.value"
               @click="useVersion"
               >Usar no editor</Button
             ><Button
-              :disabled="!writable || saving || conflicted"
+              :disabled="!writable || saving || conflicted || exitProtection.pending.value"
               @click="restoreVersion"
               >{{ saving ? 'Restaurando…' : 'Restaurar esta versão' }}</Button
             ></DialogFooter

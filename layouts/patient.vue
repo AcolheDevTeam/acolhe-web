@@ -2,17 +2,9 @@
 import { ClipboardList, HeartPulse, Home, LogOut } from 'lucide-vue-next'
 import type { User } from '~/types'
 import { Button } from '@/components/ui/button'
-import { logoutRedirect } from '~/utils/patient-portal'
 
 const { data: user } = await useFetch<User | null>('/api/me', { key: 'me' })
-const isLoggingOut = ref(false)
-
-async function logout() {
-  isLoggingOut.value = true
-  await $fetch('/api/logout', { method: 'POST' })
-  clearNuxtData()
-  await navigateTo(logoutRedirect())
-}
+const { logout, isLoggingOut } = useLogout()
 </script>
 
 <template>

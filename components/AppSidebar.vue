@@ -11,9 +11,7 @@ import {
   Settings,
   Users,
 } from 'lucide-vue-next'
-import { toast } from 'vue-sonner'
 import type { Patient, UserRole } from '~/types'
-import { logoutRedirect } from '~/utils/patient-portal'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 
@@ -59,26 +57,7 @@ function isActive(to: string) {
   return route.path === to || route.path.startsWith(`${to}/`)
 }
 
-const isLoggingOut = ref(false)
-
-// Sai da conta e recarrega a aplicação. O recarregamento é proposital: descarta
-// o cache em memória do useFetch (lista de pacientes, /me, timelines), que de
-// outro modo continuaria visível para quem entrasse em seguida no mesmo
-// navegador — mesmo motivo da chave de cache por paciente da Regra 3.
-async function logout() {
-  if (isLoggingOut.value) return
-  isLoggingOut.value = true
-  try {
-    await $fetch('/api/logout', { method: 'POST' })
-    await navigateTo(logoutRedirect(), { replace: true, external: true })
-  }
-  catch (error) {
-    isLoggingOut.value = false
-    toast.error(apiErrorMessage(error, {
-      default: 'Não foi possível sair agora. Tente novamente em instantes.',
-    }))
-  }
-}
+const { logout, isLoggingOut } = useLogout()
 
 const displayName = computed(() => user?.name ?? user?.email ?? 'Minha conta')
 const initials = computed(() =>
