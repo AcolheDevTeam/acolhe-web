@@ -76,12 +76,14 @@ const activeActivities = computed(() =>
 const identity = computed(() => {
   const p = patient.value
   return [
-    { label: 'E-mail', value: p?.email },
-    { label: 'Telefone', value: p?.phone },
-    { label: 'Vínculo', value: p?.bond },
+    { label: 'E-mail', value: p?.email || 'Não informado' },
+    { label: 'Telefone', value: p?.phone || 'Não informado' },
+    { label: 'Vínculo', value: patientRelationshipLabel(p?.relationshipStatus) },
     {
-      label: 'Consentimento',
-      value: p?.consentVersion ? `${p.consentVersion} · ${formatDate(p.consentDate)}` : undefined,
+      label: 'Consentimento de dados de saúde',
+      value: p?.healthConsent
+        ? `${p.healthConsent.accepted ? 'Aceito' : 'Não aceito'} · ${p.healthConsent.version} · ${formatDate(p.healthConsent.decidedAt)}`
+        : 'Sem registro',
     },
   ]
 })
@@ -227,7 +229,7 @@ const identity = computed(() => {
         <dl class="flex flex-col gap-2 text-sm">
           <div v-for="row in identity" :key="row.label" class="flex justify-between gap-4">
             <dt class="text-muted-foreground">{{ row.label }}</dt>
-            <dd class="text-right">{{ row.value ?? '—' }}</dd>
+            <dd class="min-w-0 break-words text-right [overflow-wrap:anywhere]">{{ row.value ?? '—' }}</dd>
           </div>
         </dl>
       </section>

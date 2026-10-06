@@ -38,7 +38,7 @@ const onSubmit = handleSubmit(async (values) => {
     await refreshNuxtData('patients-list')
   } catch (error) {
     toast.error(apiErrorMessage(error, {
-      400: 'Confira o nome, o e-mail e a data de nascimento.',
+      400: 'Confira o nome, o e-mail, o telefone e a data de nascimento.',
       403: 'Só psicólogas com perfil ativo podem cadastrar pacientes.',
       default: 'Não foi possível criar o paciente agora.',
     }))
@@ -90,6 +90,16 @@ watch(open, (isOpen) => {
             <FormLabel>E-mail</FormLabel>
             <FormControl>
               <Input type="email" placeholder="julia@exemplo.com" v-bind="componentField" />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        </FormField>
+
+        <FormField v-slot="{ componentField }" name="phone">
+          <FormItem>
+            <FormLabel>Telefone (opcional)</FormLabel>
+            <FormControl>
+              <Input type="tel" autocomplete="tel" placeholder="(11) 99999-9999" v-bind="componentField" />
             </FormControl>
             <FormMessage />
           </FormItem>

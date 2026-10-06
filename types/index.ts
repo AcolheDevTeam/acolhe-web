@@ -91,14 +91,12 @@ export interface Patient {
   adherence?: number // 0–100 (%)
   lastActivityLabel?: string // ex.: "Hoje, 14h"
   // Ficha (detalhe).
-  email?: string
-  phone?: string
-  bond?: string // vínculo, ex.: "Ativo · particular"
+  email?: string | null
+  phone?: string | null
+  healthConsent?: { accepted: boolean, version: string, decidedAt: string } | null
   demand?: string // demanda clínica
   moodAvg?: number
   moodSeries?: number[]
-  consentVersion?: string
-  consentDate?: string
   nextSession?: Pick<Session, 'occurredAt' | 'modality' | 'durationMin'> | null
 }
 
