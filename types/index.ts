@@ -5,6 +5,10 @@ export interface User {
   email: string
   role: UserRole
   organizationId: string | null
+  /** Verificação de e-mail do cadastro (ACO-61/63). Ausente em contas antigas = verificado. */
+  emailStatus?: 'pending' | 'verified'
+  /** Próximo passo obrigatório informado pela API (hoje só 'verify_email'). */
+  nextStep?: 'verify_email'
   name?: string
   crp?: string
   patient?: PatientContext

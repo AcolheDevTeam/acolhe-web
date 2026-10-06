@@ -28,6 +28,8 @@ const onSubmit = handleSubmit(async (values) => {
   try {
     const user = await $fetch<User>('/api/login', { method: 'POST', body: values })
     clearNuxtData()
+    // E-mail pendente trava o painel: o próximo passo é confirmar (ACO-63).
+    if (user.nextStep === 'verify_email') return await navigateTo('/verify-email')
     await navigateTo(user.role === 'patient' ? '/patient' : '/dashboard')
   } catch (error) {
     // Só 401 significa credencial errada; qualquer outra falha recebe a causa real.

@@ -8,12 +8,17 @@ const signupResponseSchema = z.object({
     email: z.string().email(),
     role: z.string(),
     organizationId: z.string().uuid().nullable(),
+    // Verificação de e-mail (ACO-61): pendente até confirmar pelo link.
+    emailStatus: z.enum(['pending', 'verified']),
+    nextStep: z.enum(['verify_email']).optional(),
   }),
   psychologistId: z.string().uuid(),
   crpStatus: z.literal('pending'),
   onboardingStatus: z.string(),
   termsVersion: z.literal('0.3'),
   privacyVersion: z.literal('0.3'),
+  // Resultado do e-mail de confirmação; ausente no modo automático.
+  verificationDelivery: z.enum(['sent', 'failed', 'disabled']).optional(),
 })
 
 // O token fica exclusivamente no cookie HttpOnly; o browser recebe apenas a projeção pública.
@@ -47,6 +52,7 @@ export default defineEventHandler(async (event) => {
       onboardingStatus: result.onboardingStatus,
       termsVersion: result.termsVersion,
       privacyVersion: result.privacyVersion,
+      verificationDelivery: result.verificationDelivery,
     }
   } catch (error: unknown) {
     const statusCode = (error as { response?: { status?: number } }).response?.status

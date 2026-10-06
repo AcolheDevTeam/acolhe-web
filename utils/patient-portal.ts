@@ -10,8 +10,11 @@ export function patientRedirect(role?: UserRole | null): string {
   return '/login'
 }
 
-export function authRedirect(user: { role: UserRole } | null | undefined): string | undefined {
-  return user ? undefined : '/login'
+export function authRedirect(user: { role: UserRole, nextStep?: string } | null | undefined): string | undefined {
+  if (!user) return '/login'
+  // Conta com e-mail pendente só anda depois de confirmar (ACO-63).
+  if (user.nextStep === 'verify_email') return '/verify-email'
+  return undefined
 }
 
 export function sessionExpired(error: { statusCode?: number } | null | undefined): boolean {
