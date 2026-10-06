@@ -12,6 +12,8 @@ export const createPatientSchema = z.object({
     .toLowerCase()
     .email('Informe um e-mail válido')
     .max(320, 'O e-mail deve ter no máximo 320 caracteres'),
+  phone: z.string().trim().max(32, 'O telefone deve ter no máximo 32 caracteres')
+    .refine(value => !value || (/^[+0-9() .-]+$/.test(value) && value.replace(/\D/g, '').length >= 8 && value.replace(/\D/g, '').length <= 15), 'Informe um telefone válido, com DDD').optional(),
   birthDate: z.preprocess(
     value => value === '' ? undefined : value,
     z.string().date('Data de nascimento inválida').refine((value) => {
@@ -27,6 +29,13 @@ export const patientSchema = z.object({
   status: z.enum(['onboarding', 'active', 'archived', 'deleted']),
   relationshipStatus: z.enum(['pending', 'active', 'paused', 'ended', 'transferred']),
   createdAt: z.string().datetime({ offset: true }),
+  email: z.string().email().nullable().optional(),
+  phone: z.string().nullable().optional(),
+  healthConsent: z.object({
+    accepted: z.boolean(),
+    version: z.string(),
+    decidedAt: z.string().datetime({ offset: true }),
+  }).nullable().optional(),
 }).passthrough()
 
 export const invitationDeliveryStatusSchema = z.enum(['sent', 'failed', 'disabled'])
