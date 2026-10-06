@@ -63,3 +63,20 @@ describe('contrato do cadastro do psicólogo', () => {
     expect(signupPayloadSchema.safeParse({ ...camposDoFormulario, termsVersion: '0.2' }).success).toBe(false)
   })
 })
+
+describe('validação de e-mail não pode estourar (regressão do TypeError)', () => {
+  it('e-mail sem @ reprova com mensagem, sem lançar exceção', async () => {
+    // Zod roda o refine mesmo com o .email() reprovado (estado dirty); sem o
+    // guard de domain, "semarroba" derrubava a validação inteira do formulário.
+    const result = await signupPayloadSchema.safeParseAsync({ ...camposDoFormulario, email: 'semarroba' })
+    expect(result.success).toBe(false)
+    if (!result.success) expect(result.error.issues[0]?.message).toBe('Informe um e-mail válido.')
+  })
+
+  it('variações malformadas também reprovam sem exceção', async () => {
+    for (const email of ['', '@', 'a@', '@b.com', 'a@@b.com', '.a@b.com']) {
+      const result = await signupPayloadSchema.safeParseAsync({ ...camposDoFormulario, email })
+      expect(result.success).toBe(false)
+    }
+  })
+})

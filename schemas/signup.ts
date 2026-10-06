@@ -3,9 +3,12 @@ import { z } from 'zod'
 // Contrato de POST /signup (ver acolhe-api/docs/api/psychologist-signup.md).
 // É o que a página envia e o que o BFF valida — sem campos de UI.
 export const signupPayloadSchema = z.object({
+  // O refine roda mesmo quando o .email() já reprovou (Zod só pula refinements
+  // em parse abortado, e falha de formato é "dirty"): sem o guard de domain,
+  // um e-mail sem @ estourava TypeError dentro da validação do formulário.
   email: z.string().trim().email('Informe um e-mail válido.').refine((value) => {
     const [local, domain] = value.split('@')
-    return !value.includes('..') && !local.startsWith('.') && !local.endsWith('.') && domain.includes('.')
+    return !!domain && !value.includes('..') && !local.startsWith('.') && !local.endsWith('.') && domain.includes('.')
   }, 'Informe um e-mail válido.').transform((value) => value.toLowerCase()),
   password: z.string().min(8, 'Mínimo de 8 caracteres.').max(128, 'Máximo de 128 caracteres.'),
   fullName: z.string().trim().min(2, 'Informe seu nome completo.').max(200, 'Nome muito longo.'),
