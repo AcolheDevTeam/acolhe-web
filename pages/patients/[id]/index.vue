@@ -228,7 +228,7 @@ const identity = computed(() => {
         <p class="label-mono">Identificação</p>
         <dl class="flex flex-col gap-2 text-sm">
           <div v-for="row in identity" :key="row.label" class="flex justify-between gap-4">
-            <dt class="text-muted-foreground">{{ row.label }}</dt>
+            <dt class="max-w-[45%] shrink-0 text-muted-foreground">{{ row.label }}</dt>
             <dd class="min-w-0 break-words text-right [overflow-wrap:anywhere]">{{ row.value ?? '—' }}</dd>
           </div>
         </dl>
