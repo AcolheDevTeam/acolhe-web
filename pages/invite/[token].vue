@@ -15,10 +15,11 @@ type Invitation = z.infer<typeof invitationSchema>
 
 const route = useRoute()
 const token = computed(() => route.params.token as string)
-const { data: invitation, status, error } = await useFetch<Invitation>(
+const { data: invitation, status, error, refresh } = await useFetch<Invitation>(
   () => `/api/onboarding/invitations/${encodeURIComponent(token.value)}`,
   { key: () => `invitation-${token.value}` },
 )
+const loadFailure = computed(() => invitationLoadFailure(error.value?.statusCode))
 
 const selected = ref<string[]>([])
 const password = ref('')
@@ -98,11 +99,14 @@ async function decline() {
           <div class="h-32 animate-pulse rounded bg-muted" />
         </div>
 
-        <div v-else-if="error" class="py-10 text-center">
-          <p class="font-serif text-3xl">Convite indisponível</p>
-          <p class="mt-2 text-sm text-muted-foreground">
-            O link pode ter expirado, sido recusado ou já ter sido utilizado.
+        <div v-else-if="error" class="py-10 text-center" role="alert">
+          <p class="font-serif text-3xl">{{ loadFailure.title }}</p>
+          <p class="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
+            {{ loadFailure.message }}
           </p>
+          <Button v-if="loadFailure.canRetry" class="mt-6" variant="outline" @click="refresh()">
+            Tentar novamente
+          </Button>
         </div>
 
         <div v-else-if="completed" class="py-10 text-center">
