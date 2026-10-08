@@ -14,6 +14,10 @@ const patientId = computed(() => route.params.id as string)
 
 const { data: patient } = usePatient(patientId)
 const { data: activities } = usePatientActivities(patientId)
+const { data: appointments } = useAppointments()
+const nextAppointment = computed(() => (appointments.value ?? [])
+  .filter(a => a.patientId === patientId.value && ['scheduled', 'confirmed'].includes(a.status) && new Date(a.scheduledFor) >= new Date())
+  .sort((a, b) => a.scheduledFor.localeCompare(b.scheduledFor))[0])
 const isActive = computed(() =>
   patient.value?.status === 'active' && patient.value?.relationshipStatus === 'active',
 )
@@ -72,12 +76,14 @@ const activeActivities = computed(() =>
 const identity = computed(() => {
   const p = patient.value
   return [
-    { label: 'E-mail', value: p?.email },
-    { label: 'Telefone', value: p?.phone },
-    { label: 'Vínculo', value: p?.bond },
+    { label: 'E-mail', value: p?.email || 'Não informado' },
+    { label: 'Telefone', value: p?.phone || 'Não informado' },
+    { label: 'Vínculo', value: patientRelationshipLabel(p?.relationshipStatus) },
     {
-      label: 'Consentimento',
-      value: p?.consentVersion ? `${p.consentVersion} · ${formatDate(p.consentDate)}` : undefined,
+      label: 'Consentimento de dados de saúde',
+      value: p?.healthConsent
+        ? `${p.healthConsent.accepted ? 'Aceito' : 'Não aceito'} · ${p.healthConsent.version} · ${formatDate(p.healthConsent.decidedAt)}`
+        : 'Sem registro',
     },
   ]
 })
@@ -186,16 +192,16 @@ const identity = computed(() => {
 
     <!-- Coluna lateral -->
     <template #aside>
-      <Card v-if="isActive && patient?.nextSession">
+      <Card v-if="isActive && nextAppointment">
         <CardContent class="flex flex-col gap-3 pt-6">
           <p class="label-mono">Próxima sessão</p>
-          <p class="font-serif text-2xl leading-tight">{{ formatDateTime(patient.nextSession.occurredAt) }}</p>
+          <p class="font-serif text-2xl leading-tight">{{ formatDateTime(nextAppointment.scheduledFor) }}</p>
           <p class="text-sm text-muted-foreground">
-            {{ modalityLabel(patient.nextSession.modality) }} · {{ patient.nextSession.durationMin }} min
+            {{ modalityLabel(nextAppointment.modality) }} · {{ nextAppointment.durationMinutes }} min
           </p>
           <div class="mt-1 flex gap-2">
-            <Button variant="outline" size="sm" class="flex-1">Reagendar</Button>
-            <Button size="sm" class="flex-1">Iniciar</Button>
+            <NewSessionDialog :appointment="nextAppointment"><Button variant="outline" size="sm">Reagendar</Button></NewSessionDialog>
+            <Button size="sm" as-child><NuxtLink :to="`/appointments/${nextAppointment.id}`">Ver sessão</NuxtLink></Button>
           </div>
         </CardContent>
       </Card>
@@ -222,8 +228,8 @@ const identity = computed(() => {
         <p class="label-mono">Identificação</p>
         <dl class="flex flex-col gap-2 text-sm">
           <div v-for="row in identity" :key="row.label" class="flex justify-between gap-4">
-            <dt class="text-muted-foreground">{{ row.label }}</dt>
-            <dd class="text-right">{{ row.value ?? '—' }}</dd>
+            <dt class="max-w-[45%] shrink-0 text-muted-foreground">{{ row.label }}</dt>
+            <dd class="min-w-0 break-words text-right [overflow-wrap:anywhere]">{{ row.value ?? '—' }}</dd>
           </div>
         </dl>
       </section>

@@ -4,6 +4,7 @@ import { useForm } from 'vee-validate'
 import { signupSchema, signupTermsVersion } from '~/schemas/signup'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 
@@ -26,8 +27,8 @@ const [crpNumber, crpNumberAttrs] = defineField('crpNumber')
 const [crpState, crpStateAttrs] = defineField('crpState')
 const [cpf, cpfAttrs] = defineField('cpf')
 const [approach, approachAttrs] = defineField('approach')
-const [acceptTerms, acceptTermsAttrs] = defineField('acceptTerms')
-const [acceptPrivacy, acceptPrivacyAttrs] = defineField('acceptPrivacy')
+const [acceptTerms] = defineField('acceptTerms')
+const [acceptPrivacy] = defineField('acceptPrivacy')
 
 const fieldsByStep = [
   ['email', 'password', 'confirmPassword'],
@@ -46,17 +47,29 @@ function previousStep() {
   submitError.value = ''
 }
 
+interface SignupResponse {
+  user: { emailStatus?: 'pending' | 'verified', nextStep?: string }
+  verificationDelivery?: 'sent' | 'failed' | 'disabled'
+}
+
 const onSubmit = handleSubmit(async (values) => {
   submitError.value = ''
   const { confirmPassword: _confirmPassword, ...apiPayload } = values
   try {
-    await $fetch('/api/signup', { method: 'POST', body: apiPayload })
+    const result = await $fetch<SignupResponse>('/api/signup', { method: 'POST', body: apiPayload })
+    // Com verificação ativa, o próximo passo é confirmar o e-mail (ACO-63).
+    // delivery=failed avisa a tela que o primeiro envio não saiu.
+    if (result.user.nextStep === 'verify_email') {
+      const failed = result.verificationDelivery !== 'sent'
+      return await navigateTo({ path: '/verify-email', query: failed ? { delivery: 'failed' } : {} })
+    }
     await navigateTo('/dashboard')
   } catch (error: unknown) {
-    const status = (error as { statusCode?: number }).statusCode
-    submitError.value = status === 409
-      ? 'Não foi possível concluir o cadastro. Confira os dados e tente novamente.'
-      : 'Não foi possível concluir o cadastro agora. Tente novamente.'
+    submitError.value = apiErrorMessage(error, {
+      400: 'Alguns dados não foram aceitos. Revise as etapas e tente novamente.',
+      409: 'Não foi possível concluir o cadastro. Confira os dados e tente novamente.',
+      default: 'Não foi possível concluir o cadastro agora. Tente novamente.',
+    })
   }
 })
 </script>
@@ -122,9 +135,15 @@ const onSubmit = handleSubmit(async (values) => {
           <fieldset v-else class="flex flex-col gap-4">
             <legend class="display-serif text-2xl">Leia com calma</legend>
             <p class="text-sm leading-relaxed text-muted-foreground">Ao continuar, você concorda com os Termos de Uso e a Política de Privacidade (versão 0.3). Seu consentimento fica registrado com data, IP e versão exata do documento.</p>
-            <label class="flex items-start gap-3 text-sm"><input v-model="acceptTerms" v-bind="acceptTermsAttrs" type="checkbox" class="mt-1 rounded border-input" /><span>Aceito os Termos de Uso (versão 0.3).</span></label>
+            <div class="flex items-start gap-3 text-sm">
+              <Checkbox id="acceptTerms" class="mt-1" :model-value="acceptTerms === true" @update:model-value="(checked) => (acceptTerms = checked === true)" />
+              <Label for="acceptTerms" class="font-normal leading-relaxed">Aceito os Termos de Uso (versão 0.3).</Label>
+            </div>
             <p v-if="errors.acceptTerms" class="text-xs text-destructive">{{ errors.acceptTerms }}</p>
-            <label class="flex items-start gap-3 text-sm"><input v-model="acceptPrivacy" v-bind="acceptPrivacyAttrs" type="checkbox" class="mt-1 rounded border-input" /><span>Aceito a Política de Privacidade (versão 0.3).</span></label>
+            <div class="flex items-start gap-3 text-sm">
+              <Checkbox id="acceptPrivacy" class="mt-1" :model-value="acceptPrivacy === true" @update:model-value="(checked) => (acceptPrivacy = checked === true)" />
+              <Label for="acceptPrivacy" class="font-normal leading-relaxed">Aceito a Política de Privacidade (versão 0.3).</Label>
+            </div>
             <p v-if="errors.acceptPrivacy" class="text-xs text-destructive">{{ errors.acceptPrivacy }}</p>
             <p v-if="submitError" class="text-sm text-destructive" role="alert">{{ submitError }}</p>
           </fieldset>

@@ -39,7 +39,7 @@ export function sessionStatusMeta(status?: string): { label: string, variant: Ba
     case 'completed':
       return { label: 'Realizada', variant: 'secondary' }
     case 'pending':
-      return { label: 'Agendada', variant: 'outline' }
+      return { label: 'Em registro', variant: 'outline' }
     default:
       return { label: status ?? '—', variant: 'outline' }
   }
@@ -74,4 +74,8 @@ export function patientStatusLabel(s?: string): string {
   if (s === 'onboarding') return 'Em onboarding'
   if (s === 'archived') return 'Arquivado'
   return s ?? '—'
+}
+
+export function appointmentStatusLabel(status: string): string {
+  return ({ scheduled: 'Agendada', confirmed: 'Confirmada', completed: 'Realizada', canceled: 'Cancelada', no_show: 'Falta' } as Record<string, string>)[status] ?? status
 }

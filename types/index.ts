@@ -5,6 +5,10 @@ export interface User {
   email: string
   role: UserRole
   organizationId: string | null
+  /** Verificação de e-mail do cadastro (ACO-61/63). Ausente em contas antigas = verificado. */
+  emailStatus?: 'pending' | 'verified'
+  /** Próximo passo obrigatório informado pela API (hoje só 'verify_email'). */
+  nextStep?: 'verify_email'
   name?: string
   crp?: string
   patient?: PatientContext
@@ -38,6 +42,8 @@ export interface PatientPendingActivity {
 }
 
 export interface PatientCheckin {
+  day: string
+  updatedAt: string
   id: string
   mood: number
   note?: string | null
@@ -85,14 +91,12 @@ export interface Patient {
   adherence?: number // 0–100 (%)
   lastActivityLabel?: string // ex.: "Hoje, 14h"
   // Ficha (detalhe).
-  email?: string
-  phone?: string
-  bond?: string // vínculo, ex.: "Ativo · particular"
+  email?: string | null
+  phone?: string | null
+  healthConsent?: { accepted: boolean, version: string, decidedAt: string } | null
   demand?: string // demanda clínica
   moodAvg?: number
   moodSeries?: number[]
-  consentVersion?: string
-  consentDate?: string
   nextSession?: Pick<Session, 'occurredAt' | 'modality' | 'durationMin'> | null
 }
 
@@ -100,6 +104,9 @@ export type SessionModality = 'online' | 'in_person'
 export type SessionStatus = 'pending' | 'completed'
 
 export interface Session {
+  appointmentId?: string
+  version?: number
+  locked?: boolean
   id: string
   patientId: string
   patientName?: string
@@ -152,6 +159,8 @@ export interface TimelineEvent {
 }
 
 export interface Appointment {
+  patientName?: string
+  sessionId?: string | null
   id: string
   patientId: string
   psychologistId: string
@@ -163,6 +172,8 @@ export interface Appointment {
 }
 
 export interface Checkin {
+  day: string
+  updatedAt: string
   id: string
   patientId: string
   mood: number

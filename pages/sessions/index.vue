@@ -27,7 +27,7 @@ const grouped = computed(() => {
       <NewSessionDialog>
         <Button size="sm">
           <Plus />
-          Nova sessão
+          Agendar sessão
         </Button>
       </NewSessionDialog>
     </template>

@@ -8,7 +8,7 @@ import { Separator } from '@/components/ui/separator'
 definePageMeta({ middleware: ['auth', 'psychologist-only'] })
 
 const { data: me } = await useFetch<User>('/api/me', { key: 'me' })
-const { data: allSessions } = useSessions()
+const { data: allAppointments } = useAppointments()
 const { data: allActivities } = useActivities()
 const { data: patients } = await useFetch<Patient[]>('/api/patients', {
   key: 'patients-list',
@@ -31,9 +31,9 @@ const today = computed(() => {
 
 const sessionsToday = computed(() => {
   const now = new Date()
-  return (allSessions.value ?? []).filter((session) => {
-    const occurredAt = new Date(session.occurredAt)
-    return occurredAt.getFullYear() === now.getFullYear()
+  return (allAppointments.value ?? []).filter((session) => {
+    const occurredAt = new Date(session.scheduledFor)
+    return ['scheduled', 'confirmed', 'completed'].includes(session.status) && occurredAt.getFullYear() === now.getFullYear()
       && occurredAt.getMonth() === now.getMonth()
       && occurredAt.getDate() === now.getDate()
   })
@@ -57,15 +57,15 @@ const avgAdherence = computed(() => {
         </kbd>
       </div>
       <NewSessionDialog>
-        <Button variant="outline" size="sm">
+        <Button variant="outline" size="sm" aria-label="Agendar sessão">
           <Plus />
-          Nova sessão
+          <span class="hidden sm:inline">Agendar sessão</span>
         </Button>
       </NewSessionDialog>
       <NewPatientDialog>
-        <Button size="sm">
+        <Button size="sm" aria-label="Novo paciente">
           <Plus />
-          Novo paciente
+          <span class="hidden sm:inline">Novo paciente</span>
         </Button>
       </NewPatientDialog>
     </template>
@@ -92,7 +92,7 @@ const avgAdherence = computed(() => {
           </NuxtLink>
         </div>
         <div v-if="sessionsToday.length" class="flex flex-col gap-2">
-          <SessionRow v-for="s in sessionsToday" :key="s.id" :session="s" />
+          <AppointmentRow v-for="s in sessionsToday" :key="s.id" :appointment="s" />
         </div>
         <p v-else class="rounded-lg border border-dashed px-4 py-8 text-center text-sm text-muted-foreground">
           Nenhuma sessão agendada para hoje.

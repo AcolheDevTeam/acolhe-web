@@ -574,13 +574,81 @@ recusa (`:58` e `:72`), mas **não** o carregamento inicial da página. Falta di
 carregar o convite agora, tente novamente em instantes"), e só afirmar a causa quando a API
 tiver dito qual é.
 
+**Feito em 2026-10-08** (PR #45 do web): a falha de carregamento agora diz a causa que a
+API afirmou: 404 "Convite não encontrado", 410 "expirou, foi recusado ou já foi utilizado", e
+5xx/rede "Não foi possível carregar o convite" com botão de tentar de novo, sem falar em
+expiração. Textos em `utils/invitation.ts`, testes em `tests/invitation-load.test.ts`.
+
 **Padrão que se repete — terceira ocorrência.** C5 (ACO-70), C6 (ACO-69) e agora C8 são todos
 mudança no backend rompendo em silêncio um contrato Zod do BFF, com a tela mostrando uma
 mensagem que aponta para a causa errada. O CI não pega porque as fixtures de teste são mais
 pobres que o banco real. Vale tratar "fixture tem que reproduzir o estado de produção" como
 regra, não como detalhe de cada PR.
 
----
+### C9. Verificação de e-mail do cadastro (ACO-61/63) e o que o teste dela revelou — 2026-10-06
+
+**Entregue.** API: PR #36 (contrato em `acolhe-api/docs/email-verification.md`). Web: PR #42.
+
+- Com SMTP configurado (staging e produção), o `/signup` cria a conta `emailStatus=pending`.
+  Ela só verifica pelo link enviado pelo Brevo, que vale 24h, é de uso único e tem só o digest
+  guardado no banco. `EMAIL_VERIFICATION_MODE=automatic` só se for setado de propósito.
+  Contas anteriores (seed, pacientes de convite) nasceram `verified` pela migration.
+- `/signup`, `/login` e `/me` devolvem `emailStatus` e `nextStep: verify_email`. O middleware
+  `auth` leva conta pendente para `/verify-email`, que confirma o link, trata separadamente
+  link inválido/substituído (404), vencido (410) e erro nosso (retry), e faz o reenvio com
+  resposta idêntica para e-mail com e sem conta.
+- Falha de envio não desfaz o cadastro (`verificationDelivery: failed`, aviso na tela, o
+  reenvio é a recuperação), mesma regra do convite em C2.
+- A `signup.vue` perdeu os dois `<input type="checkbox">` nativos dos consentimentos (A2) e o
+  `catch` passou a usar `apiErrorMessage` (B5).
+
+O teste da Joyce em staging achou três problemas que não eram da verificação:
+
+1. **Cadastro com CPF respondia 503 (ACO-76).** A `PII_ENCRYPTION_KEY`, que cifra o CPF, nunca
+   tinha sido configurada em ambiente nenhum, e nenhum teste preenchia o CPF. Corrigido em
+   três PRs da API: o #37 gera a chave na VM no deploy, sem nunca sobrescrever, e faz o boot
+   validá-la. O #38 adiciona um diagnóstico pós-deploy no job, sem expor valores. O #39 corrige
+   a segunda camada: o `ssh-action` exporta as envs sem secret como string vazia, e **na
+   substituição do compose o shell vence o `--env-file`**, então a chave gerada era apagada. O
+   script agora faz `unset` do que persiste no `.env`.
+2. **E-mail sem `@` derrubava a validação do formulário** (PR #44). O Zod roda `refine` mesmo
+   quando o `.email()` já reprovou, e o refine fazia `domain.includes('.')` com `domain`
+   indefinido.
+3. **409 por CRP repetido.** O CRP é único no banco. Contas de teste minhas em staging ocupam
+   os CRPs `123456`, `654321` e `765432` a `765439`, e um cadastro que repita um deles recebe
+   409 mesmo com e-mail novo. A limpeza dessas contas está pendente até haver SSH às VMs (ver
+   Parte D).
+
+**Regras que ficam:**
+
+- Variável que o deploy persiste no `.env` não pode continuar exportada no shell do
+  `compose up`.
+- Campo opcional também precisa de teste preenchido: o CPF ficou meses quebrado porque todo
+  teste o deixava em branco.
+- `refine` do Zod precisa tolerar o valor que as validações anteriores já reprovaram.
+
+### C10. Leva de PRs de outubro sem issue nem revisão — registrada em 2026-10-08
+
+Entre 01 e 06/10 entraram em `develop`, por agentes e pelo lunebakami, PRs que não têm issue
+no Linear e não passaram por revisão da Joyce. Foram para produção no release de 2026-10-08:
+
+| Assunto | Web | API |
+|---|---|---|
+| Agendar sessões e editar evolução opcional; sessão vinculada na listagem | #37 | #32, #35 |
+| Check-in diário (um por dia, edição no mesmo dia, histórico nos dois perfis) | #38 | #33 |
+| Registro Documental: cadernos privados cifrados, histórico e conflitos | #39 | #34 |
+| Navegação do prontuário entre abas; aviso de acesso e "exportação em breve" | #40, #41 | — |
+| Botão de sair na sidebar do psicólogo | #36 | — |
+| Telefone e dados de identificação na ficha do paciente | #43 | #40 |
+
+Migrations dessa leva: `link_appointment_session`, `patient_confirm_appointment`,
+`daily_checkin`, `documentary_notebooks` e `patient_phone`.
+
+**Pendências:** ninguém revisou esse código contra as regras da Parte A. A prioridade é o
+Registro Documental, por envolver criptografia e sigilo. Em produção, ele está
+**indisponível** até existirem os secrets `DOCUMENTARY_ACTIVE_KEY_ID` e
+`DOCUMENTARY_ENCRYPTION_KEYS` no Environment `production` da `acolhe-api`, que hoje só existem
+em staging.
 
 ---
 
@@ -605,3 +673,11 @@ regra, não como detalhe de cada PR.
 - O Claude Code não tem acesso SSH às VMs (bloqueado pela política de permissões). Se algo
   precisar ser feito direto na VM, a Joyce roda o comando na sessão com o prefixo `!`, por
   exemplo `! ssh ubuntu@163.176.228.171 '...'`.
+- **Atualização de 2026-10-06:** a chave SSH local da Joyce **não** está autorizada nas VMs
+  (`Permission denied (publickey)`). A chave do provisionamento existe só no secret `SSH_KEY`
+  do CI. Enquanto isso não mudar, logs e estado das VMs só aparecem pelo diagnóstico que o job
+  de deploy imprime ao final (bloco `--- diagnóstico ---`). Autorizar a chave dela é decisão
+  dela: editar o `deploy.yml` ou usar o console da Oracle Cloud.
+- **Desde 2026-10-08, produção aceita cadastro:** o `/signup` de produção exige confirmação de
+  e-mail (C9). A primeira conta real de produção nasce por ele, sem seed. Para testes de
+  cadastro em staging, use sempre um CRP novo (ver o item 3 de C9).

@@ -7,11 +7,13 @@ import {
   FileLock2,
   FileText,
   Home,
+  LogOut,
   Settings,
   Users,
 } from 'lucide-vue-next'
 import type { Patient, UserRole } from '~/types'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { Button } from '@/components/ui/button'
 
 const { user } = defineProps<{
   user?: { email?: string; name?: string; crp?: string; role?: UserRole } | null
@@ -39,13 +41,13 @@ const main = computed<NavItem[]>(() => [
     icon: Users,
     count: user?.role === 'psychologist' ? patients.value.length : undefined,
   },
-  { label: 'Agenda', to: '/agenda', icon: CalendarDays, disabled: true },
+  { label: 'Agenda', to: '/agenda', icon: CalendarDays },
   { label: 'Atividades', to: '/activities', icon: ClipboardList },
   { label: 'Documentos', to: '/documents', icon: FileText, disabled: true },
 ])
 
 const personal: NavItem[] = [
-  { label: 'Registro Documental', to: '/registry', icon: FileLock2, disabled: true },
+  { label: 'Registro Documental', to: '/registry', icon: FileLock2 },
   { label: 'Templates', to: '/templates', icon: BookMarked },
 ]
 
@@ -54,6 +56,8 @@ const NuxtLinkComponent = resolveComponent('NuxtLink')
 function isActive(to: string) {
   return route.path === to || route.path.startsWith(`${to}/`)
 }
+
+const { logout, isLoggingOut } = useLogout()
 
 const displayName = computed(() => user?.name ?? user?.email ?? 'Minha conta')
 const initials = computed(() =>
@@ -131,6 +135,15 @@ const initials = computed(() =>
         <Settings class="size-4" :stroke-width="1.75" />
         <span>Ajustes</span>
       </span>
+      <Button
+        variant="ghost"
+        class="h-auto w-full justify-start gap-3 rounded-md px-3 py-2 text-sm font-normal text-muted-foreground hover:bg-accent/60 hover:text-foreground"
+        :disabled="isLoggingOut"
+        @click="logout"
+      >
+        <LogOut class="size-4 shrink-0" :stroke-width="1.75" />
+        <span>{{ isLoggingOut ? 'Saindo…' : 'Sair' }}</span>
+      </Button>
       <div class="flex items-center gap-3 rounded-md px-3 py-2">
         <Avatar class="size-8">
           <AvatarFallback class="bg-secondary text-xs">{{ initials }}</AvatarFallback>
