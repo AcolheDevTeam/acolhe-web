@@ -51,3 +51,37 @@ export function invitationDeliveryMeta(status?: InvitationDeliveryStatus | strin
       }
   }
 }
+
+// Falha ao carregar /invite/:token (regra A6, resto do C8). Cada status vira
+// uma explicação própria, e só afirmamos causa quando a API disse qual é: um
+// 500 de contrato chegou a aparecer como "link expirado" e escondeu o ACO-75.
+export interface InvitationLoadFailure {
+  title: string
+  message: string
+  /** Erro nosso ou de rede: o link pode estar bom, vale tentar de novo. */
+  canRetry: boolean
+}
+
+export function invitationLoadFailure(status?: number): InvitationLoadFailure {
+  switch (status) {
+    case 400:
+    case 404:
+      return {
+        title: 'Convite não encontrado',
+        message: 'Não encontramos um convite para este link. Confira se ele foi copiado inteiro ou peça um novo à sua psicóloga.',
+        canRetry: false,
+      }
+    case 410:
+      return {
+        title: 'Convite indisponível',
+        message: 'Este convite expirou, foi recusado ou já foi utilizado. Se ainda não criou sua conta, peça um novo convite à sua psicóloga.',
+        canRetry: false,
+      }
+    default:
+      return {
+        title: 'Não foi possível carregar o convite',
+        message: 'Tivemos um problema do nosso lado. Seu convite não foi afetado — tente novamente em instantes.',
+        canRetry: true,
+      }
+  }
+}
