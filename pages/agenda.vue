@@ -102,12 +102,14 @@ function select(appointment: Appointment) {
 <template>
   <PageHeader title="Agenda">
     <template #actions>
-      <SegmentedControl v-model="view" :options="viewOptions" label="Visualização" class="w-[258px]" />
+      <SegmentedControl v-model="view" :options="viewOptions" label="Visualização" class="hidden w-[258px] sm:flex" />
       <NewSessionDialog><Button><Plus />Agendar sessão</Button></NewSessionDialog>
     </template>
   </PageHeader>
 
   <div class="flex flex-col gap-5 px-4 pb-14 pt-6 md:px-8 lg:px-12">
+    <!-- No celular o segmentado não cabe ao lado do botão: vai para linha própria. -->
+    <SegmentedControl v-model="view" :options="viewOptions" label="Visualização" class="w-full sm:hidden" />
     <div class="animate-rise flex flex-wrap items-center gap-x-3.5 gap-y-2 [animation-delay:60ms]">
       <div class="flex items-center gap-1.5">
         <Button variant="outline" size="icon" aria-label="Período anterior" @click="move(-1)"><ChevronLeft /></Button>
