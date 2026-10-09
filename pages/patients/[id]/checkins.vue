@@ -8,6 +8,10 @@ const { data: patient } = usePatient(patientId)
 const { data: checkins, error, status, refresh } = useFetch<PatientCheckin[]>(() => `/api/patients/${patientId.value}/checkins`, {
   key: () => `patient-checkins-${patientId.value}`, default: () => [],
 })
+// Sem vínculo ativo a API devolve lista vazia; dizer o motivo em vez de "nenhum check-in".
+const inactiveMessage = computed(() => patient.value && patient.value.relationshipStatus !== 'active'
+  ? 'O vínculo com esta paciente não está ativo. Os check-ins aparecem enquanto o vínculo estiver ativo.'
+  : undefined)
 </script>
 
 <template>
@@ -20,7 +24,7 @@ const { data: checkins, error, status, refresh } = useFetch<PatientCheckin[]>(()
         <Button variant="outline" @click="refresh()">Tentar novamente</Button>
       </div>
       <p v-else-if="status === 'pending'" class="text-sm text-muted-foreground">Carregando check-ins…</p>
-      <div v-else class="rounded-xl border bg-card p-5"><CheckinHistory :items="checkins ?? []" /></div>
+      <div v-else class="rounded-xl border bg-card p-5"><CheckinHistory :items="checkins ?? []" :empty-message="inactiveMessage" /></div>
     </div>
   </PatientShell>
 </template>
