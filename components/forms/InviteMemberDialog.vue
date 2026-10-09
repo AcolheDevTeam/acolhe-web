@@ -38,6 +38,11 @@ async function submit() {
   error.value = ''
   if (!email.value.includes('@')) { error.value = 'Informe um e-mail válido.'; return }
   if (!roles.value.length) { error.value = 'Escolha ao menos um papel.'; return }
+  // Supervisão sozinha não dá acesso a nada (sem leitura clínica nem administração).
+  if (roles.value.length === 1 && roles.value[0] === 'clinical_supervisor') {
+    error.value = 'Supervisão clínica vem junto com outro papel, como Psicóloga.'
+    return
+  }
   submitting.value = true
   try {
     result.value = await $fetch<ClinicInvitationResult>('/api/clinic/invitations', { method: 'POST', body: { email: email.value, roles: roles.value } })

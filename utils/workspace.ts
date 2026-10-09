@@ -10,7 +10,9 @@ export const INACTIVE_WORKSPACE_PATH = '/espaco-inativo'
 export const CLINIC_HOME_PATH = '/clinica'
 
 export function isClinicAdmin(user: SessionUser): boolean {
-  const roles: WorkspaceRole[] = user?.workspace?.roles ?? []
+  // Só em clínica: org_admin antigos de consultório ganharam clinic_admin no backfill.
+  if (user?.workspace?.type !== 'clinic') return false
+  const roles: WorkspaceRole[] = user.workspace.roles ?? []
   return roles.includes('clinic_owner') || roles.includes('clinic_admin')
 }
 

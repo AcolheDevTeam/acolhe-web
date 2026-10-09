@@ -22,6 +22,7 @@ describe('destino por tipo de acesso (ADR 0002)', () => {
   it('administração da clínica é por papel do vínculo, não pelo papel efetivo', () => {
     expect(isClinicAdmin({ role: 'psychologist', workspace: clinic(['clinic_owner', 'psychologist']) })).toBe(true)
     expect(isClinicAdmin({ role: 'psychologist', workspace: clinic(['psychologist']) })).toBe(false)
+    expect(isClinicAdmin({ role: 'org_admin', workspace: { ...clinic(['clinic_admin']), type: 'individual' } })).toBe(false)
   })
   it('rótulos dos papéis em português', () => {
     expect(workspaceRoleLabel('clinic_owner')).toBe('Responsável')

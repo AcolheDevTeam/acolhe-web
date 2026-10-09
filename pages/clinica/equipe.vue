@@ -19,6 +19,7 @@ const { data: team, error, status, refresh } = useFetch<ClinicTeam>('/api/clinic
 const members = computed(() => team.value?.members ?? [])
 const invitations = computed(() => team.value?.invitations ?? [])
 const busy = ref(false)
+const resent = ref<ClinicInvitationResult | null>(null)
 
 type Change = 'suspend' | 'reactivate' | 'end'
 const confirmations: Record<Change, { title: string, description: string, confirmLabel: string, destructive: boolean }> = {
@@ -61,10 +62,7 @@ async function resend(id: string) {
   if (busy.value) return
   busy.value = true
   try {
-    const result = await $fetch<ClinicInvitationResult>(`/api/clinic/invitations/${id}/resend`, { method: 'POST' })
-    toast.success(deliveryMessage(result.deliveryStatus))
-    try { await navigator.clipboard.writeText(result.link) }
-    catch { /* o link também segue no e-mail; copiar é conveniência */ }
+    resent.value = await $fetch<ClinicInvitationResult>(`/api/clinic/invitations/${id}/resend`, { method: 'POST' })
     await refresh()
   }
   catch (err) {
@@ -160,6 +158,7 @@ async function decideRevoke(confirmed: boolean) {
       :destructive="confirmation?.destructive"
       @decision="decide"
     />
+    <InvitationLinkDialog :result="resent" @close="resent = null" />
     <ConfirmDialog
       :open="pendingRevoke !== null"
       title="Cancelar convite?"
