@@ -6,12 +6,17 @@ definePageMeta({ middleware: ['auth', 'psychologist-only'] })
 const route = useRoute()
 const appointmentId = computed(() => route.params.id as string)
 const { data: appointment, error, refresh } = useAppointment(appointmentId)
+// Agenda aberta no dia do agendamento (breadcrumb e "Ver agenda").
+const agendaLink = computed(() => appointment.value ? `/agenda?date=${zonedDay(appointment.value.scheduledFor)}` : '/agenda')
 const { busy, active, hasStarted, pendingStatus, confirmation, askStatus, decideStatus, changeStatus, openRecord } = useAppointmentStatus(appointment)
 </script>
 
 <template>
-  <PageHeader title="Agendamento">
-    <template #actions><Button variant="outline" size="sm" as-child><NuxtLink :to="appointment ? `/agenda?date=${zonedDay(appointment.scheduledFor)}` : '/agenda'">Ver agenda</NuxtLink></Button></template>
+  <PageHeader>
+    <template #title>
+      <Breadcrumb :items="[{ label: 'Agenda', to: agendaLink }, { label: 'Agendamento' }]" current-tag="h1" />
+    </template>
+    <template #actions><Button variant="outline" size="sm" as-child><NuxtLink :to="agendaLink">Ver agenda</NuxtLink></Button></template>
   </PageHeader>
   <div class="mx-auto flex w-full max-w-2xl flex-col gap-6 px-4 py-6 md:px-8 md:py-8 lg:px-12">
     <div v-if="error" class="text-sm">

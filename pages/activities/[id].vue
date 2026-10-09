@@ -71,6 +71,13 @@ const crumb = computed(() => {
   if (tab === 'review') return { label: 'Aguardando revisão', tab }
   return { label: ACTIVITY_QUEUE_TABS.find(t => t.value === tab)!.label, tab }
 })
+const crumbs = computed(() => [
+  { label: 'Atividades', to: '/activities' },
+  ...(crumb.value
+    ? [{ label: crumb.value.label, to: crumb.value.tab === 'review' ? '/activities' : `/activities?tab=${crumb.value.tab}` }]
+    : []),
+  { label: activity.value?.title ?? 'Atividade' },
+])
 
 const metaLine = computed(() => {
   const detail = activity.value
@@ -156,18 +163,7 @@ async function markReviewed() {
 <template>
   <PageHeader>
     <template #title>
-      <nav aria-label="Caminho" class="flex min-w-0 items-center gap-2 font-mono text-xs tracking-[0.06em] text-muted-foreground">
-        <NuxtLink to="/activities" class="hover:text-foreground">Atividades</NuxtLink>
-        <template v-if="crumb">
-          <span aria-hidden="true">/</span>
-          <NuxtLink
-            :to="crumb.tab === 'review' ? '/activities' : `/activities?tab=${crumb.tab}`"
-            class="min-w-0 truncate text-foreground hover:text-primary"
-          >
-            {{ crumb.label }}
-          </NuxtLink>
-        </template>
-      </nav>
+      <Breadcrumb :items="crumbs" />
     </template>
     <template v-if="queueIndex >= 0" #actions>
       <!-- No celular só "1 de 3", para os botões caberem na linha. -->
