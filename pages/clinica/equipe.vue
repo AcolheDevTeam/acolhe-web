@@ -7,7 +7,6 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import { InlineNotice } from '@/components/ui/inline-notice'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 
 // Equipe da clínica (ACO-62), no layout do protótipo "Equipe": vínculos e
@@ -134,7 +133,54 @@ async function decideRevoke(confirmed: boolean) {
     <p v-else-if="status === 'pending'" class="text-sm text-muted-foreground">Carregando equipe…</p>
     <Card v-else role="region" aria-labelledby="t-membros" class="animate-rise overflow-hidden [animation-delay:.1s]">
       <h2 id="t-membros" class="px-[22px] pb-2 pt-5 text-lg font-semibold">Psicólogas</h2>
-      <Table class="min-w-[680px]">
+      <!-- Celular: lista com as ações embaixo de cada pessoa (padrão de Pacientes). -->
+      <ul class="flex flex-col divide-y divide-secondary md:hidden">
+        <li v-for="member in members" :key="member.userId" class="flex animate-fade flex-col gap-3 px-[22px] py-3.5">
+          <span class="flex items-center gap-3">
+            <Avatar class="h-9 w-9 text-xs" aria-hidden="true"><AvatarFallback>{{ initials(member.fullName ?? member.email) }}</AvatarFallback></Avatar>
+            <span class="flex min-w-0 flex-1 flex-col gap-0.5">
+              <span class="truncate text-[15px] font-semibold">{{ member.fullName ?? member.email }}</span>
+              <span class="truncate text-[13px] text-muted-foreground">{{ member.email }}</span>
+            </span>
+          </span>
+          <span class="flex flex-wrap items-center gap-x-3 gap-y-2 text-[13px] text-secondary-foreground">
+            <Badge :variant="statusVariant(member.status)" class="h-6">{{ membershipStatusLabel(member.status) }}</Badge>
+            <span>{{ member.roles.map(workspaceRoleLabel).join(', ') }}</span>
+            <span v-if="patientsByUser.has(member.userId)">{{ patientsByUser.get(member.userId) }} pacientes</span>
+          </span>
+          <span v-if="canManage(member) && changesFor(member).length" class="-ml-3 flex flex-wrap gap-1">
+            <Button
+              v-for="change in changesFor(member)"
+              :key="change"
+              variant="ghost"
+              size="sm"
+              :class="change === 'end' ? 'text-warning hover:bg-warning-soft hover:text-warning' : 'text-primary hover:bg-positive-soft hover:text-primary'"
+              :disabled="busy"
+              @click="pending = { member, change }"
+            >
+              {{ changeLabel[change] }}
+            </Button>
+          </span>
+        </li>
+        <li v-for="invitation in invitations" :key="invitation.id" class="flex animate-fade flex-col gap-3 px-[22px] py-3.5">
+          <span class="flex items-center gap-3">
+            <Avatar tone="pending" class="h-9 w-9 text-xs" aria-hidden="true"><AvatarFallback>··</AvatarFallback></Avatar>
+            <span class="flex min-w-0 flex-1 flex-col gap-0.5">
+              <span class="truncate text-[15px] font-semibold">{{ invitation.email }}</span>
+              <span class="truncate text-[13px] text-muted-foreground">Vale até {{ formatDateTime(invitation.expiresAt) }}</span>
+            </span>
+          </span>
+          <span class="flex flex-wrap items-center gap-x-3 gap-y-2 text-[13px] text-secondary-foreground">
+            <Badge variant="warning" class="h-6">Convite pendente</Badge>
+            <span>{{ invitation.roles.map(workspaceRoleLabel).join(', ') }}</span>
+          </span>
+          <span v-if="isOwner || !invitation.roles.includes('clinic_owner')" class="-ml-3 flex flex-wrap gap-1">
+            <Button variant="ghost" size="sm" class="text-primary hover:bg-positive-soft hover:text-primary" :disabled="busy" @click="resend(invitation.id)">Reenviar convite</Button>
+            <Button variant="ghost" size="sm" class="text-warning hover:bg-warning-soft hover:text-warning" :disabled="busy" @click="pendingRevoke = invitation.id">Cancelar</Button>
+          </span>
+        </li>
+      </ul>
+      <Table class="hidden min-w-[680px] md:table">
         <TableHeader>
           <TableRow class="border-border hover:bg-transparent">
             <TableHead class="pl-[22px]">Nome</TableHead>
@@ -206,9 +252,10 @@ async function decideRevoke(confirmed: boolean) {
           </TableRow>
         </TableBody>
       </Table>
-      <InlineNotice v-if="notice" tone="neutral" class="rounded-none border-t border-secondary bg-card px-[22px] text-[13px] text-secondary-foreground">
-        {{ notice }}
-      </InlineNotice>
+      <!-- Região viva sempre montada: só o texto muda, para o leitor de tela anunciar. -->
+      <div role="status" aria-live="polite">
+        <p v-if="notice" class="animate-fade border-t border-secondary px-[22px] py-3 text-[13px] leading-relaxed text-secondary-foreground">{{ notice }}</p>
+      </div>
     </Card>
     <ConfirmDialog
       :open="pending !== null"
