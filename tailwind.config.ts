@@ -1,7 +1,7 @@
 import type { Config } from 'tailwindcss'
 
-// Design system do Acolhe — estética editorial, silenciosa ("Sem IA. Sem ruído.").
-// Serif de display, rótulos em mono maiúsculo, corpo em sans; fundo creme, tinta quase-preta.
+// Design system do Acolhe — identidade "novo design" (2026-10-09, docs/design/novo-design.md).
+// Schibsted Grotesk em texto e títulos, IBM Plex Mono em rótulos e dados; índigo para ação.
 export default <Partial<Config>>{
   darkMode: 'class',
   content: [
@@ -21,9 +21,10 @@ export default <Partial<Config>>{
     },
     extend: {
       fontFamily: {
-        sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
-        serif: ['Newsreader', 'ui-serif', 'Georgia', 'serif'],
-        mono: ['"JetBrains Mono"', 'ui-monospace', 'SFMono-Regular', 'monospace'],
+        sans: ['"Schibsted Grotesk"', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        // Sem serif no novo design: font-serif vira a mesma família até as telas migrarem.
+        serif: ['"Schibsted Grotesk"', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        mono: ['"IBM Plex Mono"', 'ui-monospace', 'SFMono-Regular', 'monospace'],
       },
       colors: {
         border: 'hsl(var(--border))',
@@ -34,6 +35,32 @@ export default <Partial<Config>>{
         primary: {
           DEFAULT: 'hsl(var(--primary))',
           foreground: 'hsl(var(--primary-foreground))',
+          hover: 'hsl(var(--primary-hover))',
+        },
+        brand: {
+          DEFAULT: 'hsl(var(--brand))',
+          foreground: 'hsl(var(--brand-foreground))',
+          muted: 'hsl(var(--brand-muted))',
+        },
+        positive: {
+          DEFAULT: 'hsl(var(--positive))',
+          soft: 'hsl(var(--positive-soft))',
+        },
+        highlight: 'hsl(var(--highlight))',
+        alert: 'hsl(var(--alert))',
+        surface: {
+          subtle: 'hsl(var(--surface-subtle))',
+          hover: 'hsl(var(--surface-hover))',
+        },
+        'input-hover': 'hsl(var(--input-hover))',
+        placeholder: 'hsl(var(--placeholder))',
+        'selected-border': 'hsl(var(--selected-border))',
+        mood: {
+          1: 'hsl(var(--mood-1))',
+          2: 'hsl(var(--mood-2))',
+          3: 'hsl(var(--mood-3))',
+          4: 'hsl(var(--mood-4))',
+          5: 'hsl(var(--mood-5))',
         },
         secondary: {
           DEFAULT: 'hsl(var(--secondary))',
@@ -42,6 +69,8 @@ export default <Partial<Config>>{
         destructive: {
           DEFAULT: 'hsl(var(--destructive))',
           foreground: 'hsl(var(--destructive-foreground))',
+          soft: 'hsl(var(--destructive-soft))',
+          hover: 'hsl(var(--destructive-hover))',
         },
         success: {
           DEFAULT: 'hsl(var(--success))',
@@ -50,6 +79,7 @@ export default <Partial<Config>>{
         warning: {
           DEFAULT: 'hsl(var(--warning))',
           foreground: 'hsl(var(--warning-foreground))',
+          soft: 'hsl(var(--warning-soft))',
         },
         muted: {
           DEFAULT: 'hsl(var(--muted))',
@@ -69,6 +99,9 @@ export default <Partial<Config>>{
         },
       },
       borderRadius: {
+        // Cards 16px, diálogos 18px (protótipo).
+        '2xl': '1rem',
+        '3xl': '1.125rem',
         xl: 'calc(var(--radius) + 4px)',
         lg: 'var(--radius)',
         md: 'calc(var(--radius) - 2px)',
