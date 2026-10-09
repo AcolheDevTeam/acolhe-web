@@ -30,11 +30,12 @@ const onSubmit = handleSubmit(async (values) => {
     clearNuxtData()
     // E-mail pendente trava o painel: o próximo passo é confirmar (ACO-63).
     if (user.nextStep === 'verify_email') return await navigateTo('/verify-email')
-    await navigateTo(user.role === 'patient' ? '/patient' : '/dashboard')
+    await navigateTo(homeFor(user))
   } catch (error) {
     // Só 401 significa credencial errada; qualquer outra falha recebe a causa real.
     loginError.value = apiErrorMessage(error, {
       401: 'E-mail ou senha inválidos.',
+      403: 'Seu acesso não está ativo em nenhum espaço de trabalho. Fale com a clínica ou com o suporte do Acolhe.',
       default: 'Não foi possível entrar agora. Tente novamente em instantes.',
     })
   }

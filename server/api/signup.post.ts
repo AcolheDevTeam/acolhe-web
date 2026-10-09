@@ -37,13 +37,7 @@ export default defineEventHandler(async (event) => {
     })
     const result = signupResponseSchema.parse(response)
 
-    setCookie(event, 'acolhe_session', result.token, {
-      httpOnly: true,
-      sameSite: 'lax',
-      path: '/',
-      maxAge: 60 * 60 * 24 * 7,
-      secure: !import.meta.dev,
-    })
+    setSessionCookie(event, result.token)
 
     return {
       user: result.user,

@@ -4,18 +4,18 @@ export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
   const body = await readBody(event)
 
-  const res = await $fetch<{ token: string; user: unknown }>(`${config.apiUrl}/login`, {
-    method: 'POST',
-    body,
-  })
+  let res: { token: string, user: unknown }
+  try {
+    res = await $fetch<{ token: string, user: unknown }>(`${config.apiUrl}/login`, {
+      method: 'POST',
+      body,
+    })
+  }
+  catch (error) {
+    // 401 credencial, 403 sem vínculo ativo: o motivo chega à tela (ADR 0002).
+    throw relayApiError(error)
+  }
 
-  setCookie(event, 'acolhe_session', res.token, {
-    httpOnly: true,
-    sameSite: 'lax',
-    path: '/',
-    maxAge: 60 * 60 * 24 * 7, // 7 dias
-    secure: !import.meta.dev,
-  })
-
+  setSessionCookie(event, res.token)
   return res.user
 })

@@ -79,6 +79,8 @@ const initials = computed(() =>
       </NuxtLink>
     </div>
 
+    <WorkspaceSwitcher v-if="user?.role !== 'patient'" />
+
     <nav class="flex flex-1 flex-col gap-0.5 overflow-y-auto px-3 pb-4">
       <component
         :is="item.disabled ? 'span' : NuxtLinkComponent"
