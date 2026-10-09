@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { CalendarDays, MoreHorizontal, Plus } from 'lucide-vue-next'
+import { CalendarDays, Clock3, MoreHorizontal, Plus } from 'lucide-vue-next'
 import type { Patient } from '~/types'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
@@ -31,9 +31,7 @@ const tabs = computed(() => [
   { key: 'registry', label: 'Registro Documental', to: `/patients/${patientId}/registry` },
 ].filter(tab => isActive.value || tab.key === 'overview' || tab.key === 'registry'))
 
-const isActive = computed(() =>
-  patient?.status === 'active' && patient?.relationshipStatus === 'active',
-)
+const isActive = computed(() => patientLinkActive(patient))
 
 // Linha sob o nome: idade e abordagem só quando a API mandar.
 const meta = computed(() => {
@@ -143,6 +141,15 @@ onMounted(() => {
         {{ t.label }}
       </NuxtLink>
     </nav>
+
+    <!-- Fora da visão geral (que tem o próprio estado), avisa por que o resto da ficha está fechado. -->
+    <InlineNotice v-if="patient && !isActive && active !== 'overview'" tone="neutral" class="flex items-start gap-3">
+      <Clock3 class="mt-0.5 size-4 shrink-0" aria-hidden="true" />
+      <p>
+        <span class="font-medium text-foreground">Vínculo ainda não ativado.</span>
+        Sessões e atividades serão liberadas somente depois que a paciente aceitar o consentimento.
+      </p>
+    </InlineNotice>
 
     <!-- Conteúdo: coluna principal e lateral quebram em uma coluna no celular. -->
     <div class="flex flex-wrap items-start gap-6">

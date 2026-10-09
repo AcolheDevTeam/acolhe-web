@@ -4,6 +4,7 @@ import {
   activityResponse,
   maskPhone,
   moodSummary,
+  patientLinkActive,
   relationshipBadge,
   sessionWhenLabel,
   timelineWhenLabel,
@@ -22,6 +23,13 @@ const patient = (over: Partial<Patient>): Patient => ({
 })
 
 describe('visão geral da ficha', () => {
+  it('só libera dado clínico com cadastro e vínculo ativos', () => {
+    expect(patientLinkActive(patient({}))).toBe(true)
+    expect(patientLinkActive(patient({ status: 'onboarding', relationshipStatus: 'pending' }))).toBe(false)
+    expect(patientLinkActive(patient({ relationshipStatus: 'paused' }))).toBe(false)
+    expect(patientLinkActive(null)).toBe(false)
+  })
+
   it('calcula o humor só com os check-ins dos últimos 30 dias, em ordem', () => {
     const summary = moodSummary([
       checkin('2026-10-09', 5), checkin('2026-09-10', 3), checkin('2026-09-09', 1), checkin('2026-10-01', 4),

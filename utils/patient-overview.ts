@@ -8,6 +8,11 @@ import { relativeSince } from './patient-list'
 
 const DAY_MS = 24 * 60 * 60 * 1000
 
+// Vínculo e cadastro ativos: só então a ficha mostra (e busca) dado clínico.
+export function patientLinkActive(patient?: Pick<Patient, 'status' | 'relationshipStatus'> | null): boolean {
+  return patient?.status === 'active' && patient?.relationshipStatus === 'active'
+}
+
 // Humor dos últimos `days` dias a partir dos check-ins (escala 1–5).
 export function moodSummary(checkins: PatientCheckin[], now: Date = new Date(), days = 30) {
   const from = checkinDay(new Date(now.getTime() - (days - 1) * DAY_MS))

@@ -14,14 +14,15 @@ const patientId = computed(() => route.params.id as string)
 
 const { data: patient } = usePatient(patientId)
 const { data: activities } = usePatientActivities(patientId)
-const { data: checkins, status: checkinsStatus, error: checkinsError } = usePatientCheckins(patientId)
 const { data: appointments } = useAppointments()
 const nextAppointment = computed(() => (appointments.value ?? [])
   .filter(a => a.patientId === patientId.value && ['scheduled', 'confirmed'].includes(a.status) && new Date(a.scheduledFor) >= new Date())
   .sort((a, b) => a.scheduledFor.localeCompare(b.scheduledFor))[0])
-const isActive = computed(() =>
-  patient.value?.status === 'active' && patient.value?.relationshipStatus === 'active',
-)
+const isActive = computed(() => patientLinkActive(patient.value))
+// Check-ins só são pedidos com o vínculo ativo (nenhuma requisição antes disso).
+// Conferir o id evita usar a ficha anterior, ainda em tela, ao trocar de paciente.
+const canLoadCheckins = computed(() => isActive.value && patient.value?.id === patientId.value)
+const { data: checkins, status: checkinsStatus, error: checkinsError } = usePatientCheckins(patientId, canLoadCheckins)
 const isPending = computed(() => patient.value?.relationshipStatus === 'pending')
 const invitation = ref<PatientInvitation>()
 const isGeneratingInvitation = ref(false)
@@ -112,7 +113,7 @@ const consentLabel = computed(() => {
           :aria-label="`Humor dos check-ins dos últimos 30 dias: média ${mood.avgLabel} de 5 em ${mood.count} registros`"
           class="h-[120px] w-full text-primary"
         />
-        <p v-else-if="checkinsStatus === 'pending'" class="text-sm text-muted-foreground" role="status">Carregando check-ins…</p>
+        <p v-else-if="checkinsStatus === 'pending' || checkinsStatus === 'idle'" class="text-sm text-muted-foreground" role="status">Carregando check-ins…</p>
         <p v-else-if="checkinsError" class="text-sm">
           {{ apiErrorMessage(checkinsError, { 403: 'Seu vínculo precisa estar ativo para consultar o humor.', default: 'Não foi possível carregar os check-ins desta paciente.' }) }}
         </p>
@@ -247,10 +248,11 @@ const consentLabel = computed(() => {
               <button
                 v-if="patient?.phone"
                 type="button"
+                :aria-pressed="showPhone"
                 class="rounded text-right underline-offset-[3px] hover:underline focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/15"
-                :aria-label="showPhone ? 'Ocultar telefone' : 'Mostrar telefone completo'"
                 @click="showPhone = !showPhone"
               >
+                <span class="sr-only">{{ showPhone ? 'Telefone completo (clique para ocultar): ' : 'Telefone oculto (clique para mostrar): ' }}</span>
                 {{ showPhone ? patient.phone : maskPhone(patient.phone) }}
               </button>
               <template v-else>Não informado</template>

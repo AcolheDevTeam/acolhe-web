@@ -5,7 +5,9 @@ definePageMeta({ middleware: ['auth', 'psychologist-only'] })
 const route = useRoute()
 const patientId = computed(() => route.params.id as string)
 const { data: patient } = usePatient(patientId)
-const { data: checkins, error, status, refresh } = usePatientCheckins(patientId)
+// Sem vínculo ativo nada é pedido à API (mesma regra da visão geral).
+const canLoad = computed(() => patientLinkActive(patient.value) && patient.value?.id === patientId.value)
+const { data: checkins, error, status, refresh } = usePatientCheckins(patientId, canLoad)
 // Sem vínculo ativo a API devolve lista vazia; dizer o motivo em vez de "nenhum check-in".
 const inactiveMessage = computed(() => patient.value && patient.value.relationshipStatus !== 'active'
   ? 'O vínculo com esta paciente não está ativo. Os check-ins aparecem enquanto o vínculo estiver ativo.'
@@ -21,7 +23,7 @@ const inactiveMessage = computed(() => patient.value && patient.value.relationsh
         <p>{{ apiErrorMessage(error, { 403: 'Seu vínculo precisa estar ativo para consultar os check-ins.', default: 'Não foi possível carregar os check-ins desta paciente.' }) }}</p>
         <Button variant="outline" @click="refresh()">Tentar novamente</Button>
       </div>
-      <p v-else-if="status === 'pending'" class="text-sm text-muted-foreground">Carregando check-ins…</p>
+      <p v-else-if="status === 'pending' || (canLoad && status === 'idle')" class="text-sm text-muted-foreground">Carregando check-ins…</p>
       <Card v-else class="p-6"><CheckinHistory :items="checkins ?? []" :empty-message="inactiveMessage" /></Card>
     </div>
   </PatientShell>
