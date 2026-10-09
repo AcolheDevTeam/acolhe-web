@@ -20,12 +20,12 @@ const totals = computed(() => professionals.value.reduce((sum, p) => ({
 </script>
 
 <template>
-  <PageHeader title="Clínica">
+  <PageHeader eyebrow="Clínica" title="Painel da clínica">
     <template #actions>
       <Button variant="outline" size="sm" as-child><NuxtLink to="/clinica/equipe">Equipe</NuxtLink></Button>
     </template>
   </PageHeader>
-  <div class="flex flex-col gap-8 px-4 py-6 md:px-8 md:py-8">
+  <div class="flex flex-col gap-8 px-4 py-6 md:px-8 md:py-8 lg:px-12">
     <div v-if="error" class="flex flex-col items-start gap-3 text-sm" role="alert">
       <p class="text-destructive">{{ clinicErrorMessage(error, 'Não foi possível carregar os números da clínica.') }}</p>
       <Button variant="outline" @click="refresh()">Tentar novamente</Button>

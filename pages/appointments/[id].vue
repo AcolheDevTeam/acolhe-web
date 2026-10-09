@@ -50,7 +50,7 @@ async function openRecord() {
   <PageHeader title="Agendamento">
     <template #actions><Button variant="outline" size="sm" as-child><NuxtLink :to="appointment ? `/agenda?date=${zonedDay(appointment.scheduledFor)}` : '/agenda'">Ver agenda</NuxtLink></Button></template>
   </PageHeader>
-  <div class="mx-auto flex w-full max-w-2xl flex-col gap-6 px-4 py-6 md:px-8 md:py-8">
+  <div class="mx-auto flex w-full max-w-2xl flex-col gap-6 px-4 py-6 md:px-8 md:py-8 lg:px-12">
     <div v-if="error" class="text-sm">
       <p>{{ apiErrorMessage(error, { 404: 'Agendamento não encontrado.', default: 'Não foi possível carregar o agendamento.' }) }}</p>
       <Button class="mt-3" variant="outline" @click="refresh()">Tentar novamente</Button>

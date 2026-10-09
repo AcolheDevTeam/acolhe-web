@@ -20,7 +20,7 @@ watch(() => route.fullPath, () => { menuOpen.value = false })
 
     <div class="flex min-w-0 flex-1 flex-col">
       <!-- Barra superior só no celular -->
-      <header class="flex h-14 items-center justify-between border-b bg-card/40 px-4 md:hidden">
+      <header class="flex h-14 items-center justify-between border-b bg-background px-4 md:hidden">
         <NuxtLink :to="homeFor(user as never)" aria-label="Ir para o início"><AppLogo /></NuxtLink>
         <Sheet v-model:open="menuOpen">
           <SheetTrigger as-child>

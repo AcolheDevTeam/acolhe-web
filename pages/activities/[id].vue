@@ -96,7 +96,7 @@ async function markReviewed() {
     </template>
   </PageHeader>
 
-  <div class="mx-auto w-full max-w-3xl px-4 py-6 md:px-8 md:py-8">
+  <div class="mx-auto w-full max-w-3xl px-4 py-6 md:px-8 md:py-8 lg:px-12">
     <div v-if="activity" class="flex flex-col gap-7">
       <div class="flex flex-col gap-2">
         <div class="flex items-center gap-3">

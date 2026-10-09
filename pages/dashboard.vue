@@ -68,7 +68,7 @@ const avgAdherence = computed(() => {
     </template>
   </PageHeader>
 
-  <div class="grid flex-1 gap-8 px-4 py-6 md:px-8 md:py-8 lg:grid-cols-[1fr_320px] lg:gap-10">
+  <div class="grid flex-1 gap-8 px-4 py-6 md:px-8 md:py-8 lg:px-12 lg:grid-cols-[1fr_320px] lg:gap-10">
     <!-- Coluna principal -->
     <div class="flex flex-col gap-10">
       <div class="flex flex-col gap-2">

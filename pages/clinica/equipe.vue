@@ -93,14 +93,14 @@ async function decideRevoke(confirmed: boolean) {
 </script>
 
 <template>
-  <PageHeader title="Equipe">
+  <PageHeader eyebrow="Clínica" title="Equipe">
     <template #actions>
       <InviteMemberDialog :can-invite-owner="isOwner" @invited="refresh()">
         <Button size="sm">Convidar</Button>
       </InviteMemberDialog>
     </template>
   </PageHeader>
-  <div class="flex flex-col gap-8 px-4 py-6 md:px-8 md:py-8">
+  <div class="flex flex-col gap-8 px-4 py-6 md:px-8 md:py-8 lg:px-12">
     <div v-if="error" class="flex flex-col items-start gap-3 text-sm" role="alert">
       <p class="text-destructive">{{ clinicErrorMessage(error, 'Não foi possível carregar a equipe.') }}</p>
       <Button variant="outline" @click="refresh()">Tentar novamente</Button>

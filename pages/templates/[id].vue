@@ -93,7 +93,7 @@ async function onArchived() {
     </template>
   </PageHeader>
 
-  <div class="flex flex-col gap-6 px-4 py-6 md:px-8 md:py-8">
+  <div class="flex flex-col gap-6 px-4 py-6 md:px-8 md:py-8 lg:px-12">
     <template v-if="status === 'pending'">
       <Skeleton class="h-10 w-2/3" />
       <Skeleton class="h-24 w-full" />

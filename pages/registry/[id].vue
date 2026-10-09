@@ -4,8 +4,8 @@ const route = useRoute()
 const identity = useDocumentaryIdentity()
 </script>
 <template>
-  <PageHeader title="Registro Documental" />
-  <div class="px-4 py-6 md:px-8 md:py-8">
+  <PageHeader eyebrow="Só você" title="Registro Documental" />
+  <div class="px-4 py-6 md:px-8 md:py-8 lg:px-12">
     <NuxtLink
       to="/registry"
       class="text-sm text-muted-foreground hover:text-foreground"
