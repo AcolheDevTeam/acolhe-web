@@ -88,3 +88,27 @@ describe('comparação sem perder formatação', () => {
     expect(result.prefix + result.added + result.suffix).toBe(prefix + 'depois')
   })
 })
+
+describe('erros do registro documental por caso (ACO-84)', async () => {
+  const { documentaryErrorText, documentaryForbiddenReason } = await import('../utils/documentary-errors')
+  const { z } = await import('zod')
+  const fetchError = (statusCode: number, reason?: string) => ({ statusCode, data: { statusCode, data: reason ? { reason } : undefined } })
+
+  it('separa somente leitura de caderno de outra autora', () => {
+    expect(documentaryForbiddenReason(fetchError(403, 'read_only'))).toBe('read_only')
+    expect(documentaryErrorText(fetchError(403, 'read_only'))).toContain('somente para leitura')
+    expect(documentaryErrorText(fetchError(403, 'not_author'))).toContain('privado da psicóloga autora')
+    expect(documentaryErrorText(fetchError(403))).not.toContain('somente para leitura')
+  })
+
+  it('erro de contrato não vira falta de conexão', () => {
+    const contract = z.object({ id: z.string() }).safeParse({})
+    expect(contract.success).toBe(false)
+    expect(documentaryErrorText(contract.error)).toContain('jeito inesperado')
+  })
+
+  it('500 e 502 têm textos distintos', () => {
+    expect(documentaryErrorText(fetchError(500))).toContain('erro inesperado')
+    expect(documentaryErrorText(fetchError(502))).toContain('falar com o serviço')
+  })
+})

@@ -77,14 +77,7 @@ const canSave = computed(
 const categoryLabel = computed(
   () => documentaryCategories.find((c) => c.value === category.value)?.label,
 )
-const errorText = (err: unknown) =>
-  apiErrorMessage(err, {
-    400: 'Confira a revisão, a categoria e o limite de 200.000 bytes do texto.',
-    403: 'Paciente ou vínculo clínico inativo. O caderno está disponível somente para leitura.',
-    404: 'Este caderno ou esta versão não está disponível para sua conta.',
-    409: 'Este caderno foi atualizado em outra aba. Compare os textos antes de tentar novamente.',
-    503: 'Não foi possível validar a criptografia do caderno. O conteúdo foi preservado; solicite a verificação da configuração.',
-  })
+const errorText = documentaryErrorText
 function isCurrent() {
   return identity.value === initialIdentity
 }
@@ -221,7 +214,8 @@ async function persist(restoreRevision?: number) {
       conflicted.value = true
       await inspectLatest()
     }
-    if (code === 403 && data.value) data.value.patient.writable = false
+    if (code === 403 && documentaryForbiddenReason(err) === 'read_only' && data.value)
+      data.value.patient.writable = false
     if (code === 401) sessionLost.value = true
   } finally {
     saving.value = false
@@ -229,6 +223,7 @@ async function persist(restoreRevision?: number) {
 }
 async function openVersion(revision: number) {
   if (!saved.value) return
+  compareRequest++ // invalida a comparação pendente da versão anterior
   versionBusy.value = true
   historyError.value = ''
   comparedVersion.value = null
@@ -250,21 +245,27 @@ async function openVersion(revision: number) {
     versionBusy.value = false
   }
 }
+// Só a comparação pedida por último pode preencher a tela (ACO-84).
+let compareRequest = 0
 async function compareVersion(revision: string) {
+  const request = ++compareRequest
   if (!saved.value || !revision) {
     comparedVersion.value = null
     return
   }
   comparedVersion.value = null
+  const id = saved.value.id
   try {
     const result = versionSchema.parse(
       await requestFetch(
-        `/api/documentary/notebooks/${saved.value.id}/versions/${revision}`,
+        `/api/documentary/notebooks/${id}/versions/${revision}`,
       ),
     )
-    if (isCurrent()) comparedVersion.value = result
+    if (isCurrent() && request === compareRequest && saved.value?.id === id)
+      comparedVersion.value = result
   } catch (err) {
-    if (isCurrent()) historyError.value = errorText(err)
+    if (isCurrent() && request === compareRequest)
+      historyError.value = errorText(err)
   }
 }
 const comparisonOptions = computed(() => {
@@ -362,7 +363,11 @@ watch(
 <template>
   <div class="mx-auto max-w-6xl space-y-6">
     <div v-if="error" role="alert" class="space-y-3">
-      <p>{{ errorText(error) }}</p>
+      <p class="text-sm text-destructive">{{ errorText(error) }}</p>
+      <p v-if="isSessionExpired(error)" class="text-sm text-muted-foreground">
+        <NuxtLink to="/login" target="_blank" class="underline underline-offset-4 hover:text-foreground">Entrar novamente em outra aba</NuxtLink>
+        e depois tentar de novo.
+      </p>
       <Button variant="outline" @click="refresh()">Tentar novamente</Button>
     </div>
     <p
@@ -414,6 +419,10 @@ watch(
             :readonly="!writable || saving || exitProtection.pending.value"
             class="min-h-[360px] resize-y whitespace-pre-wrap text-base leading-relaxed"
             placeholder="Escreva suas anotações nesta categoria…"
+            spellcheck="false"
+            autocomplete="off"
+            autocorrect="off"
+            autocapitalize="off"
             :aria-invalid="!contentValid"
           />
           <p v-if="!contentValid" class="text-sm text-destructive">
@@ -465,17 +474,18 @@ watch(
             Carregando histórico…
           </p>
           <div v-if="historyError" role="alert" class="space-y-2 text-sm">
-            <p>{{ historyError }}</p>
+            <p class="text-destructive">{{ historyError }}</p>
             <Button variant="outline" @click="loadHistory()"
               >Tentar novamente</Button
             >
           </div>
           <template v-if="history"
             ><div class="divide-y rounded-lg border">
-              <button
+              <Button
                 v-for="version in history.items"
                 :key="version.id"
-                class="flex w-full flex-col gap-1 p-3 text-left text-sm hover:bg-muted/40 disabled:opacity-50"
+                variant="ghost"
+                class="h-auto w-full flex-col items-start gap-1 rounded-none p-3 text-left font-normal"
                 :disabled="versionBusy || saving"
                 @click="openVersion(version.revision)"
               >
@@ -488,7 +498,7 @@ watch(
                   class="text-xs text-muted-foreground"
                   >Restaurada da versão {{ version.restoredFrom }}</span
                 >
-              </button>
+              </Button>
             </div>
             <PaginationControls
               :page="history.page"
