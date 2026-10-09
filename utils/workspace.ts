@@ -8,6 +8,8 @@ type SessionUser = { role: UserRole, workspace?: WorkspaceContext } | null | und
 
 export const INACTIVE_WORKSPACE_PATH = '/espaco-inativo'
 export const CLINIC_HOME_PATH = '/clinica'
+/** Papel sem área no Acolhe (ex.: org_admin de consultório, legado do backfill). */
+export const NO_AREA_PATH = '/sem-acesso'
 
 export function isClinicAdmin(user: SessionUser): boolean {
   // Só em clínica: org_admin antigos de consultório ganharam clinic_admin no backfill.
@@ -20,7 +22,9 @@ export function homeFor(user: SessionUser): string {
   if (!user) return '/login'
   if (user.role === 'patient') return '/patient'
   if (user.workspace && !user.workspace.active) return INACTIVE_WORKSPACE_PATH
-  if (user.role === 'org_admin') return CLINIC_HOME_PATH
+  // Só quem administra uma clínica tem área própria; sem ela, a página explica
+  // (evita o vaivém entre /clinica e o middleware de administração).
+  if (user.role === 'org_admin') return isClinicAdmin(user) ? CLINIC_HOME_PATH : NO_AREA_PATH
   return '/dashboard'
 }
 
