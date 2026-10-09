@@ -6,7 +6,7 @@ import type {
   PatientProcessSummary,
   User,
 } from '~/types'
-import { patientPortalCacheKey } from '~/utils/patient-portal'
+import { patientPortalCacheKey, sessionExpired } from '~/utils/patient-portal'
 
 export function usePatientPortal() {
   const { data: me } = useFetch<User | null>('/api/me', { key: 'me' })
@@ -52,8 +52,19 @@ export function usePatientPortal() {
     void Promise.all(requests.map(request => request.execute()))
   }, { immediate: true })
 
-  const pending = computed(() => requests.some(request => request.pending.value))
+  // Skeleton só na primeira carga: ao trocar de aba os dados em cache aparecem
+  // na hora e a atualização acontece por baixo.
+  const loaded = ref(false)
+  watch(() => requests.every(request => request.status.value === 'success'), (done) => { if (done) loaded.value = true }, { immediate: true })
+  const pending = computed(() => !loaded.value && requests.some(request => request.pending.value || request.status.value === 'idle'))
   const error = computed(() => requests.find(request => request.error.value)?.error.value ?? null)
+
+  // Sessão expirada em qualquer tela do portal volta para o login.
+  watch(error, (value) => {
+    if (import.meta.client && sessionExpired(value as { statusCode?: number } | null)) {
+      navigateTo('/login')
+    }
+  })
 
   return { me, context, nextSession, activities, checkins, summary, pending, error }
 }
