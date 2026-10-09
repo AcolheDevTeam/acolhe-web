@@ -39,6 +39,8 @@ const initialized = ref(false)
 const saving = ref(false)
 const message = ref('')
 const failure = ref('')
+// 401 ao salvar: a pessoa entra de novo em outra aba e o rascunho fica aqui (ACO-77).
+const sessionLost = ref(false)
 const historyError = ref('')
 const history = ref<DocumentaryHistory | null>(null)
 const historyBusy = ref(false)
@@ -187,6 +189,7 @@ async function persist(restoreRevision?: number) {
     return
   saving.value = true
   failure.value = ''
+  sessionLost.value = false
   message.value = ''
   try {
     const base = `/api/documentary/patients/${props.patientId}/${category.value}`
@@ -219,6 +222,7 @@ async function persist(restoreRevision?: number) {
       await inspectLatest()
     }
     if (code === 403 && data.value) data.value.patient.writable = false
+    if (code === 401) sessionLost.value = true
   } finally {
     saving.value = false
   }
@@ -418,6 +422,11 @@ watch(
           </p>
           <p v-if="failure" role="alert" class="text-sm text-destructive">
             {{ failure }}
+          </p>
+          <p v-if="sessionLost" class="text-sm text-muted-foreground">
+            Seu texto continua aqui.
+            <NuxtLink to="/login" target="_blank" class="underline underline-offset-4 hover:text-foreground">Entre novamente em outra aba</NuxtLink>
+            e depois salve de novo.
           </p>
           <p v-if="message" role="status" class="text-sm text-muted-foreground">
             {{ message }}
