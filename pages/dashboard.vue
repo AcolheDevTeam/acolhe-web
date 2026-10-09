@@ -91,9 +91,9 @@ const avgAdherence = computed(() => {
         <div v-if="sessionsToday.length" class="flex flex-col gap-2">
           <AppointmentRow v-for="s in sessionsToday" :key="s.id" :appointment="s" />
         </div>
-        <p v-else class="rounded-lg border border-dashed px-4 py-8 text-center text-sm text-muted-foreground">
+        <EmptyState v-else compact>
           Nenhuma sessão agendada para hoje.
-        </p>
+        </EmptyState>
       </section>
 
       <section class="flex flex-col gap-3">
@@ -101,9 +101,9 @@ const avgAdherence = computed(() => {
         <div v-if="reviews.length" class="flex flex-col gap-2">
           <ActivityRow v-for="a in reviews" :key="a.id" :activity="a" show-patient />
         </div>
-        <p v-else class="rounded-lg border border-dashed px-4 py-8 text-center text-sm text-muted-foreground">
+        <EmptyState v-else compact>
           Nada aguardando revisão.
-        </p>
+        </EmptyState>
       </section>
     </div>
 

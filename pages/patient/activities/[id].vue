@@ -138,9 +138,9 @@ async function send() {
       <div class="h-40 animate-pulse rounded-xl bg-muted" />
     </div>
 
-    <p v-else-if="error" class="rounded-xl border border-dashed px-5 py-8 text-center text-sm text-muted-foreground">
+    <EmptyState v-else-if="error" compact>
       {{ apiErrorMessage(error, { 404: 'Esta atividade não existe ou não é sua.' }) }}
-    </p>
+    </EmptyState>
 
     <template v-else-if="activity">
       <header class="flex items-start gap-3">
@@ -169,9 +169,9 @@ async function send() {
         </CardContent>
       </Card>
 
-      <p v-else-if="!total" class="mt-8 rounded-xl border border-dashed px-5 py-8 text-center text-sm text-muted-foreground">
+      <EmptyState v-else-if="!total" class="mt-8" compact>
         Esta atividade ainda não tem perguntas. Fale com sua psicóloga.
-      </p>
+      </EmptyState>
 
       <template v-else-if="currentField">
         <div class="mt-6 flex flex-col gap-2">

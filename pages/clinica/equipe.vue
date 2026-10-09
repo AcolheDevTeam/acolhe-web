@@ -135,7 +135,7 @@ async function decideRevoke(confirmed: boolean) {
       </section>
       <section class="flex flex-col gap-3">
         <p class="label-mono">Convites pendentes · {{ invitations.length }}</p>
-        <p v-if="!invitations.length" class="rounded-lg border border-dashed px-4 py-6 text-center text-sm text-muted-foreground">Nenhum convite pendente.</p>
+        <EmptyState v-if="!invitations.length" compact>Nenhum convite pendente.</EmptyState>
         <ul v-else class="divide-y rounded-xl border bg-card">
           <li v-for="invitation in invitations" :key="invitation.id" class="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
             <div class="min-w-0">

@@ -135,7 +135,7 @@ const identity = computed(() => {
     </div>
     <div
       v-else
-      class="rounded-xl border border-dashed px-6 py-12 text-center"
+      class="rounded-2xl border border-dashed border-input-hover px-6 py-12 text-center"
     >
       <p class="font-serif text-2xl">Aguardando aceite</p>
       <p class="mx-auto mt-2 max-w-md text-sm text-muted-foreground">

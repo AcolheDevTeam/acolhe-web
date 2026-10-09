@@ -165,14 +165,12 @@ async function markReviewed() {
           A revisão permanece bloqueada.
         </p>
       </div>
-      <p
-        v-else
-        class="rounded-lg border border-dashed px-4 py-10 text-center text-sm text-muted-foreground"
-      >
+      <EmptyState
+        v-else compact>
         {{ activity.state === 'awaiting_response'
           ? 'A paciente ainda não respondeu esta atividade.'
           : 'Esta atividade foi encerrada sem resposta.' }}
-      </p>
+      </EmptyState>
     </div>
 
     <div v-else-if="status === 'pending'" class="flex flex-col gap-3">
@@ -180,11 +178,9 @@ async function markReviewed() {
       <Skeleton class="h-4 w-40" />
       <Skeleton class="mt-4 h-24 w-full" />
     </div>
-    <div
-      v-else-if="error"
-      class="rounded-lg border border-dashed px-4 py-10 text-center text-sm text-muted-foreground"
-    >
+    <EmptyState
+      v-else-if="error" compact>
       Não foi possível carregar uma resposta íntegra. A revisão está bloqueada.
-    </div>
+    </EmptyState>
   </div>
 </template>

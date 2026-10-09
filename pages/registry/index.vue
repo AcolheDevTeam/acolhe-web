@@ -28,12 +28,9 @@ const { data, error, status, refresh } = useDocumentaryPatients(page)
       Carregando cadernos…
     </p>
     <template v-else-if="data">
-      <div
-        v-if="!data.items.length"
-        class="rounded-lg border border-dashed p-8 text-center text-muted-foreground"
-      >
+      <EmptyState v-if="!data.items.length" compact>
         Nenhum caderno salvo nesta página.
-      </div>
+      </EmptyState>
       <div v-else class="divide-y rounded-lg border bg-card">
         <NuxtLink
           v-for="patient in data.items"

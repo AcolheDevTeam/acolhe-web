@@ -83,9 +83,9 @@ const ordered = computed(() =>
           <ChevronRight class="size-4 text-muted-foreground" />
         </NuxtLink>
       </div>
-      <p v-else-if="!loading && !sessionsError" class="rounded-lg border border-dashed px-4 py-10 text-center text-sm text-muted-foreground">
+      <EmptyState v-else-if="!loading && !sessionsError" compact>
         Nenhuma sessão registrada ainda.
-      </p>
+      </EmptyState>
     </div>
   </PatientShell>
 </template>

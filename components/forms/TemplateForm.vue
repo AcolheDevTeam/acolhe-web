@@ -165,12 +165,10 @@ const onSubmit = handleSubmit((formValues) => {
             @change-type="(fieldType) => changeType(index, fieldType)"
           />
         </div>
-        <p
-          v-else
-          class="rounded-lg border border-dashed px-4 py-10 text-center text-sm text-muted-foreground"
-        >
+        <EmptyState
+          v-else compact>
           Nenhum campo ainda. Escolha um tipo em "Adicionar campo" para começar.
-        </p>
+        </EmptyState>
         <p v-if="fieldsError" class="text-sm font-medium text-destructive">{{ fieldsError }}</p>
       </section>
     </div>

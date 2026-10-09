@@ -22,9 +22,9 @@ const grouped = computed(() => groupActivityQueue(activities.value ?? []))
         </div>
       </section>
     </div>
-    <div v-else class="flex flex-col items-center gap-1 rounded-lg border border-dashed px-4 py-16 text-center text-sm text-muted-foreground">
+    <EmptyState v-else compact>
       <p>Nenhuma atividade atribuída.</p>
       <p>Para atribuir uma, abra a ficha da paciente e use "Atribuir atividade".</p>
-    </div>
+    </EmptyState>
   </div>
 </template>
