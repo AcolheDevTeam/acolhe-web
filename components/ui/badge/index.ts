@@ -3,18 +3,22 @@ import { cva } from "class-variance-authority"
 
 export { default as Badge } from "./Badge.vue"
 
+// Pílulas do novo design: 26px, raio total, 12/500, sem borda (seção 2 do mapa).
+// As variantes antigas continuam aceitas e caem no tom equivalente.
 export const badgeVariants = cva(
-  "inline-flex gap-1 items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+  "inline-flex h-[26px] shrink-0 items-center gap-1 whitespace-nowrap rounded-full px-2.5 text-xs font-medium",
   {
     variants: {
       variant: {
-        default:
-          "border-transparent bg-primary text-primary-foreground shadow hover:bg-primary/80",
-        secondary:
-          "border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80",
-        destructive:
-          "border-transparent bg-destructive text-destructive-foreground shadow hover:bg-destructive/80",
-        outline: "text-foreground",
+        default: "bg-positive-soft text-positive",
+        positive: "bg-positive-soft text-positive",
+        secondary: "bg-secondary text-secondary-foreground",
+        neutral: "bg-secondary text-secondary-foreground",
+        warning: "bg-warning-soft text-warning",
+        destructive: "bg-destructive-soft text-destructive",
+        danger: "bg-destructive-soft text-destructive",
+        strong: "bg-brand text-brand-foreground",
+        outline: "border border-border bg-card text-secondary-foreground",
       },
     },
     defaultVariants: {
