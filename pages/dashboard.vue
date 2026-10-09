@@ -105,8 +105,8 @@ const labelClass: Record<AgendaRowState, string> = {
             </TabsList>
           </div>
 
-          <TabsContent value="dia" class="mt-0 animate-fade">
-            <ol v-if="agenda.length" class="flex flex-col">
+          <TabsContent value="dia" class="mt-0">
+            <ol v-if="agenda.length" class="flex animate-fade flex-col">
               <li v-for="row in agenda" :key="row.appointment.id">
                 <NuxtLink
                   :to="`/appointments/${row.appointment.id}`"
@@ -123,13 +123,13 @@ const labelClass: Record<AgendaRowState, string> = {
                 </NuxtLink>
               </li>
             </ol>
-            <EmptyState v-else compact class="mx-2 mb-2">
+            <EmptyState v-else compact class="mx-2 mb-2 animate-fade">
               Nenhuma sessão hoje.
             </EmptyState>
           </TabsContent>
 
-          <TabsContent value="semana" class="mt-0 animate-fade">
-            <div class="px-2 pb-1 pt-2">
+          <TabsContent value="semana" class="mt-0">
+            <div class="animate-fade px-2 pb-1 pt-2">
               <div role="img" :aria-label="weekAria" class="grid h-[200px] grid-cols-7 items-end gap-2 sm:gap-3">
                 <div v-for="(d, i) in week" :key="d.day" class="flex h-full flex-col items-center justify-end gap-2">
                   <span class="font-mono text-xs text-secondary-foreground">{{ d.count }}</span>
