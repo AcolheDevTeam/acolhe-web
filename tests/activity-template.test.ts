@@ -14,6 +14,7 @@ import {
   templateApiErrorMessage,
   templateTypePreset,
   templateOriginLabel,
+  templateScope,
   templateToFormValues,
 } from '~/utils/activity-template'
 
@@ -89,9 +90,10 @@ describe('helpers do builder', () => {
   })
 
   it('origem do template', () => {
-    expect(templateOriginLabel({ isGlobal: true, ownedByMe: false })).toBe('Acolhe')
-    expect(templateOriginLabel({ isGlobal: false, ownedByMe: true })).toBe('Meu')
-    expect(templateOriginLabel({ isGlobal: false, ownedByMe: false })).toBe('Da organização')
+    expect(templateOriginLabel({ isGlobal: true, ownedByMe: false })).toBe('Biblioteca Acolhe')
+    expect(templateOriginLabel({ isGlobal: false, ownedByMe: true })).toBe('Pessoal')
+    expect(templateOriginLabel({ isGlobal: false, ownedByMe: false })).toBe('Da clínica')
+    expect(templateScope({ isGlobal: false, ownedByMe: false })).toBe('clinic')
   })
 
   it('campo novo já vem com a configuração mínima do tipo', () => {
