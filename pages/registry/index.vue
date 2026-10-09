@@ -19,12 +19,8 @@ const { data, error, status, refresh } = useDocumentaryPatients(page)
       Para começar um caderno, abra Registro Documental na ficha da paciente.
     </p>
     <div v-if="error" role="alert" class="space-y-3">
-      <p>
-        {{
-          apiErrorMessage(error, {
-            503: 'Registro Documental indisponível. A configuração de criptografia precisa ser verificada.',
-          })
-        }}
+      <p class="text-sm text-destructive">
+        {{ documentaryErrorText(error) }}
       </p>
       <Button variant="outline" @click="refresh()">Tentar novamente</Button>
     </div>

@@ -90,7 +90,11 @@ export default defineEventHandler(async (event) => {
     )
   } catch (error: unknown) {
     // Não propagar FetchError: options/body podem conter o texto clínico.
-    const upstream = error as { statusCode?: number; status?: number }
+    const upstream = error as {
+      statusCode?: number
+      status?: number
+      data?: { message?: unknown }
+    }
     const code = upstream.statusCode ?? upstream.status
     const messages: Record<number, string> = {
       400: 'Dados documentais inválidos.',
@@ -98,11 +102,24 @@ export default defineEventHandler(async (event) => {
       403: 'Acesso ou gravação documental não permitido.',
       404: 'Caderno ou versão não encontrado.',
       409: 'O caderno foi atualizado em outra aba.',
+      500: 'Erro inesperado no Registro Documental.',
       503: 'Não foi possível validar a criptografia documental.',
     }
-    const statusCode = code && messages[code] ? code : 502
+    // Sem status a API não respondeu (rede/timeout): 502. Os demais seguem,
+    // para o cliente distinguir erro nosso de indisponibilidade (ACO-84).
+    const statusCode = code ?? 502
+    // O 403 da API tem dois motivos; o cliente recebe só o código do motivo.
+    const apiMessage =
+      typeof upstream.data?.message === 'string' ? upstream.data.message : ''
+    const reason =
+      statusCode === 403
+        ? /somente para leitura/i.test(apiMessage)
+          ? 'read_only'
+          : 'not_author'
+        : undefined
     throw createError({
       statusCode,
+      data: reason ? { reason } : undefined,
       message:
         messages[statusCode] ??
         'Registro Documental indisponível. Tente novamente.',
