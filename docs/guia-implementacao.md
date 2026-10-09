@@ -645,10 +645,43 @@ Migrations dessa leva: `link_appointment_session`, `patient_confirm_appointment`
 `daily_checkin`, `documentary_notebooks` e `patient_phone`.
 
 **Pendências:** ninguém revisou esse código contra as regras da Parte A. A prioridade é o
-Registro Documental, por envolver criptografia e sigilo. Em produção, ele está
-**indisponível** até existirem os secrets `DOCUMENTARY_ACTIVE_KEY_ID` e
-`DOCUMENTARY_ENCRYPTION_KEYS` no Environment `production` da `acolhe-api`, que hoje só existem
-em staging.
+Registro Documental, por envolver criptografia e sigilo.
+
+**Secrets de produção — resolvido em 2026-10-08.** `DOCUMENTARY_ACTIVE_KEY_ID` e
+`DOCUMENTARY_ENCRYPTION_KEYS` foram criados no Environment `production` da `acolhe-api` às
+11:01. O deploy do release esperou a aprovação do Environment e só chegou à
+VM às 11:02, já com as chaves: o `configure-documentary.py` as validou e a API subiu
+healthy, sem o aviso "registro documental indisponível" no boot. Pendências de operação das chaves: ACO-82.
+
+### C11. Revisão da leva de outubro (C10) — feita em 2026-10-09
+
+Revisão só de leitura dos PRs da tabela da C10, contra a Parte A e com foco no sigilo do
+Registro Documental. Os achados, com arquivo e linha, ficam no Linear; aqui só o resumo.
+Nada foi corrigido ainda. `pnpm typecheck` e `pnpm test` passam em `develop`.
+
+Não há vazamento de conteúdo nem acesso a dados de outra psicóloga, e a criptografia do
+Registro Documental está bem feita. Os problemas estão em perda de texto, regras de negócio nas
+bordas e erros que não distinguem o caso (A6).
+
+| Issue | Prioridade | Assunto |
+|---|---|---|
+| ACO-77 | Alta | Registro Documental: rascunho não salvo some quando a sessão expira ou a API oscila |
+| ACO-78 | Média | Agendamento com evolução aberta pode ser cancelado ou marcado como falta |
+| ACO-79 | Média | Check-in: registro do psicólogo ocupa a vaga do paciente; vínculo inativo vira "já registrou hoje" |
+| ACO-80 | Média | API devolve erro cru do banco em respostas 500 |
+| ACO-81 | Média | Telefone do paciente sem cifra (o CPF é cifrado) — decidir |
+| ACO-82 | Média | Registro Documental (API): endurecimento no banco e na rotação de chave |
+| ACO-83 | Média | Agendamento (web): confirmação nas ações finais; agenda no fuso errado no SSR |
+| ACO-84 | Média | Registro Documental (web): erros específicos por caso (A6) e ajustes do editor |
+| ACO-85 | Baixa | Conferência mobile (A4) das telas novas e revogação de token no logout |
+
+**Regras que ficam:**
+
+- Falha ao consultar a identidade (`/me`) não é troca de usuário: nunca descartar texto da
+  pessoa por causa de erro de rede ou sessão expirada.
+- Ação sem volta (cancelar, registrar falta, concluir) sempre pede confirmação num `Dialog`.
+- Data e hora exibidas no SSR precisam de fuso explícito; o servidor roda em UTC.
+- Achados de segurança com detalhe técnico vão para o Linear, não para este guia.
 
 ---
 
