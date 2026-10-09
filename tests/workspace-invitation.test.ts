@@ -26,3 +26,16 @@ describe('convite para workspace (ACO-62)', () => {
     expect(invitationErrorMessage({ statusCode: 401 })).toBe('Senha incorreta.')
   })
 })
+
+describe('conta existente que passa a atender (ACO-62)', async () => {
+  const { acceptExistingSchema } = await import('../schemas/workspace-invitation')
+  const { invitationErrorMessage } = await import('../utils/workspace-invitation')
+  it('pede CRP só quando o convite inclui atender e falta o perfil', () => {
+    expect(acceptExistingSchema(false).safeParse({ password: 'x' }).success).toBe(true)
+    expect(acceptExistingSchema(true).safeParse({ password: 'x' }).success).toBe(false)
+    expect(acceptExistingSchema(true).safeParse({ password: 'x', fullName: 'Ana Souza', crpNumber: '123456', crpState: '06' }).success).toBe(true)
+  })
+  it('link cortado na prévia não fala de formulário', () => {
+    expect(invitationErrorMessage({ statusCode: 400 }, 'preview')).toContain('link está completo')
+  })
+})

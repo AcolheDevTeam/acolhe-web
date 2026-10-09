@@ -14,6 +14,8 @@ import { Label } from '@/components/ui/label'
 const props = defineProps<{ token: string, preview: InvitationPreview }>()
 const submitError = ref('')
 const isNew = computed(() => !props.preview.accountExists)
+// Nome e CRP: conta nova, ou conta existente que vai passar a atender.
+const asksProfile = computed(() => isNew.value || props.preview.needsCrp)
 
 interface AcceptFormValues {
   fullName?: string
@@ -27,7 +29,7 @@ interface AcceptFormValues {
 }
 
 // O schema depende do convite (conta nova ou existente, com ou sem CRP).
-const schema = props.preview.accountExists ? acceptExistingSchema : acceptNewAccountSchema(props.preview.needsCrp)
+const schema = props.preview.accountExists ? acceptExistingSchema(props.preview.needsCrp) : acceptNewAccountSchema(props.preview.needsCrp)
 const { defineField, errors, handleSubmit, isSubmitting } = useForm<AcceptFormValues>({
   validationSchema: toTypedSchema(schema) as never,
   initialValues: { termsVersion: signupTermsVersion, privacyVersion: signupTermsVersion, acceptTerms: false, acceptPrivacy: false },
@@ -42,7 +44,11 @@ const errorFor = (field: string) => (errors.value as Record<string, string | und
 
 const onSubmit = handleSubmit(async (values) => {
   submitError.value = ''
-  const body = props.preview.accountExists ? { password: values.password } : values
+  const body = props.preview.accountExists
+    ? (props.preview.needsCrp
+        ? { password: values.password, fullName: values.fullName, crpNumber: values.crpNumber, crpState: values.crpState }
+        : { password: values.password })
+    : values
   try {
     const user = await $fetch<User>(`/api/workspace-invitations/${props.token}/accept`, { method: 'POST', body })
     clearNuxtData()
@@ -57,7 +63,7 @@ const onSubmit = handleSubmit(async (values) => {
 
 <template>
   <form class="flex flex-col gap-4" novalidate @submit.prevent="onSubmit">
-    <template v-if="isNew">
+    <template v-if="asksProfile">
       <div class="flex flex-col gap-1.5">
         <Label for="fullName">Nome completo</Label>
         <Input id="fullName" v-model="fullName" v-bind="fullNameAttrs" autocomplete="name" :aria-invalid="!!errorFor('fullName')" />

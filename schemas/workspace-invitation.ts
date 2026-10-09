@@ -20,10 +20,18 @@ const crpNumber = z.string().trim().regex(/^\d{4,8}$/, 'Informe apenas os númer
 const crpState = z.string().trim().transform(value => value.toUpperCase().replace(/^CRP-/, '').padStart(2, '0'))
   .refine(value => /^(0[1-9]|1\d|2[0-4])$/.test(value), 'Informe uma região de CRP válida (01 a 24).')
 
-/** Conta existente: só a senha confirma quem está aceitando. */
-export const acceptExistingSchema = z.object({
-  password: z.string().min(1, 'Informe sua senha.').max(128, 'Senha muito longa.'),
-})
+/** Conta existente: a senha confirma quem aceita; o CRP entra quando o convite
+ * inclui atender e a conta ainda não tem perfil de psicóloga. */
+export function acceptExistingSchema(needsCrp: boolean) {
+  const password = z.string().min(1, 'Informe sua senha.').max(128, 'Senha muito longa.')
+  if (!needsCrp) return z.object({ password })
+  return z.object({
+    password,
+    fullName: z.string().trim().min(2, 'Informe seu nome completo.').max(200, 'Nome muito longo.'),
+    crpNumber,
+    crpState,
+  })
+}
 
 /** Conta nova: as mesmas regras do cadastro; CRP só quando o convite inclui atender. */
 export function acceptNewAccountSchema(needsCrp: boolean) {

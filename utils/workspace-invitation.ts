@@ -9,8 +9,10 @@ const conflictCases: Array<[RegExp, string]> = [
   [/acabou de ser cadastrado/i, 'Este e-mail acabou de ser cadastrado. Recarregue a página para entrar com a conta.'],
 ]
 
-export function invitationErrorMessage(error: unknown): string {
+export function invitationErrorMessage(error: unknown, context: 'preview' | 'accept' = 'accept'): string {
   const { status, technical } = apiErrorInfo(error)
+  // Na prévia, 400 é token fora do formato: link cortado pelo cliente de e-mail.
+  if (context === 'preview' && status === 400) return 'Convite não encontrado. Confira se o link está completo.'
   if (status === 409 && technical) {
     const known = conflictCases.find(([pattern]) => pattern.test(technical))
     if (known) return known[1]

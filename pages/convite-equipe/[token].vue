@@ -40,12 +40,14 @@ const validity = computed(() => preview.value ? formatDateTime(preview.value.exp
       <CardContent class="flex flex-col gap-4">
         <p v-if="status === 'pending'" class="text-sm text-muted-foreground" role="status">Carregando o convite…</p>
         <div v-else-if="error" class="flex flex-col gap-3" role="alert">
-          <p class="text-sm text-destructive">{{ invitationErrorMessage(error) }}</p>
+          <p class="text-sm text-destructive">{{ invitationErrorMessage(error, 'preview') }}</p>
           <Button v-if="!error.statusCode || error.statusCode >= 500" variant="outline" class="self-start" @click="refresh()">Tentar novamente</Button>
         </div>
         <template v-else-if="preview">
           <p class="text-sm text-muted-foreground">
-            {{ preview.accountExists ? 'Este e-mail já tem conta no Acolhe. Confirme com a sua senha.' : 'Crie sua conta para aceitar.' }}
+            {{ preview.accountExists
+              ? (preview.needsCrp ? 'Este e-mail já tem conta no Acolhe. Confirme com a sua senha e informe seu CRP para atender.' : 'Este e-mail já tem conta no Acolhe. Confirme com a sua senha.')
+              : 'Crie sua conta para aceitar.' }}
           </p>
           <InvitationAcceptForm :token="token" :preview="preview" />
         </template>
