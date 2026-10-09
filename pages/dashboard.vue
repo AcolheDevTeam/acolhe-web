@@ -17,7 +17,7 @@ const { data: patients } = await useFetch<Patient[]>('/api/patients', {
 
 const firstName = computed(() => me.value?.name?.split(' ')[0] ?? '')
 const greeting = computed(() => {
-  const h = new Date().getHours()
+  const h = zonedParts(new Date()).hour
   return h < 12 ? 'Bom dia' : h < 18 ? 'Boa tarde' : 'Boa noite'
 })
 const today = computed(() => {
@@ -25,6 +25,7 @@ const today = computed(() => {
     weekday: 'long',
     day: 'numeric',
     month: 'long',
+    timeZone: APP_TIMEZONE,
   }).format(new Date())
   return s.charAt(0).toUpperCase() + s.slice(1)
 })

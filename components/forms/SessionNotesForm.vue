@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { toTypedSchema } from '@vee-validate/zod'
 import { useForm } from 'vee-validate'
+import { onBeforeRouteLeave } from 'vue-router'
 import { toast } from 'vue-sonner'
 import type { Session } from '~/types'
 import { updateSessionNotesSchema } from '~/schemas/session'
@@ -46,15 +47,27 @@ function decide(discard: boolean) {
   resolveConfirmation?.(discard)
   resolveConfirmation = undefined
 }
-const unregisterExit = exitProtection.register({
-  saving: isSubmitting,
-  confirm: () => {
-    if (!dirty.value) return Promise.resolve(true)
-    confirmOpen.value = true
-    return new Promise<boolean>(resolve => { resolveConfirmation = resolve })
-  },
+function confirmDiscard(): Promise<boolean> {
+  if (!dirty.value) return Promise.resolve(true)
+  if (resolveConfirmation) return Promise.resolve(false)
+  confirmOpen.value = true
+  return new Promise<boolean>(resolve => { resolveConfirmation = resolve })
+}
+const unregisterExit = exitProtection.register({ saving: isSubmitting, confirm: confirmDiscard })
+// Sair da página com evolução não salva também pede confirmação (ACO-83),
+// como no logout e no Registro Documental.
+onBeforeRouteLeave(() => confirmDiscard())
+function beforeUnload(event: BeforeUnloadEvent) {
+  if (exitProtection.leaving.value || !dirty.value) return
+  event.preventDefault()
+  event.returnValue = ''
+}
+onMounted(() => window.addEventListener('beforeunload', beforeUnload))
+onBeforeUnmount(() => {
+  window.removeEventListener('beforeunload', beforeUnload)
+  unregisterExit()
+  decide(false)
 })
-onBeforeUnmount(() => { unregisterExit(); decide(false) })
 </script>
 
 <template>

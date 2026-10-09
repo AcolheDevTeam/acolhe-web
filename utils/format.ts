@@ -1,4 +1,5 @@
 // Helpers de apresentação (auto-importados pelo Nuxt em utils/).
+import { APP_TIMEZONE } from './timezone'
 
 export function initials(name?: string | null): string {
   if (!name) return '—'
@@ -12,13 +13,17 @@ export function initials(name?: string | null): string {
     .toUpperCase()
 }
 
-const dtf = new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' })
-const tf = new Intl.DateTimeFormat('pt-BR', { hour: '2-digit', minute: '2-digit' })
+// Instantes saem no fuso do app (igual no SSR e no browser); datas puras
+// (`YYYY-MM-DD`, ex.: nascimento) são dias de calendário e não mudam de dia.
+const dtf = new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', timeZone: APP_TIMEZONE })
+const calendarDtf = new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'UTC' })
+const tf = new Intl.DateTimeFormat('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: APP_TIMEZONE })
 
 export function formatDate(iso?: string | null): string {
   if (!iso) return '—'
   const d = new Date(iso)
-  return Number.isNaN(d.getTime()) ? '—' : dtf.format(d)
+  if (Number.isNaN(d.getTime())) return '—'
+  return /^\d{4}-\d{2}-\d{2}$/.test(iso) ? calendarDtf.format(d) : dtf.format(d)
 }
 
 export function formatTime(iso?: string | null): string {

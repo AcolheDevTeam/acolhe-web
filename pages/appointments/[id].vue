@@ -3,6 +3,7 @@ import { useNow } from '@vueuse/core'
 import { toast } from 'vue-sonner'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { appointmentConflictMessage, finalStatusConfirmation, type FinalAppointmentStatus } from '~/utils/appointment-errors'
 
 definePageMeta({ middleware: ['auth', 'psychologist-only'] })
 const route = useRoute()
@@ -15,6 +16,18 @@ const now = useNow({ interval: 60000 })
 const active = computed(() => ['scheduled', 'confirmed'].includes(appointment.value?.status ?? ''))
 const hasStarted = computed(() => appointment.value && new Date(appointment.value.scheduledFor) <= now.value)
 
+// Ações sem volta passam por confirmação (ACO-83; regra A2, sem confirm() nativo).
+const pendingStatus = ref<FinalAppointmentStatus | null>(null)
+const confirmation = computed(() => pendingStatus.value ? finalStatusConfirmation[pendingStatus.value] : null)
+function askStatus(status: FinalAppointmentStatus) {
+  if (!busy.value) pendingStatus.value = status
+}
+async function decideStatus(confirmed: boolean) {
+  const status = pendingStatus.value
+  pendingStatus.value = null
+  if (confirmed && status) await changeStatus(status)
+}
+
 async function changeStatus(status: string) {
   if (busy.value) return
   changingStatus.value = true
@@ -24,7 +37,7 @@ async function changeStatus(status: string) {
     await refreshNuxtData('appointments-all')
     toast.success('Agendamento atualizado.')
   } catch (error) {
-    toast.error(apiErrorMessage(error, { 404: 'Este agendamento não está disponível para você.', 409: 'O status mudou ou esta ação não é permitida. Recarregue o agendamento.', default: 'Não foi possível atualizar o agendamento.' }))
+    toast.error(appointmentConflictMessage(error) ?? apiErrorMessage(error, { 404: 'Este agendamento não está disponível para você.', 409: 'O status mudou ou esta ação não é permitida. Recarregue o agendamento.', default: 'Não foi possível atualizar o agendamento.' }))
   } finally { changingStatus.value = false }
 }
 async function openRecord() {
@@ -35,7 +48,7 @@ async function openRecord() {
 
 <template>
   <PageHeader title="Agendamento">
-    <template #actions><Button variant="outline" size="sm" as-child><NuxtLink :to="appointment ? `/agenda?date=${new Date(appointment.scheduledFor).toLocaleDateString('sv-SE')}` : '/agenda'">Ver agenda</NuxtLink></Button></template>
+    <template #actions><Button variant="outline" size="sm" as-child><NuxtLink :to="appointment ? `/agenda?date=${zonedDay(appointment.scheduledFor)}` : '/agenda'">Ver agenda</NuxtLink></Button></template>
   </PageHeader>
   <div class="mx-auto flex w-full max-w-2xl flex-col gap-6 px-4 py-6 md:px-8 md:py-8">
     <div v-if="error" class="text-sm">
@@ -54,10 +67,18 @@ async function openRecord() {
           <Button variant="outline" :disabled="busy">Reagendar</Button>
         </NewSessionDialog>
         <Button v-if="appointment.status === 'scheduled'" variant="outline" :disabled="busy" @click="changeStatus('confirmed')">Confirmar</Button>
-        <Button v-if="active && hasStarted" :disabled="busy" @click="changeStatus('completed')">Marcar como realizada</Button>
-        <Button v-if="active && hasStarted" variant="outline" :disabled="busy" @click="changeStatus('no_show')">Registrar falta</Button>
-        <Button v-if="active" variant="outline" :disabled="busy" @click="changeStatus('canceled')">Cancelar sessão</Button>
+        <Button v-if="active && hasStarted" :disabled="busy" @click="askStatus('completed')">Marcar como realizada</Button>
+        <Button v-if="active && hasStarted && !appointment.sessionId" variant="outline" :disabled="busy" @click="askStatus('no_show')">Registrar falta</Button>
+        <Button v-if="active && !appointment.sessionId" variant="outline" :disabled="busy" @click="askStatus('canceled')">Cancelar sessão</Button>
       </div>
+      <ConfirmDialog
+        :open="pendingStatus !== null"
+        :title="confirmation?.title ?? ''"
+        :description="confirmation?.description ?? ''"
+        :confirm-label="confirmation?.confirmLabel ?? ''"
+        :destructive="confirmation?.destructive"
+        @decision="decideStatus"
+      />
       <section class="flex flex-col gap-3 rounded-lg border bg-card p-5">
         <h2 class="font-serif text-2xl">Evolução da sessão</h2>
         <p class="text-sm text-muted-foreground">A evolução é opcional e pode ser preenchida ou editada depois. Salvar o texto não marca o atendimento como realizado.</p>
