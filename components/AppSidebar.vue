@@ -104,6 +104,7 @@ const initials = computed(() =>
 
 <template>
   <aside
+    id="menu-principal"
     :class="[
       'flex h-dvh shrink-0 flex-col gap-6 border-r bg-background py-6 transition-[width] duration-200 ease-[cubic-bezier(.2,.7,.2,1)]',
       collapsed ? 'w-[72px] px-3' : 'w-64 px-4',
@@ -121,6 +122,7 @@ const initials = computed(() =>
         :aria-label="collapsed ? 'Expandir menu' : 'Recolher menu'"
         :title="collapsed ? 'Expandir menu' : 'Recolher menu'"
         :aria-expanded="!collapsed"
+        aria-controls="menu-principal"
         @click="toggleCollapsed"
       >
         <PanelLeftOpen v-if="collapsed" class="size-[18px]" :stroke-width="1.7" />
