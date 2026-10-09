@@ -23,8 +23,8 @@ const text = computed(() => {
 </script>
 
 <template>
+  <!-- Sempre montado: a região live precisa existir antes da primeira mensagem. -->
   <p
-    v-if="text"
     role="status"
     aria-live="polite"
     :class="cn(

@@ -27,7 +27,6 @@ const notice = cva("animate-fade rounded-xl px-4 py-3 text-sm leading-relaxed", 
 <template>
   <div
     :role="tone === 'danger' ? 'alert' : 'status'"
-    :aria-live="tone === 'danger' ? 'assertive' : 'polite'"
     :class="cn(notice({ tone }), props.class)"
   >
     <slot />
