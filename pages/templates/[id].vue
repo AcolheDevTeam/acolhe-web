@@ -1,13 +1,16 @@
 <script setup lang="ts">
-import { Archive, Check } from 'lucide-vue-next'
+import { Archive } from 'lucide-vue-next'
 import { toast } from 'vue-sonner'
 import type { ActivityTemplateDetail, TemplateRequest } from '~/schemas/activity-template'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { EmptyState } from '@/components/ui/empty-state'
+import { InlineNotice } from '@/components/ui/inline-notice'
 import { Skeleton } from '@/components/ui/skeleton'
 
-// Detalhe e edição de um template. Editável só para a autora, não arquivado e
-// sem versão mais nova; nos demais casos o builder abre em leitura.
+// Detalhe e edição de um template (protótipo "Builder"). Editável só para a
+// autora, não arquivado e sem versão mais nova; nos demais casos o builder abre
+// em leitura.
 definePageMeta({ middleware: ['auth', 'psychologist-only'] })
 
 const route = useRoute()
@@ -15,6 +18,7 @@ const templateId = computed(() => route.params.id as string)
 const { data: template, status, error } = useTemplate(templateId)
 
 const submitting = ref(false)
+const form = ref<{ markSaved: () => void } | null>(null)
 const initial = computed(() => (template.value ? templateToFormValues(template.value) : null))
 const readonly = computed(() => !template.value?.editable)
 
@@ -38,6 +42,7 @@ async function save(values: TemplateRequest) {
   submitting.value = true
   try {
     const saved = await $fetch<ActivityTemplateDetail>(`/api/templates/${template.value.id}`, { method: 'PUT', body: values })
+    form.value?.markSaved()
     await refreshNuxtData('templates-list')
     if (saved.id !== template.value.id) {
       toast.success(`Versão ${saved.version} publicada. As atividades já atribuídas continuam na versão ${template.value.version}.`)
@@ -61,12 +66,14 @@ async function onArchived() {
 <template>
   <PageHeader>
     <template #title>
-      <nav class="flex min-w-0 items-center gap-2 text-sm text-muted-foreground">
-        <NuxtLink to="/templates" class="hidden hover:text-foreground sm:inline">Templates</NuxtLink>
-        <span class="hidden sm:inline">/</span>
-        <span class="truncate text-foreground">{{ template?.title ?? 'Template' }}</span>
-        <Badge v-if="template" variant="outline" class="hidden font-normal tabular-nums sm:inline-flex">v{{ template.version }}</Badge>
-      </nav>
+      <div class="flex min-w-0 items-center gap-2 font-mono text-xs tracking-[0.06em] text-muted-foreground">
+        <nav aria-label="Caminho">
+          <NuxtLink to="/templates" class="underline-offset-[3px] hover:text-foreground hover:underline">Templates</NuxtLink>
+        </nav>
+        <span aria-hidden="true">/</span>
+        <h1 class="truncate font-normal text-foreground">{{ template?.title ?? 'Template' }}</h1>
+        <span v-if="template" class="shrink-0 tabular-nums">v{{ template.version }}</span>
+      </div>
     </template>
     <template #actions>
       <template v-if="template">
@@ -75,17 +82,16 @@ async function onArchived() {
           :template="template"
           @archived="onArchived"
         >
-          <Button variant="outline" size="sm" aria-label="Arquivar template">
+          <Button variant="outline" aria-label="Arquivar template">
             <Archive />
             <span class="hidden sm:inline">Arquivar</span>
           </Button>
         </ArchiveTemplateDialog>
         <template v-if="!readonly">
-          <Button variant="ghost" size="sm" as-child class="hidden sm:inline-flex">
+          <Button variant="ghost" as-child>
             <NuxtLink to="/templates">Descartar</NuxtLink>
           </Button>
-          <Button type="submit" form="template-form" size="sm" :disabled="submitting">
-            <Check />
+          <Button type="submit" form="template-form" :loading="submitting">
             {{ submitLabel }}
           </Button>
         </template>
@@ -93,36 +99,36 @@ async function onArchived() {
     </template>
   </PageHeader>
 
-  <div class="flex flex-col gap-6 px-4 py-6 md:px-8 md:py-8 lg:px-12">
+  <div class="flex flex-col gap-6 px-4 pb-14 pt-6 md:px-8 lg:px-12">
     <template v-if="status === 'pending'">
       <Skeleton class="h-10 w-2/3" />
       <Skeleton class="h-24 w-full" />
       <Skeleton class="h-40 w-full" />
     </template>
 
-    <EmptyState
-      v-else-if="error || !template" compact>
+    <EmptyState v-else-if="error || !template" compact>
       {{ apiErrorMessage(error, { 404: 'Template não encontrado. Ele pode ter sido removido ou pertencer a outra organização.' }) }}
     </EmptyState>
 
     <template v-else>
-      <div
-        v-if="readonlyReason"
-        class="flex flex-wrap items-center gap-2 rounded-lg border bg-muted/40 px-4 py-3 text-sm"
-      >
-        <Badge variant="secondary" class="font-normal">{{ template.isArchived ? 'Arquivado' : template.superseded ? 'Versão antiga' : templateOriginLabel(template) }}</Badge>
-        <span class="text-muted-foreground">{{ readonlyReason }}</span>
-      </div>
-      <p v-else-if="willCreateVersion" class="rounded-lg border bg-muted/40 px-4 py-3 text-sm text-muted-foreground">
+      <InlineNotice v-if="readonlyReason" tone="neutral" class="flex flex-wrap items-center gap-x-3 gap-y-2">
+        <Badge :variant="template.isArchived ? 'warning' : 'outline'">
+          {{ template.isArchived ? 'Arquivado' : template.superseded ? 'Versão antiga' : templateOriginLabel(template) }}
+        </Badge>
+        <span>{{ readonlyReason }}</span>
+      </InlineNotice>
+      <InlineNotice v-else-if="willCreateVersion" tone="neutral">
         Este template já foi atribuído {{ template.assignmentCount === 1 ? '1 vez' : `${template.assignmentCount} vezes` }}.
         Ao salvar, uma nova versão é publicada e as atividades existentes continuam com a versão {{ template.version }}.
-      </p>
+      </InlineNotice>
 
       <TemplateForm
         v-if="initial"
+        ref="form"
         :key="template.id"
         :initial="initial"
         :readonly="readonly"
+        :saving="submitting"
         @submit="save"
       />
     </template>

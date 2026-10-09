@@ -18,7 +18,8 @@ import { DateTimePicker } from '@/components/ui/date-time-picker'
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Button } from '@/components/ui/button'
 
-const { patientId } = defineProps<{ patientId?: string }>()
+// `templateId` pré-seleciona o template (botão "Enviar" do card da biblioteca).
+const { patientId, templateId } = defineProps<{ patientId?: string, templateId?: string }>()
 
 const open = ref(false)
 
@@ -66,6 +67,7 @@ const { handleSubmit, isSubmitting, setFieldValue, resetForm } = useForm({
 
 watchEffect(() => {
   if (patientId) setFieldValue('patientId', patientId)
+  if (templateId) setFieldValue('templateId', templateId)
 })
 
 const onSubmit = handleSubmit(async (values) => {
@@ -75,6 +77,7 @@ const onSubmit = handleSubmit(async (values) => {
     open.value = false
     resetForm()
     if (patientId) setFieldValue('patientId', patientId)
+    if (templateId) setFieldValue('templateId', templateId)
     await refreshNuxtData(`activities-${values.patientId}`)
     await refreshNuxtData('activities-all')
   } catch (error) {
