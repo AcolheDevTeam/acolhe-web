@@ -100,7 +100,7 @@ levantamento de 2026-09-09; reconfira as linhas antes de editar.
 
 ### B1. Criar os componentes base que faltam — regras A1, A2, A3
 
-**Status: parcialmente feito** na branch `feat/componentes-base-formulario` (2026-09-09).
+**Status: feito** (branch `feat/componentes-base-formulario`, 2026-09-09). Conferido em 2026-10-09: não há controle nativo nem `Select` em formulário no código.
 
 | Componente | Substitui | Situação |
 |---|---|---|
@@ -179,6 +179,15 @@ página usam `px-4` no celular e `px-8` a partir de `md`; `DialogContent` cabe n
 Pendente de auditoria fina: `pages/sessions/[id]`, `pages/activities/[id]`, tela de aceite com
 muitos documentos, e comportamento dos popovers (calendário/dropdown) em telas muito estreitas
 (&lt; 360px).
+
+**Auditoria fina feita em 2026-10-09** (PR #49), em staging com Chromium headless em 320, 360
+e 390px. Cobriu 24 telas do psicólogo, inclusive as da leva de outubro, e os popovers do
+"Agendar sessão". Só `/patients` rolava na horizontal: o `TabsList` estourava a tela, e agora
+ele rola dentro da própria faixa, o que vale para todas as abas. O calendário encostava na
+borda em 320px e ganhou `collision-padding`. A linha do tempo mostrava status em inglês e
+agora usa os rótulos das listagens. Ficaram sem conferir a tela de aceite com muitos documentos
+e as telas sem dados em staging (detalhe de agendamento, caderno com histórico); o
+acompanhamento está na ACO-85.
 
 ---
 

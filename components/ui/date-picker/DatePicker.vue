@@ -113,7 +113,7 @@ const displayValue = computed(() =>
         <CalendarIcon class="size-4 shrink-0 opacity-50" />
       </button>
     </PopoverTrigger>
-    <PopoverContent align="start" class="w-[19.5rem] max-w-[calc(100vw-2rem)] p-0">
+    <PopoverContent align="start" :collision-padding="16" class="w-[19.5rem] max-w-[calc(100vw-2rem)] p-0">
       <CalendarRoot
         v-slot="{ grid, weekDays }"
         v-model:placeholder="placeholderDate"
