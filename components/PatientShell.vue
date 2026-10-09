@@ -23,12 +23,20 @@ const lgpdExportEnabled = computed(() =>
   String(config.public.lgpdExportEnabled).toLowerCase() === 'true',
 )
 
+const TAB_LABELS = {
+  overview: 'Visão geral',
+  sessions: 'Prontuário',
+  activities: 'Atividades',
+  checkins: 'Check-ins',
+  registry: 'Registro Documental',
+} as const
+
 const tabs = computed(() => [
-  { key: 'overview', label: 'Visão geral', to: `/patients/${patientId}` },
-  { key: 'sessions', label: 'Prontuário', to: `/patients/${patientId}/sessions` },
-  { key: 'activities', label: 'Atividades', to: `/patients/${patientId}/activities` },
-  { key: 'checkins', label: 'Check-ins', to: `/patients/${patientId}/checkins` },
-  { key: 'registry', label: 'Registro Documental', to: `/patients/${patientId}/registry` },
+  { key: 'overview', label: TAB_LABELS.overview, to: `/patients/${patientId}` },
+  { key: 'sessions', label: TAB_LABELS.sessions, to: `/patients/${patientId}/sessions` },
+  { key: 'activities', label: TAB_LABELS.activities, to: `/patients/${patientId}/activities` },
+  { key: 'checkins', label: TAB_LABELS.checkins, to: `/patients/${patientId}/checkins` },
+  { key: 'registry', label: TAB_LABELS.registry, to: `/patients/${patientId}/registry` },
 ].filter(tab => isActive.value || tab.key === 'overview' || tab.key === 'registry'))
 
 const isActive = computed(() => patientLinkActive(patient))
@@ -56,13 +64,14 @@ function revealActiveTab() {
 onMounted(revealActiveTab)
 watch(() => active, () => nextTick(revealActiveTab))
 
-// Na visão geral o nome é a página atual; nas outras abas volta para ela.
-const crumbs = computed(() => [
-  { label: 'Pacientes', to: '/patients' },
-  active === 'overview'
-    ? { label: patient?.fullName ?? '—' }
-    : { label: patient?.fullName ?? '—', to: `/patients/${patientId}` },
-])
+// Na visão geral o nome é a página atual; nas outras abas o nome volta para a
+// visão geral e a aba é o último trecho ("Pacientes / Júlia / Prontuário").
+const crumbs = computed(() => {
+  const name = patient?.fullName ?? '—'
+  return active !== 'overview'
+    ? [{ label: 'Pacientes', to: '/patients' }, { label: name, to: `/patients/${patientId}` }, { label: TAB_LABELS[active] }]
+    : [{ label: 'Pacientes', to: '/patients' }, { label: name }]
+})
 </script>
 
 <template>
