@@ -115,7 +115,7 @@ const onSubmit = handleSubmit(async (values) => {
 
           <p v-if="loginError" class="text-sm text-destructive" role="alert">{{ loginError }}</p>
 
-          <Button type="submit" size="xl" class="w-full rounded-xl text-[15px]" :loading="isSubmitting">
+          <Button type="submit" size="xl" class="w-full" :loading="isSubmitting">
             {{ isSubmitting ? 'Entrando…' : 'Entrar' }}
           </Button>
         </form>

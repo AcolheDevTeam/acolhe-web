@@ -6,7 +6,6 @@ import { invitationSchema } from '~/schemas/onboarding'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
-import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 
 definePageMeta({ layout: 'auth' })
@@ -185,7 +184,6 @@ async function decline() {
               <PasswordInput
                 id="password-confirmation"
                 v-model="passwordConfirmation"
-               
                 autocomplete="new-password"
               />
             </div>
