@@ -12,6 +12,7 @@ interface Props extends PrimitiveProps {
   class?: HTMLAttributes["class"]
   /** Mostra o spinner e bloqueia o clique; o texto vem do slot ("Entrando…"). */
   loading?: boolean
+  disabled?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -24,10 +25,10 @@ const props = withDefaults(defineProps<Props>(), {
     :as="as"
     :as-child="asChild"
     :class="cn(buttonVariants({ variant, size }), props.class)"
-    :disabled="loading || undefined"
+    :disabled="disabled || loading || undefined"
     :aria-busy="loading || undefined"
   >
-    <span v-if="loading" class="size-4 animate-spin rounded-full border-2 border-current/35 border-t-current" aria-hidden="true" />
+    <span v-if="loading" class="size-4 animate-spin rounded-full border-2 border-[color-mix(in_srgb,currentColor_35%,transparent)] border-t-current" aria-hidden="true" />
     <slot />
   </Primitive>
 </template>
