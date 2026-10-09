@@ -84,7 +84,7 @@ const onSubmit = handleSubmit(async (values) => {
     </template>
     <div class="flex flex-col gap-1.5">
       <Label for="password">{{ isNew ? 'Crie uma senha' : 'Sua senha do Acolhe' }}</Label>
-      <Input id="password" v-model="password" v-bind="passwordAttrs" type="password" :autocomplete="isNew ? 'new-password' : 'current-password'" :aria-invalid="!!errorFor('password')" />
+      <PasswordInput id="password" v-model="password" v-bind="passwordAttrs" :autocomplete="isNew ? 'new-password' : 'current-password'" :aria-invalid="!!errorFor('password')" />
       <p v-if="errorFor('password')" class="text-xs text-destructive">{{ errorFor('password') }}</p>
     </div>
     <template v-if="isNew">
