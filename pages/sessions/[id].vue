@@ -1,60 +1,133 @@
 <script setup lang="ts">
-import { Check } from 'lucide-vue-next'
+import { ArrowRight, FileLock2 } from 'lucide-vue-next'
+import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
+import { Card } from '@/components/ui/card'
 
 definePageMeta({ middleware: ['auth', 'psychologist-only'] })
 
 const route = useRoute()
 const sessionId = computed(() => route.params.id as string)
 const { data: session, error, refresh } = useSession(sessionId)
+
+// Estado do salvamento vem do formulário; o cabeçalho só exibe ("Salvo · versão N").
+const saveState = ref<'idle' | 'dirty' | 'saving' | 'saved' | 'error'>('idle')
+
+const sessionTitle = computed(() => session.value?.number ? `Sessão ${session.value.number}` : 'Sessão')
+
+// Dados da sessão em card (protótipo): só o que a API devolve.
+const details = computed(() => {
+  const s = session.value
+  if (!s) return []
+  return [
+    { label: 'Data', value: formatDateTime(s.occurredAt) },
+    s.durationMin ? { label: 'Duração', value: `${s.durationMin} min` } : null,
+    s.modality ? { label: 'Modalidade', value: modalityLabel(s.modality) } : null,
+    { label: 'Situação', value: sessionStatusMeta(s.status).label },
+  ].filter(Boolean) as { label: string, value: string }[]
+})
 </script>
 
 <template>
   <PageHeader>
     <template #title>
-      <nav class="flex min-w-0 items-center gap-2 text-sm text-muted-foreground">
+      <nav aria-label="Caminho" class="flex min-w-0 items-center gap-2 font-mono text-xs tracking-[.06em] text-muted-foreground">
         <!-- No celular só o trecho final do caminho aparece. -->
-        <NuxtLink to="/patients" class="hidden hover:text-foreground sm:inline">Pacientes</NuxtLink>
-        <span class="hidden sm:inline">/</span>
+        <NuxtLink to="/patients" class="hidden underline-offset-[3px] hover:text-foreground hover:underline sm:inline">Pacientes</NuxtLink>
+        <span class="hidden sm:inline" aria-hidden="true">/</span>
         <NuxtLink
           v-if="session?.patientId"
           :to="`/patients/${session.patientId}/sessions`"
-          class="hover:text-foreground"
+          class="min-w-0 truncate underline-offset-[3px] hover:text-foreground hover:underline"
         >
           {{ session?.patientName ?? 'Paciente' }}
         </NuxtLink>
-        <span>/</span>
-        <span class="min-w-0 truncate font-medium text-foreground">Prontuário</span>
+        <span aria-hidden="true">/</span>
+        <span class="shrink-0 text-foreground">{{ sessionTitle }}</span>
       </nav>
     </template>
     <template #actions>
-      <Badge v-if="session" variant="secondary" class="gap-1">
-        <Check class="size-3" />
-        Prontuário
-      </Badge>
       <RecordExportButton />
     </template>
   </PageHeader>
 
-  <div class="mx-auto w-full max-w-2xl px-4 py-6 md:px-8 md:py-8 lg:px-12">
-    <div v-if="session" class="flex flex-col gap-6">
-      <div class="flex flex-col gap-1">
-        <h1 class="display-serif text-3xl">
-          Sessão {{ session.number ?? '' }} · {{ formatDate(session.occurredAt) }}
-        </h1>
-        <p class="text-sm text-muted-foreground">
-          <template v-if="session.modality">{{ modalityLabel(session.modality) }} · </template>
-          <template v-if="session.durationMin">{{ session.durationMin }} min · </template>
-          {{ formatTime(session.occurredAt) }}
-        </p>
-      </div>
+  <div class="flex w-full flex-col gap-6 px-4 pb-6 pt-6 md:px-8 md:pb-14 lg:px-12">
+    <template v-if="session">
+      <header class="flex animate-rise flex-wrap items-center justify-between gap-5 [animation-delay:.05s]">
+        <div class="flex min-w-0 items-center gap-4">
+          <Avatar tone="brand" class="h-[52px] w-[52px] text-lg text-highlight">
+            <AvatarFallback>{{ initials(session.patientName) }}</AvatarFallback>
+          </Avatar>
+          <h1 class="min-w-0 text-[28px] font-semibold leading-tight tracking-[-0.03em]">
+            {{ sessionTitle }}<template v-if="session.patientName"> · {{ session.patientName }}</template>
+          </h1>
+        </div>
+        <SaveStatus :state="saveState" :version="session.version" />
+      </header>
 
-      <Button v-if="session.appointmentId" variant="outline" class="self-start" as-child>
-        <NuxtLink :to="`/appointments/${session.appointmentId}`">Ver agendamento</NuxtLink>
-      </Button>
-      <SessionNotesForm :key="session.id" :session="session" @saved="session = $event" @reload="refresh()" />
-    </div>
+      <Card
+        role="region"
+        aria-label="Dados da sessão"
+        class="grid animate-rise grid-cols-[repeat(auto-fit,minmax(150px,1fr))] gap-4 px-[22px] py-[18px] [animation-delay:.1s]"
+      >
+        <div v-for="item in details" :key="item.label" class="flex flex-col gap-1">
+          <span class="label-mono">{{ item.label }}</span>
+          <span class="text-[15px] font-medium">{{ item.value }}</span>
+        </div>
+        <div v-if="session.appointmentId" class="flex flex-col gap-1">
+          <span class="label-mono">Agendamento</span>
+          <NuxtLink
+            :to="`/appointments/${session.appointmentId}`"
+            class="text-[15px] font-medium text-primary underline-offset-[3px] hover:underline"
+          >
+            Ver agendamento
+          </NuxtLink>
+        </div>
+      </Card>
+
+      <SessionNotesForm
+        :key="session.id"
+        :session="session"
+        @saved="session = $event"
+        @reload="refresh()"
+        @status="saveState = $event"
+      >
+        <template #aside>
+          <!-- Bloco escuro do protótipo. O caderno fica na ficha da paciente;
+               aqui só o atalho, sem editor duplicado. -->
+          <section
+            aria-labelledby="t-rd"
+            class="flex animate-rise flex-col gap-3.5 rounded-2xl bg-brand p-[22px] text-brand-foreground [animation-delay:.2s]"
+          >
+            <div class="flex items-center gap-2">
+              <FileLock2 class="size-4 text-highlight" aria-hidden="true" />
+              <h2 id="t-rd" class="label-mono text-brand-foreground/80">Registro Documental · só você</h2>
+            </div>
+            <p class="text-sm leading-relaxed text-brand-muted">
+              Hipóteses, observações técnicas e planejamento ficam no caderno da paciente.
+              Não aparece para a paciente nem na exportação de dados dela.
+            </p>
+            <Button variant="on-brand-outline" class="self-start" as-child>
+              <NuxtLink :to="`/patients/${session.patientId}/registry`">
+                Abrir Registro Documental
+                <ArrowRight aria-hidden="true" />
+              </NuxtLink>
+            </Button>
+          </section>
+
+          <Card
+            role="region"
+            aria-labelledby="t-next"
+            class="flex animate-rise flex-col gap-3.5 p-[22px] [animation-delay:.25s]"
+          >
+            <h2 id="t-next" class="label-mono">Atividade para a próxima semana</h2>
+            <AssignActivityDialog :patient-id="session.patientId">
+              <Button variant="outline" class="self-start">Atribuir atividade</Button>
+            </AssignActivityDialog>
+          </Card>
+        </template>
+      </SessionNotesForm>
+    </template>
 
     <div v-else-if="error" class="text-sm">
       <p>{{ apiErrorMessage(error, { 404: 'Sessão não encontrada.', default: 'Não foi possível carregar a sessão agora.' }) }}</p>
