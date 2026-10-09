@@ -7,7 +7,7 @@ defineProps<{ title?: string, eyebrow?: string, description?: string }>()
 
 <template>
   <header class="animate-rise flex flex-wrap items-end justify-between gap-4 px-4 pt-6 md:px-8 md:pt-7 lg:px-12">
-    <div class="flex min-w-0 flex-col gap-2">
+    <div class="flex min-w-0 flex-1 basis-72 flex-col gap-2">
       <div v-if="$slots.title" class="flex min-h-9 min-w-0 items-center gap-2 overflow-hidden whitespace-nowrap">
         <slot name="title" />
       </div>
