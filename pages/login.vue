@@ -48,15 +48,15 @@ const onSubmit = handleSubmit(async (values) => {
 </script>
 
 <template>
-  <main class="flex min-h-dvh flex-wrap bg-background md:h-dvh md:flex-nowrap">
+  <main class="flex min-h-dvh flex-wrap bg-background min-[900px]:h-dvh min-[900px]:flex-nowrap">
     <!-- Painel da marca -->
-    <section class="relative flex min-h-[420px] flex-[1_1_520px] flex-col justify-between gap-6 overflow-hidden bg-secondary px-6 py-8 md:min-h-0 md:px-14 md:py-12">
+    <section class="relative flex min-h-[420px] flex-[1_1_520px] flex-col justify-between gap-6 overflow-hidden bg-secondary px-6 py-8 min-[900px]:min-h-0 md:px-14 md:py-12">
       <AppLogo class="animate-rise" animated :size="34" />
       <div class="flex min-h-0 flex-1 items-center justify-center">
         <img
           src="/images/login-ilustracao.jpg"
           alt="Ilustração de uma sessão de psicologia: paciente e psicóloga conversando em frente a uma ficha clínica"
-          class="login-illus h-auto w-full max-w-[520px] mix-blend-multiply md:h-full md:object-contain"
+          class="login-illus h-auto w-full max-w-[520px] mix-blend-multiply min-[900px]:h-full min-[900px]:object-contain"
         >
       </div>
       <div class="animate-rise flex flex-col gap-4 [animation-delay:.15s]">
@@ -72,8 +72,8 @@ const onSubmit = handleSubmit(async (values) => {
     </section>
 
     <!-- Formulário -->
-    <section class="flex flex-[1_1_480px] items-center justify-center px-6 py-14 md:overflow-y-auto md:py-8">
-      <div class="flex w-full max-w-[400px] flex-col gap-7">
+    <section class="flex flex-[1_1_480px] justify-center px-6 py-14 min-[900px]:overflow-y-auto min-[900px]:py-8">
+      <div class="my-auto flex w-full max-w-[400px] flex-col gap-7">
         <header class="animate-rise flex flex-col gap-2.5 [animation-delay:.1s]">
           <p class="label-mono text-xs">Acolhe</p>
           <h1 class="text-[34px] font-semibold leading-[1.15] tracking-[-0.025em]">Entrar na sua conta</h1>
