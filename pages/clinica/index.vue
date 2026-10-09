@@ -97,9 +97,9 @@ const chartLabel = computed(() => `Sessões nos últimos 30 dias por psicóloga:
             <TableHeader>
               <TableRow class="border-border hover:bg-transparent">
                 <TableHead>Psicóloga</TableHead>
-                <TableHead>Sessões em 30 dias</TableHead>
+                <TableHead class="whitespace-nowrap">Sessões em 30 dias</TableHead>
                 <TableHead>Agendadas</TableHead>
-                <TableHead>Pacientes ativos</TableHead>
+                <TableHead class="whitespace-nowrap">Pacientes ativos</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
