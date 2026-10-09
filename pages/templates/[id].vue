@@ -100,12 +100,10 @@ async function onArchived() {
       <Skeleton class="h-40 w-full" />
     </template>
 
-    <p
-      v-else-if="error || !template"
-      class="rounded-lg border border-dashed px-4 py-16 text-center text-sm text-muted-foreground"
-    >
+    <EmptyState
+      v-else-if="error || !template" compact>
       {{ apiErrorMessage(error, { 404: 'Template não encontrado. Ele pode ter sido removido ou pertencer a outra organização.' }) }}
-    </p>
+    </EmptyState>
 
     <template v-else>
       <div

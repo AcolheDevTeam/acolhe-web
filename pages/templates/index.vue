@@ -71,10 +71,7 @@ const tabs = computed(() => [
         <div v-if="t.rows.length" class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
           <TemplateCard v-for="template in t.rows" :key="template.id" :template="template" />
         </div>
-        <div
-          v-else
-          class="flex flex-col items-center gap-1 rounded-lg border border-dashed px-4 py-16 text-center text-sm text-muted-foreground"
-        >
+        <EmptyState v-else compact>
           <p v-if="search || typeCode">Nenhum template corresponde à busca ou ao tipo escolhido.</p>
           <template v-else-if="t.value === 'acolhe'">
             <p>A biblioteca da Acolhe ainda não tem templates.</p>
@@ -83,7 +80,7 @@ const tabs = computed(() => [
             <p>Nenhum template ainda.</p>
             <p>Crie o primeiro em "Novo template" para poder atribuir atividades às pacientes.</p>
           </template>
-        </div>
+        </EmptyState>
       </TabsContent>
     </Tabs>
   </div>

@@ -40,9 +40,9 @@ const totals = computed(() => professionals.value.reduce((sum, p) => ({
       <section class="flex flex-col gap-3">
         <p class="label-mono">Por profissional</p>
         <p class="text-sm text-muted-foreground">Só números: dados de pacientes ficam restritos a quem atende.</p>
-        <div v-if="!professionals.length" class="rounded-lg border border-dashed px-4 py-8 text-center text-sm text-muted-foreground">
+        <EmptyState v-if="!professionals.length" compact>
           Ainda não há profissionais atendendo. Convide a equipe em <NuxtLink to="/clinica/equipe" class="underline underline-offset-4">Equipe</NuxtLink>.
-        </div>
+        </EmptyState>
         <ul v-else class="divide-y rounded-xl border bg-card">
           <li v-for="p in professionals" :key="p.userId" class="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
             <div class="min-w-0">

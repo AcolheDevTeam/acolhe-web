@@ -49,10 +49,12 @@ function position(iso: string, minutes: number) {
       <Button variant="ghost" size="sm" @click="selectedDate = zonedDay()">Hoje</Button>
       <p class="label-mono">{{ formatDate(days[0]!.iso) }} – {{ formatDate(days[6]!.iso) }}</p>
     </div>
-    <div v-if="error" class="rounded-lg border border-dashed p-6 text-sm">
-      <p>{{ apiErrorMessage(error, { default: 'Não foi possível carregar a agenda agora.' }) }}</p>
-      <Button class="mt-3" variant="outline" @click="refresh()">Tentar novamente</Button>
-    </div>
+    <EmptyState v-if="error" compact>
+      {{ apiErrorMessage(error, { default: 'Não foi possível carregar a agenda agora.' }) }}
+      <template #action>
+        <Button variant="outline" @click="refresh()">Tentar novamente</Button>
+      </template>
+    </EmptyState>
     <p v-else-if="status === 'pending'" class="text-sm text-muted-foreground">Carregando agenda…</p>
     <template v-else>
       <div class="flex flex-col gap-6 lg:hidden">

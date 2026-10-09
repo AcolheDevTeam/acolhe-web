@@ -14,12 +14,10 @@ const { data: timeline, error } = await useFetch<TimelineEvent[]>(
 <template>
   <section class="flex flex-col gap-3">
     <p class="label-mono">Linha do tempo</p>
-    <p
-      v-if="error"
-      class="rounded-lg border border-dashed px-4 py-8 text-center text-sm text-muted-foreground"
-    >
+    <EmptyState
+      v-if="error" compact>
       Não foi possível carregar a linha do tempo.
-    </p>
+    </EmptyState>
     <ol v-else-if="timeline?.length" class="flex flex-col">
       <li
         v-for="(event, index) in timeline"
@@ -39,11 +37,9 @@ const { data: timeline, error } = await useFetch<TimelineEvent[]>(
         </div>
       </li>
     </ol>
-    <p
-      v-else
-      class="rounded-lg border border-dashed px-4 py-8 text-center text-sm text-muted-foreground"
-    >
+    <EmptyState
+      v-else compact>
       Ainda não há eventos na linha do tempo.
-    </p>
+    </EmptyState>
   </section>
 </template>

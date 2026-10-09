@@ -42,8 +42,8 @@ const grouped = computed(() => {
         </div>
       </section>
     </div>
-    <p v-else class="rounded-lg border border-dashed px-4 py-16 text-center text-sm text-muted-foreground">
+    <EmptyState v-else compact>
       Nenhuma sessão agendada.
-    </p>
+    </EmptyState>
   </div>
 </template>

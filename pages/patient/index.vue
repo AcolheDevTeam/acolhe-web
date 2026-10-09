@@ -197,9 +197,9 @@ function formatTime(value: string) {
             </NuxtLink>
           </CardContent>
         </Card>
-        <p v-else class="rounded-xl border border-dashed px-5 py-8 text-center text-sm text-muted-foreground">
+        <EmptyState v-else compact>
           Nenhuma atividade pendente. Este espaço fica aqui quando houver uma nova proposta.
-        </p>
+        </EmptyState>
       </section>
 
       <section id="check-in" class="grid gap-4 md:grid-cols-[1fr_0.8fr]">
