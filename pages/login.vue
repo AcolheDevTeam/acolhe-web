@@ -72,7 +72,7 @@ const onSubmit = handleSubmit(async (values) => {
     </section>
 
     <!-- Formulário -->
-    <section class="flex flex-[1_1_480px] items-center justify-center px-6 py-14 md:overflow-y-auto">
+    <section class="flex flex-[1_1_480px] items-center justify-center px-6 py-14 md:overflow-y-auto md:py-8">
       <div class="flex w-full max-w-[400px] flex-col gap-7">
         <header class="animate-rise flex flex-col gap-2.5 [animation-delay:.1s]">
           <p class="label-mono text-xs">Acolhe</p>

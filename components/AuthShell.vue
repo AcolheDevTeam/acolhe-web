@@ -15,7 +15,7 @@ defineProps<{ heading: string, support?: string }>()
         <p v-if="support" class="max-w-[400px] text-[15px] leading-relaxed text-secondary-foreground">{{ support }}</p>
       </div>
     </section>
-    <section class="flex flex-[1_1_480px] items-center justify-center px-6 py-14 md:overflow-y-auto">
+    <section class="flex flex-[1_1_480px] items-center justify-center px-6 py-14 md:overflow-y-auto md:py-8">
       <div class="w-full max-w-[400px]">
         <slot />
       </div>
