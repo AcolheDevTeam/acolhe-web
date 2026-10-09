@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Acolhe — Agenda</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&amp;family=Schibsted+Grotesk:wght@400;500;600;700&amp;display=swap">
+<style>
+body{margin:0;background:#F5F7FE}
+*{box-sizing:border-box}
+a{color:#4040D6}a:hover{color:#1C1A5E}
+.mono{font-family:'IBM Plex Mono',ui-monospace,monospace}
+@keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.rise{animation:rise .7s cubic-bezier(.2,.7,.2,1) both}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.fade{animation:fade .36s cubic-bezier(.2,.7,.2,1) both}
+@keyframes slideIn{from{opacity:0;transform:translateX(32px)}to{opacity:1;transform:none}}
+.panel{animation:slideIn .45s cubic-bezier(.2,.7,.2,1) both}
+@keyframes pop{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:none}}
+.ev{animation:pop .4s cubic-bezier(.2,.7,.2,1) both}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(217,80,60,.45)}70%{box-shadow:0 0 0 8px rgba(217,80,60,0)}100%{box-shadow:0 0 0 0 rgba(217,80,60,0)}}
+.now-dot{animation:pulse 2.4s cubic-bezier(.2,.7,.2,1) infinite}
+.nav{display:flex;align-items:center;gap:12px;height:40px;padding:0 12px;border-radius:10px;color:#3E4466;text-decoration:none;font-size:14px;font-weight:500;transition:background .2s ease,color .2s ease}
+.nav:hover{background:#ECEFFB;color:#161A3A}
+.nav.on{background:#E6EAFD;color:#1C1A5E}
+.btn{height:40px;padding:0 16px;border-radius:10px;font:inherit;font-size:14px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;transition:background .25s ease,box-shadow .25s ease,transform .25s cubic-bezier(.2,.7,.2,1),border-color .25s ease,color .25s ease;white-space:nowrap}
+.btn:active{transform:scale(.985)}
+.btn-p{border:0;background:#4040D6;color:#FFFFFF}.btn-p:hover{background:#3232B5;box-shadow:0 6px 18px rgba(64,64,214,.22)}
+.btn-s{border:1px solid #CBD2EA;background:#FFFFFF;color:#161A3A}.btn-s:hover{border-color:#A7AFCF;background:#F7F8FE}
+.btn-q{border:0;background:transparent;color:#4040D6}.btn-q:hover{background:#E6EAFD}
+.btn-d{border:1px solid #F3C9C1;background:#FFFFFF;color:#9E3522}.btn-d:hover{background:#FDEBE7}
+.icon-b{width:40px;height:40px;padding:0;border:1px solid #CBD2EA;border-radius:10px;background:#FFFFFF;color:#161A3A;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:background .2s ease}
+.icon-b:hover{background:#F7F8FE}
+.seg{position:relative;z-index:1;width:84px;height:32px;border:0;background:transparent;font:inherit;font-size:13px;font-weight:500;color:#5C6385;cursor:pointer;border-radius:8px;transition:color .3s ease}
+.seg.on{color:#161A3A}
+.seg-pill{position:absolute;top:3px;bottom:3px;left:3px;width:84px;background:#FFFFFF;border-radius:8px;box-shadow:0 1px 2px rgba(22,26,58,.1);transition:transform .42s cubic-bezier(.2,.7,.2,1)}
+.evb{position:absolute;left:4px;right:4px;padding:6px 8px;border-radius:8px;font:inherit;text-align:left;cursor:pointer;overflow:hidden;display:flex;flex-direction:column;gap:2px;transition:transform .25s cubic-bezier(.2,.7,.2,1),box-shadow .25s ease}
+.evb:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(22,26,58,.12)}
+.block{position:absolute;left:4px;right:4px;border-radius:8px;background:repeating-linear-gradient(135deg,#EFF2FB 0 6px,#E7EBF8 6px 12px);border:1px dashed #A7AFCF;padding:6px 8px;font-size:12px;color:#5C6385}
+.card{background:#FFFFFF;border:1px solid #DDE3F3;border-radius:16px}
+.mcell{min-height:92px;padding:8px;border-right:1px solid #EFF2FB;border-bottom:1px solid #EFF2FB;display:flex;flex-direction:column;gap:6px}
+:focus-visible{outline:2px solid #4040D6;outline-offset:2px}
+@media (max-width:760px){.side{max-width:none!important}.side nav{flex-direction:row!important;flex-wrap:wrap}.side .sec{display:none!important}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition-duration:.01ms!important}}
+</style>
+</helmet>
+<div style="min-height: 1000px; display: flex; flex-wrap: wrap; background: #F5F7FE; color: #161A3A; font-family: 'Schibsted Grotesk', ui-sans-serif, system-ui, sans-serif">
+
+  <aside class="side" style="flex: 1 1 248px; max-width: 264px; padding: 24px 16px; border-right: 1px solid #DDE3F3; display: flex; flex-direction: column; gap: 24px; background: #F5F7FE">
+    <a href="Dashboard.dc.html" aria-label="Acolhe, ir para o início" style="display: flex; align-items: center; gap: 10px; padding: 0 12px; color: #161A3A; text-decoration: none">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#4040D6" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M22 17a10 10 0 0 0-20 0"></path><path d="M18 17a6 6 0 0 0-12 0" stroke="#FF7A5C"></path><path d="M14 17a2 2 0 0 0-4 0" stroke="currentColor"></path></svg>
+      <span style="font-size: 18px; font-weight: 600; letter-spacing: -0.02em">Acolhe</span>
+    </a>
+    <button type="button" class="sec" style="display: flex; align-items: center; gap: 10px; width: 100%; padding: 10px 12px; border: 1px solid #DDE3F3; border-radius: 12px; background: #FFFFFF; font: inherit; text-align: left; cursor: pointer">
+      <span aria-hidden="true" style="width: 32px; height: 32px; border-radius: 8px; background: #1C1A5E; color: #FF8A70; font-size: 13px; font-weight: 600; display: flex; align-items: center; justify-content: center">CT</span>
+      <span style="display: flex; flex-direction: column; flex: 1; min-width: 0"><span style="font-size: 14px; font-weight: 600">Clínica Travessia</span><span style="font-size: 12px; color: #5C6385">Trocar clínica</span></span>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5C6385" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 9l4-4 4 4M8 15l4 4 4-4"></path></svg>
+    </button>
+    <nav aria-label="Principal" style="display: flex; flex-direction: column; gap: 2px">
+      <a href="Dashboard.dc.html" class="nav"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 11l8-6 8 6v8a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1z"></path></svg>Início</a>
+      <a href="Pacientes.dc.html" class="nav"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"></circle><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.5a3.5 3.5 0 0 1 0 7M18.5 14a6.5 6.5 0 0 1 3 6"></path></svg>Pacientes<span class="mono" style="margin-left: auto; font-size: 12px; color: #5C6385">14</span></a>
+      <a href="Agenda.dc.html" class="nav on" aria-current="page"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="2"></rect><path d="M3.5 10h17M8 3v4M16 3v4"></path></svg>Agenda</a>
+      <a href="Atividades.dc.html" class="nav"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5h10M9 12h10M9 19h10M4.5 5l.5.5L6.5 4M4.5 12l.5.5 1.5-1.5M4.5 19l.5.5 1.5-1.5"></path></svg>Atividades<span class="mono" style="margin-left: auto; font-size: 12px; color: #4040D6">2</span></a>
+      <a href="Documentos.dc.html" class="nav"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3h7l5 5v12a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"></path><path d="M14 3v5h5M9 13h6M9 17h6"></path></svg>Documentos</a>
+      <a href="Templates.dc.html" class="nav"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h11l3 3v13H5z"></path><path d="M9 4v5h6"></path></svg>Templates</a>
+      <p class="mono sec" style="margin: 18px 12px 6px; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: #5C6385">Só você</p>
+      <a href="Registro.dc.html" class="nav"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="2"></rect><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"></path></svg>Registro Documental</a>
+      <p class="mono sec" style="margin: 18px 12px 6px; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: #5C6385">Clínica</p>
+      <a href="PainelClinica.dc.html" class="nav"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"></path></svg>Painel</a>
+      <a href="Equipe.dc.html" class="nav"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21h18M5 21V8l7-4 7 4v13M10 21v-5h4v5"></path></svg>Equipe</a>
+      <a href="Assinatura.dc.html" class="nav"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5.5" width="18" height="13" rx="2"></rect><path d="M3 10h18M7 15h3"></path></svg>Assinatura</a>
+    </nav>
+    <div class="sec" style="margin-top: auto; display: flex; align-items: center; gap: 10px; padding: 12px; border-top: 1px solid #DDE3F3">
+      <span aria-hidden="true" style="width: 34px; height: 34px; border-radius: 50%; background: #E6EAFD; color: #2B2E9E; font-size: 13px; font-weight: 600; display: flex; align-items: center; justify-content: center">MS</span>
+      <span style="display: flex; flex-direction: column; min-width: 0; flex: 1"><span style="font-size: 14px; font-weight: 600">Mariana Sá</span><span class="mono" style="font-size: 11px; color: #5C6385">CRP 06/123456</span></span>
+    </div>
+  </aside>
+
+  <main style="flex: 999 1 560px; min-width: 0; padding: 28px clamp(16px, 3vw, 40px) 48px; display: flex; flex-direction: column; gap: 20px; position: relative">
+    <header class="rise" style="display: flex; flex-wrap: wrap; gap: 14px; align-items: center">
+      <h1 style="margin: 0; font-size: 30px; font-weight: 600; letter-spacing: -0.03em; margin-right: 8px">Agenda</h1>
+      <div style="display: flex; gap: 6px; align-items: center">
+        <button type="button" class="icon-b" aria-label="Período anterior"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg></button>
+        <button type="button" class="icon-b" aria-label="Próximo período"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg></button>
+        <button type="button" class="btn btn-s">Hoje</button>
+      </div>
+      <p class="mono" style="margin: 0; font-size: 13px; letter-spacing: .06em; color: #3E4466">{{rangeLabel}}</p>
+      <div role="group" aria-label="Visualização" style="position: relative; display: flex; padding: 3px; background: #E7EBF8; border-radius: 10px; margin-left: auto">
+        <div class="seg-pill" aria-hidden="true" style="{{pillStyle}}"></div>
+        <sc-for list="{{views}}" as="v" hint-placeholder-count="3">
+          <button type="button" class="{{v.cls}}" aria-pressed="{{v.on}}" onClick="{{v.pick}}">{{v.label}}</button>
+        </sc-for>
+      </div>
+      <button type="button" class="btn btn-p"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>Agendar sessão</button>
+    </header>
+
+    <div class="rise" style="animation-delay: .06s; display: flex; flex-wrap: wrap; gap: 18px; font-size: 13px; color: #3E4466">
+      <span style="display: inline-flex; align-items: center; gap: 6px"><span aria-hidden="true" style="width: 12px; height: 12px; border-radius: 3px; background: #4040D6"></span>Confirmada</span>
+      <span style="display: inline-flex; align-items: center; gap: 6px"><span aria-hidden="true" style="width: 12px; height: 12px; border-radius: 3px; background: #FFFFFF; border: 1.5px solid #4040D6"></span>Agendada</span>
+      <span style="display: inline-flex; align-items: center; gap: 6px"><span aria-hidden="true" style="width: 12px; height: 12px; border-radius: 3px; background: #E7EBF8"></span>Realizada</span>
+      <span style="display: inline-flex; align-items: center; gap: 6px"><span aria-hidden="true" style="width: 12px; height: 12px; border-radius: 3px; background: #FDEBE7; border: 1.5px solid #D9503C"></span>Falta</span>
+      <span style="display: inline-flex; align-items: center; gap: 6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="13" height="12" rx="2"></rect><path d="M16 10l5-3v10l-5-3"></path></svg>Online</span>
+      <span style="display: inline-flex; align-items: center; gap: 6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 21V9l8-5 8 5v12M9 21v-6h6v6"></path></svg>Presencial</span>
+    </div>
+
+    <sc-if value="{{isWeekOrDay}}" hint-placeholder-val="{{ true }}">
+      <section class="card fade" aria-label="Grade da agenda" style="overflow-x: auto">
+        <div style="{{gridMinW}}">
+          <div style="display: grid; {{colsStyle}}; border-bottom: 1px solid #DDE3F3">
+            <div></div>
+            <sc-for list="{{days}}" as="d" hint-placeholder-count="6">
+              <div style="padding: 12px 8px; text-align: center; border-left: 1px solid #EFF2FB">
+                <div class="mono" style="font-size: 11px; letter-spacing: .12em; text-transform: uppercase; {{d.labelStyle}}">{{d.dia}}</div>
+                <div style="margin-top: 4px; font-size: 20px; font-weight: 600; {{d.numStyle}}">{{d.num}}</div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="display: grid; {{colsStyle}}; position: relative">
+            <div>
+              <sc-for list="{{hours}}" as="h" hint-placeholder-count="12">
+                <div class="mono" style="height: 56px; padding: 4px 8px 0 0; text-align: right; font-size: 11px; color: #5C6385">{{h}}</div>
+              </sc-for>
+            </div>
+            <sc-for list="{{days}}" as="d" hint-placeholder-count="6">
+              <div style="position: relative; height: 672px; border-left: 1px solid #EFF2FB; background-image: repeating-linear-gradient(to bottom, transparent 0 55px, #EFF2FB 55px 56px); {{d.colBg}}">
+                <sc-if value="{{d.hasBlock}}" hint-placeholder-val="{{ false }}">
+                  <div class="block" style="top: 224px; height: 56px">Bloqueado · almoço</div>
+                </sc-if>
+                <sc-for list="{{d.events}}" as="e" hint-placeholder-count="2">
+                  <button type="button" class="evb ev" style="{{e.style}}" aria-label="{{e.aria}}" onClick="{{e.open}}">
+                    <span style="display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600">
+                      <sc-if value="{{e.online}}" hint-placeholder-val="{{ true }}"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="13" height="12" rx="2"></rect><path d="M16 10l5-3v10l-5-3"></path></svg></sc-if>
+                      <sc-if value="{{e.presencial}}" hint-placeholder-val="{{ false }}"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 21V9l8-5 8 5v12M9 21v-6h6v6"></path></svg></sc-if>
+                      {{e.nome}}
+                    </span>
+                    <span class="mono" style="font-size: 11px; opacity: .85">{{e.hora}} · {{e.status}}</span>
+                  </button>
+                </sc-for>
+                <sc-if value="{{d.isToday}}" hint-placeholder-val="{{ false }}">
+                  <div aria-hidden="true" style="position: absolute; left: 0; right: 0; top: 355px; height: 2px; background: #D9503C; z-index: 2">
+                    <span class="now-dot" style="position: absolute; left: -5px; top: -4px; width: 10px; height: 10px; border-radius: 50%; background: #D9503C"></span>
+                  </div>
+                </sc-if>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </section>
+    </sc-if>
+
+    <sc-if value="{{isMonth}}" hint-placeholder-val="{{ false }}">
+      <section class="card fade" aria-label="Mês de outubro" style="overflow-x: auto">
+        <div style="min-width: 720px">
+          <div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); border-bottom: 1px solid #DDE3F3">
+            <sc-for list="{{weekdays}}" as="w" hint-placeholder-count="7">
+              <div class="mono" style="padding: 10px; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: #5C6385">{{w}}</div>
+            </sc-for>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr))">
+            <sc-for list="{{month}}" as="m" hint-placeholder-count="35">
+              <div class="mcell" style="{{m.bg}}">
+                <span style="font-size: 13px; font-weight: 500; {{m.numStyle}}">{{m.n}}</span>
+                <sc-if value="{{m.has}}" hint-placeholder-val="{{ false }}">
+                  <span style="align-self: flex-start; padding: 2px 8px; border-radius: 10px; background: #E6EAFD; color: #2B2E9E; font-size: 12px; font-weight: 500">{{m.count}} sessões</span>
+                </sc-if>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </section>
+    </sc-if>
+
+    <sc-if value="{{hasSel}}" hint-placeholder-val="{{ false }}">
+      <section class="panel card" role="dialog" aria-labelledby="t-sel" style="position: absolute; top: 24px; right: clamp(16px, 3vw, 40px); width: min(380px, calc(100% - 32px)); padding: 24px; display: flex; flex-direction: column; gap: 18px; box-shadow: 0 24px 60px rgba(22,26,58,.18); z-index: 5">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px">
+          <div style="display: flex; flex-direction: column; gap: 4px">
+            <p class="mono" style="margin: 0; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: #5C6385">{{sel.quando}}</p>
+            <h2 id="t-sel" style="margin: 0; font-size: 22px; font-weight: 600; letter-spacing: -0.02em">{{sel.nome}}</h2>
+          </div>
+          <button type="button" class="btn btn-q" aria-label="Fechar detalhes" onClick="{{closeSel}}" style="width: 40px; padding: 0"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+        </div>
+        <dl style="margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 10px 16px; font-size: 14px">
+          <dt style="color: #5C6385">Horário</dt><dd style="margin: 0">{{sel.hora}} · 50 min</dd>
+          <dt style="color: #5C6385">Modalidade</dt><dd style="margin: 0">{{sel.modalidade}}</dd>
+          <dt style="color: #5C6385">Situação</dt><dd style="margin: 0; font-weight: 600" aria-live="polite">{{sel.status}}</dd>
+          <dt style="color: #5C6385">Sessão nº</dt><dd style="margin: 0" class="mono">{{sel.numero}}</dd>
+        </dl>
+        <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+          <button type="button" class="btn btn-s" onClick="{{setConfirmada}}">Confirmar</button>
+          <button type="button" class="btn btn-s" onClick="{{setRealizada}}">Realizada</button>
+          <button type="button" class="btn btn-d" onClick="{{setFalta}}">Falta</button>
+          <button type="button" class="btn btn-d" onClick="{{setCancelada}}">Cancelar</button>
+        </div>
+        <div style="display: flex; gap: 8px">
+          <button type="button" class="btn btn-s" style="flex: 1">Reagendar</button>
+          <a href="Sessao.dc.html" class="btn btn-p" style="flex: 1; text-decoration: none">Abrir sessão</a>
+        </div>
+        <a href="Ficha.dc.html" style="font-size: 13px; text-underline-offset: 3px">Ver ficha do paciente</a>
+      </section>
+    </sc-if>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1000}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { view: 'semana', sel: null, statuses: {} };
+  }
+  renderVals() {
+    const s = this.state;
+    const H = 56;
+    const base = [
+      { id: 1, d: 0, h: 9, nome: 'Pedro Tavares', mod: 'online', st: 'realizada', n: 'S-42' },
+      { id: 2, d: 0, h: 14, nome: 'Júlia Andrade', mod: 'online', st: 'realizada', n: 'S-27' },
+      { id: 3, d: 0, h: 17, nome: 'Henrique Brito', mod: 'presencial', st: 'realizada', n: 'S-31' },
+      { id: 4, d: 1, h: 10, nome: 'Carolina Mota', mod: 'online', st: 'realizada', n: 'S-116' },
+      { id: 5, d: 1, h: 15, nome: 'Mateus Reis', mod: 'online', st: 'falta', n: 'S-19' },
+      { id: 6, d: 2, h: 11, nome: 'Rita Lopes', mod: 'presencial', st: 'realizada', n: 'S-9' },
+      { id: 7, d: 2, h: 18, nome: 'Sofia Lima', mod: 'presencial', st: 'realizada', n: 'S-4' },
+      { id: 8, d: 3, h: 9, nome: 'Pedro Tavares', mod: 'online', st: 'realizada', n: 'S-43' },
+      { id: 9, d: 3, h: 11, nome: 'Rita Lopes', mod: 'presencial', st: 'falta', n: 'S-10' },
+      { id: 10, d: 3, h: 14, nome: 'Júlia Andrade', mod: 'online', st: 'confirmada', n: 'S-28' },
+      { id: 11, d: 3, h: 16, nome: 'Bruno Felix', mod: 'online', st: 'agendada', n: 'S-8' },
+      { id: 12, d: 3, h: 18, nome: 'Sofia Lima', mod: 'presencial', st: 'confirmada', n: 'S-5' },
+      { id: 13, d: 4, h: 10, nome: 'Carolina Mota', mod: 'online', st: 'confirmada', n: 'S-117' },
+      { id: 14, d: 4, h: 13, nome: 'Henrique Brito', mod: 'presencial', st: 'agendada', n: 'S-32' },
+      { id: 15, d: 4, h: 16, nome: 'Mateus Reis', mod: 'online', st: 'agendada', n: 'S-20' },
+      { id: 16, d: 5, h: 9, nome: 'Bruno Felix', mod: 'online', st: 'agendada', n: 'S-9' }
+    ];
+    const label = { agendada: 'Agendada', confirmada: 'Confirmada', realizada: 'Realizada', falta: 'Falta', cancelada: 'Cancelada' };
+    const styleFor = (st) => ({
+      confirmada: 'background: #4040D6; color: #FFFFFF; border: 1px solid #4040D6',
+      agendada: 'background: #FFFFFF; color: #2B2E9E; border: 1.5px solid #4040D6',
+      realizada: 'background: #E7EBF8; color: #3E4466; border: 1px solid #E7EBF8',
+      falta: 'background: #FDEBE7; color: #9E3522; border: 1.5px solid #D9503C',
+      cancelada: 'background: #FFFFFF; color: #5C6385; border: 1px dashed #A7AFCF; text-decoration: line-through'
+    })[st];
+    const dayNames = ['seg', 'ter', 'qua', 'qui', 'sex', 'sáb'];
+    const isDay = s.view === 'dia';
+    const dayIdx = isDay ? [3] : [0, 1, 2, 3, 4, 5];
+    const evs = base.map((e) => Object.assign({}, e, { st: s.statuses[e.id] || e.st }));
+    const days = dayIdx.map((i) => ({
+      dia: dayNames[i], num: 6 + i,
+      isToday: i === 3,
+      hasBlock: i === 2 || (isDay && i === 3),
+      labelStyle: i === 3 ? 'color: #D9503C' : 'color: #5C6385',
+      numStyle: i === 3 ? 'color: #D9503C' : 'color: #161A3A',
+      colBg: i === 3 ? 'background-color: #FBFCFF' : '',
+      events: evs.filter((e) => e.d === i).map((e, k) => ({
+        nome: e.nome, hora: (e.h < 10 ? '0' : '') + e.h + ':00', status: label[e.st],
+        online: e.mod === 'online', presencial: e.mod !== 'online',
+        aria: e.nome + ', ' + dayNames[i] + ' ' + e.h + 'h, ' + label[e.st],
+        style: 'top: ' + ((e.h - 8) * H + 2) + 'px; height: ' + (H * 50 / 60 - 2) + 'px; animation-delay: ' + ((i * 0.04) + k * 0.03) + 's; ' + styleFor(e.st),
+        open: () => this.setState({ sel: e.id })
+      }))
+    }));
+    const viewDefs = [['dia', 'Dia'], ['semana', 'Semana'], ['mes', 'Mês']];
+    const vIdx = viewDefs.findIndex((v) => v[0] === s.view);
+    const selEv = evs.find((e) => e.id === s.sel);
+    const setSt = (st) => () => this.setState({ statuses: Object.assign({}, s.statuses, { [s.sel]: st }) });
+    const counts = { 1: 4, 2: 5, 3: 3, 6: 3, 7: 2, 8: 2, 9: 5, 10: 4, 13: 4, 14: 5, 15: 3, 16: 4, 17: 3, 20: 4, 21: 5, 22: 3, 23: 4, 24: 3, 27: 4, 28: 5, 29: 3, 30: 4, 31: 2 };
+    const month = [];
+    for (let c = 0; c < 35; c++) {
+      const n = c - 1;
+      const valid = n >= 1 && n <= 31;
+      month.push({
+        n: valid ? n : '', has: valid && !!counts[n], count: counts[n] || 0,
+        bg: n === 9 ? 'background: #F5F7FE' : '',
+        numStyle: n === 9 ? 'color: #D9503C; font-weight: 600' : 'color: #161A3A'
+      });
+    }
+    return {
+      views: viewDefs.map((v) => ({ label: v[1], on: s.view === v[0], cls: s.view === v[0] ? 'seg on' : 'seg', pick: () => this.setState({ view: v[0] }) })),
+      pillStyle: 'transform: translateX(' + (vIdx * 100) + '%)',
+      rangeLabel: isDay ? 'Quinta, 9 de outubro' : s.view === 'mes' ? 'Outubro de 2026' : '6 a 11 de outubro',
+      isWeekOrDay: s.view !== 'mes',
+      isMonth: s.view === 'mes',
+      colsStyle: isDay ? 'grid-template-columns: 64px minmax(0, 1fr)' : 'grid-template-columns: 64px repeat(6, minmax(0, 1fr))',
+      gridMinW: isDay ? 'min-width: 360px' : 'min-width: 820px',
+      days: days,
+      hours: ['08h', '09h', '10h', '11h', '12h', '13h', '14h', '15h', '16h', '17h', '18h', '19h'],
+      weekdays: ['dom', 'seg', 'ter', 'qua', 'qui', 'sex', 'sáb'],
+      month: month,
+      hasSel: !!selEv,
+      sel: selEv ? {
+        nome: selEv.nome, quando: dayNames[selEv.d] + ' · ' + (6 + selEv.d) + ' de outubro',
+        hora: (selEv.h < 10 ? '0' : '') + selEv.h + ':00', modalidade: selEv.mod === 'online' ? 'Online' : 'Presencial',
+        status: label[selEv.st], numero: selEv.n
+      } : { nome: '', quando: '', hora: '', modalidade: '', status: '', numero: '' },
+      closeSel: () => this.setState({ sel: null }),
+      setConfirmada: setSt('confirmada'), setRealizada: setSt('realizada'), setFalta: setSt('falta'), setCancelada: setSt('cancelada')
+    };
+  }
+}
+</script>
+</body>
+</html>

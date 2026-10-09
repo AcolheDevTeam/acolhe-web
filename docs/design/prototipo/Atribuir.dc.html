@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Acolhe — Atribuir atividade</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&amp;family=Schibsted+Grotesk:wght@400;500;600;700&amp;display=swap">
+<style>
+body{margin:0;background:#F5F7FE}
+*{box-sizing:border-box}
+a{color:#4040D6}a:hover{color:#1C1A5E}
+.mono{font-family:'IBM Plex Mono',ui-monospace,monospace}
+@keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.rise{animation:rise .7s cubic-bezier(.2,.7,.2,1) both}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.fade{animation:fade .36s cubic-bezier(.2,.7,.2,1) both}
+@keyframes drop{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+.menu{animation:drop .28s cubic-bezier(.2,.7,.2,1) both}
+@keyframes drawc{from{stroke-dashoffset:24}to{stroke-dashoffset:0}}
+.check path{stroke-dasharray:24;animation:drawc .5s cubic-bezier(.2,.7,.2,1) .15s both}
+.nav{display:flex;align-items:center;gap:12px;height:40px;padding:0 12px;border-radius:10px;color:#3E4466;text-decoration:none;font-size:14px;font-weight:500;transition:background .2s ease,color .2s ease}
+.nav:hover{background:#ECEFFB;color:#161A3A}
+.nav.on{background:#E6EAFD;color:#1C1A5E}
+.btn{height:44px;padding:0 18px;border-radius:10px;font:inherit;font-size:14px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;transition:background .25s ease,box-shadow .25s ease,transform .25s cubic-bezier(.2,.7,.2,1),border-color .25s ease,color .25s ease;white-space:nowrap}
+.btn:active{transform:scale(.985)}
+.btn-p{border:0;background:#4040D6;color:#FFFFFF}.btn-p:hover{background:#3232B5;color:#FFFFFF;box-shadow:0 6px 18px rgba(64,64,214,.22)}
+.btn-s{border:1px solid #CBD2EA;background:#FFFFFF;color:#161A3A}.btn-s:hover{border-color:#A7AFCF;background:#F7F8FE;color:#161A3A}
+.combo{width:100%;min-height:52px;padding:8px 14px;border:1px solid #CBD2EA;border-radius:12px;background:#FFFFFF;font:inherit;text-align:left;cursor:pointer;display:flex;align-items:center;gap:12px;transition:border-color .2s ease,box-shadow .2s ease}
+.combo:hover{border-color:#A7AFCF}
+.combo.open{border-color:#4040D6;box-shadow:0 0 0 4px rgba(64,64,214,.14)}
+.combo svg.chev{transition:transform .3s cubic-bezier(.2,.7,.2,1)}
+.combo.open svg.chev{transform:rotate(180deg)}
+.inp{width:100%;height:40px;padding:0 12px 0 36px;border:1px solid #DDE3F3;border-radius:10px;background:#FFFFFF;font:inherit;font-size:14px;color:#161A3A;outline:none;transition:border-color .2s ease,box-shadow .2s ease}
+.inp:focus{border-color:#4040D6;box-shadow:0 0 0 4px rgba(64,64,214,.14)}
+.area{width:100%;min-height:96px;padding:12px 14px;border:1px solid #CBD2EA;border-radius:12px;background:#FFFFFF;font:inherit;font-size:15px;line-height:1.55;color:#161A3A;resize:vertical;outline:none;transition:border-color .2s ease,box-shadow .2s ease}
+.area:focus{border-color:#4040D6;box-shadow:0 0 0 4px rgba(64,64,214,.14)}
+.option{width:100%;padding:10px 12px;border:0;border-radius:10px;background:transparent;font:inherit;text-align:left;cursor:pointer;display:flex;align-items:center;gap:12px;transition:background .2s ease}
+.option:hover{background:#F5F7FE}
+.option.on{background:#E6EAFD}
+.seg{position:relative;z-index:1;width:150px;height:40px;border:0;background:transparent;font:inherit;font-size:14px;font-weight:500;color:#5C6385;cursor:pointer;border-radius:9px;transition:color .3s ease}
+.seg.on{color:#161A3A}
+.seg-pill{position:absolute;top:4px;left:4px;width:150px;height:40px;background:#FFFFFF;border-radius:9px;box-shadow:0 1px 2px rgba(22,26,58,.1),0 4px 12px rgba(22,26,58,.06);transition:transform .42s cubic-bezier(.2,.7,.2,1)}
+.chip{height:40px;padding:0 16px;border:1px solid #DDE3F3;border-radius:10px;background:#FFFFFF;font:inherit;font-size:14px;font-weight:500;color:#3E4466;cursor:pointer;transition:background .25s ease,border-color .25s ease,color .25s ease}
+.chip:hover{border-color:#A7AFCF}
+.chip.on{background:#E6EAFD;border-color:#B9C3F4;color:#2B2E9E}
+.step{width:40px;height:40px;border:1px solid #CBD2EA;border-radius:10px;background:#FFFFFF;font:inherit;font-size:18px;color:#161A3A;cursor:pointer;transition:background .2s ease}
+.step:hover{background:#F7F8FE}
+.step:disabled{opacity:.4;cursor:default}
+.datebtn{height:44px;padding:0 14px;border:1px solid #CBD2EA;border-radius:10px;background:#FFFFFF;font:inherit;font-size:14px;color:#161A3A;cursor:pointer;display:inline-flex;align-items:center;gap:10px}
+.switch{position:relative;width:42px;height:24px;border:0;border-radius:12px;background:#CBD2EA;cursor:pointer;transition:background .25s ease;flex:none}
+.switch::after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#FFFFFF;box-shadow:0 1px 2px rgba(22,26,58,.2);transition:transform .3s cubic-bezier(.2,.7,.2,1)}
+.switch.on{background:#4040D6}
+.switch.on::after{transform:translateX(18px)}
+.num{transition:opacity .3s ease}
+:focus-visible{outline:2px solid #4040D6;outline-offset:2px}
+@media (max-width:760px){.side{max-width:none!important}.side nav{flex-direction:row!important;flex-wrap:wrap}.side .sec{display:none!important}.seg{width:auto;padding:0 12px}.seg-pill{display:none}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition-duration:.01ms!important}}
+</style>
+</helmet>
+<div style="min-height: 1000px; display: flex; flex-wrap: wrap; background: #F5F7FE; color: #161A3A; font-family: 'Schibsted Grotesk', ui-sans-serif, system-ui, sans-serif">
+
+  <aside class="side" style="flex: 1 1 248px; max-width: 264px; padding: 24px 16px; border-right: 1px solid #DDE3F3; display: flex; flex-direction: column; gap: 24px; background: #F5F7FE">
+    <a href="Main.dc.html" aria-label="Acolhe, ir para o login" style="display: flex; align-items: center; gap: 10px; padding: 0 12px; color: #161A3A; text-decoration: none">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#4040D6" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M22 17a10 10 0 0 0-20 0"></path><path d="M18 17a6 6 0 0 0-12 0" stroke="#FF7A5C"></path><path d="M14 17a2 2 0 0 0-4 0" stroke="currentColor"></path></svg>
+      <span style="font-size: 18px; font-weight: 600; letter-spacing: -0.02em">Acolhe</span>
+    </a>
+    <button type="button" class="sec" style="display: flex; align-items: center; gap: 10px; width: 100%; padding: 10px 12px; border: 1px solid #DDE3F3; border-radius: 12px; background: #FFFFFF; font: inherit; text-align: left; cursor: pointer">
+      <span aria-hidden="true" style="width: 32px; height: 32px; border-radius: 8px; background: #1C1A5E; color: #FF8A70; font-size: 13px; font-weight: 600; display: flex; align-items: center; justify-content: center">CT</span>
+      <span style="display: flex; flex-direction: column; flex: 1; min-width: 0">
+        <span style="font-size: 14px; font-weight: 600">Clínica Travessia</span>
+        <span style="font-size: 12px; color: #5C6385">Trocar clínica</span>
+      </span>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5C6385" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 9l4-4 4 4M8 15l4 4 4-4"></path></svg>
+    </button>
+    <nav aria-label="Principal" style="display: flex; flex-direction: column; gap: 2px">
+      <a href="Dashboard.dc.html" class="nav"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 11l8-6 8 6v8a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1z"></path></svg>Início</a>
+      <a href="Pacientes.dc.html" class="nav"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"></circle><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.5a3.5 3.5 0 0 1 0 7M18.5 14a6.5 6.5 0 0 1 3 6"></path></svg>Pacientes<span class="mono" style="margin-left: auto; font-size: 12px; color: #5C6385">14</span></a>
+      <a href="Agenda.dc.html" class="nav"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="2"></rect><path d="M3.5 10h17M8 3v4M16 3v4"></path></svg>Agenda</a>
+      <a href="Revisar.dc.html" class="nav on" aria-current="page"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5h10M9 12h10M9 19h10M4.5 5l.5.5L6.5 4M4.5 12l.5.5 1.5-1.5M4.5 19l.5.5 1.5-1.5"></path></svg>Atividades<span class="mono" style="margin-left: auto; font-size: 12px; color: #4040D6">2</span></a>
+      <a href="Documentos.dc.html" class="nav"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3h7l5 5v12a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"></path><path d="M14 3v5h5M9 13h6M9 17h6"></path></svg>Documentos</a>
+      <a href="Templates.dc.html" class="nav"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h11l3 3v13H5z"></path><path d="M9 4v5h6"></path></svg>Templates</a>
+      <p class="mono sec" style="margin: 18px 12px 6px; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: #5C6385">Só você</p>
+      <a href="Registro.dc.html" class="nav"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="2"></rect><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"></path></svg>Registro Documental</a>
+      <p class="mono sec" style="margin: 18px 12px 6px; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: #5C6385">Clínica</p>
+      <a href="PainelClinica.dc.html" class="nav"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"></path></svg>Painel</a>
+      <a href="Equipe.dc.html" class="nav"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21h18M5 21V8l7-4 7 4v13M10 21v-5h4v5"></path></svg>Equipe</a>
+      <a href="Assinatura.dc.html" class="nav"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5.5" width="18" height="13" rx="2"></rect><path d="M3 10h18M7 15h3"></path></svg>Assinatura</a>
+    </nav>
+  </aside>
+
+  <main style="flex: 999 1 560px; min-width: 0; padding: 28px clamp(16px, 4vw, 48px) 56px; display: flex; flex-direction: column; gap: 28px">
+
+    <nav aria-label="Caminho" class="rise mono" style="font-size: 12px; letter-spacing: .06em; color: #5C6385; display: flex; gap: 8px; flex-wrap: wrap">
+      <a href="Pacientes.dc.html" style="color: #5C6385; text-underline-offset: 3px">Pacientes</a><span aria-hidden="true">/</span><a href="Ficha.dc.html" style="color: #5C6385; text-underline-offset: 3px">Júlia Andrade</a><span aria-hidden="true">/</span><span style="color: #161A3A">Atribuir atividade</span>
+    </nav>
+
+    <header class="rise" style="animation-delay: .06s; display: flex; align-items: center; gap: 16px">
+      <span aria-hidden="true" style="width: 52px; height: 52px; border-radius: 50%; background: #1C1A5E; color: #FF8A70; font-size: 18px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex: none">JA</span>
+      <div>
+        <h1 style="margin: 0; font-size: 30px; line-height: 1.1; font-weight: 600; letter-spacing: -0.03em">Atribuir atividade</h1>
+        <p style="margin: 4px 0 0; font-size: 15px; color: #3E4466">Para Júlia Andrade · próxima sessão quinta, 16 de outubro</p>
+      </div>
+    </header>
+
+    <sc-if value="{{notSent}}" hint-placeholder-val="{{ true }}">
+      <div style="display: flex; flex-wrap: wrap; gap: 28px; align-items: flex-start">
+        <form class="rise" style="animation-delay: .12s; flex: 2 1 520px; min-width: 0; max-width: 720px; display: flex; flex-direction: column; gap: 28px" onSubmit="{{send}}">
+
+          <div style="display: flex; flex-direction: column; gap: 8px; position: relative">
+            <span id="lbl-tpl" style="font-size: 14px; font-weight: 600">Template</span>
+            <button type="button" class="{{comboCls}}" aria-haspopup="listbox" aria-expanded="{{open}}" aria-labelledby="lbl-tpl" onClick="{{toggleOpen}}">
+              <span style="display: flex; flex-direction: column; flex: 1; min-width: 0">
+                <span style="font-size: 15px; font-weight: 600; color: #161A3A">{{tpl.nome}}</span>
+                <span style="font-size: 13px; color: #5C6385">{{tpl.meta}}</span>
+              </span>
+              <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5C6385" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg>
+            </button>
+            <sc-if value="{{open}}" hint-placeholder-val="{{ false }}">
+              <div class="menu" style="position: absolute; top: 88px; left: 0; right: 0; z-index: 5; padding: 10px; background: #FFFFFF; border: 1px solid #DDE3F3; border-radius: 14px; box-shadow: 0 18px 40px rgba(22,26,58,.12); display: flex; flex-direction: column; gap: 6px">
+                <div style="position: relative">
+                  <label for="tpl-busca" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Buscar template</label>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#5C6385" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" style="position: absolute; left: 12px; top: 12px"><circle cx="11" cy="11" r="6.5"></circle><path d="M20 20l-4-4"></path></svg>
+                  <input id="tpl-busca" class="inp" type="search" placeholder="Buscar template" value="{{query}}" onChange="{{setQuery}}">
+                </div>
+                <div role="listbox" aria-label="Templates" style="display: flex; flex-direction: column; gap: 2px">
+                  <sc-for list="{{options}}" as="o" hint-placeholder-count="4">
+                    <button type="button" role="option" class="{{o.cls}}" aria-selected="{{o.on}}" onClick="{{o.pick}}">
+                      <span style="display: flex; flex-direction: column; flex: 1">
+                        <span style="font-size: 14px; font-weight: 600; color: #161A3A">{{o.nome}}</span>
+                        <span style="font-size: 12px; color: #5C6385">{{o.meta}}</span>
+                      </span>
+                      <sc-if value="{{o.on}}" hint-placeholder-val="{{ false }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4040D6" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></sc-if>
+                    </button>
+                  </sc-for>
+                  <sc-if value="{{noOptions}}" hint-placeholder-val="{{ false }}"><p style="margin: 0; padding: 12px; font-size: 13px; color: #5C6385">Nenhum template com esse nome.</p></sc-if>
+                </div>
+              </div>
+            </sc-if>
+          </div>
+
+          <div role="group" aria-labelledby="lbl-rec" style="display: flex; flex-direction: column; gap: 10px">
+            <span id="lbl-rec" style="font-size: 14px; font-weight: 600">Frequência</span>
+            <div style="position: relative; display: inline-flex; flex-wrap: wrap; align-self: flex-start; padding: 4px; background: #E7EBF8; border-radius: 13px">
+              <div class="seg-pill" aria-hidden="true" style="{{recPill}}"></div>
+              <sc-for list="{{recs}}" as="r" hint-placeholder-count="3">
+                <button type="button" class="{{r.cls}}" aria-pressed="{{r.on}}" onClick="{{r.pick}}">{{r.label}}</button>
+              </sc-for>
+            </div>
+            <sc-if value="{{isWeekly}}" hint-placeholder-val="{{ true }}">
+              <div class="fade" style="display: flex; align-items: center; gap: 12px">
+                <button type="button" class="step" aria-label="Menos uma vez por semana" onClick="{{decWeek}}" disabled="{{minWeek}}">−</button>
+                <span style="min-width: 150px; text-align: center; font-size: 15px"><strong style="font-weight: 600">{{perWeek}}</strong> vezes por semana</span>
+                <button type="button" class="step" aria-label="Mais uma vez por semana" onClick="{{incWeek}}" disabled="{{maxWeek}}">+</button>
+              </div>
+            </sc-if>
+          </div>
+
+          <div role="group" aria-labelledby="lbl-prazo" style="display: flex; flex-direction: column; gap: 10px">
+            <span id="lbl-prazo" style="font-size: 14px; font-weight: 600">Prazo para responder cada envio</span>
+            <div style="display: flex; flex-wrap: wrap; gap: 8px">
+              <sc-for list="{{prazos}}" as="p" hint-placeholder-count="3">
+                <button type="button" class="{{p.cls}}" aria-pressed="{{p.on}}" onClick="{{p.pick}}">{{p.label}}</button>
+              </sc-for>
+            </div>
+          </div>
+
+          <div role="group" aria-labelledby="lbl-per" style="display: flex; flex-direction: column; gap: 10px">
+            <span id="lbl-per" style="font-size: 14px; font-weight: 600">Período</span>
+            <div style="display: flex; flex-wrap: wrap; gap: 8px">
+              <sc-for list="{{periodos}}" as="p" hint-placeholder-count="2">
+                <button type="button" class="{{p.cls}}" aria-pressed="{{p.on}}" onClick="{{p.pick}}">{{p.label}}</button>
+              </sc-for>
+            </div>
+            <sc-if value="{{isDates}}" hint-placeholder-val="{{ false }}">
+              <div class="fade" style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px">
+                <button type="button" class="datebtn" aria-label="Data de início: 10 de outubro de 2026"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5C6385" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="2"></rect><path d="M3.5 10h17M8 3v4M16 3v4"></path></svg>10/10/2026</button>
+                <span style="font-size: 14px; color: #5C6385">até</span>
+                <button type="button" class="datebtn" aria-label="Data de fim: 6 de novembro de 2026"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5C6385" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="2"></rect><path d="M3.5 10h17M8 3v4M16 3v4"></path></svg>06/11/2026</button>
+              </div>
+            </sc-if>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 8px">
+            <label for="msg" style="font-size: 14px; font-weight: 600">Mensagem para a paciente <span style="font-weight: 400; color: #5C6385">(opcional)</span></label>
+            <textarea id="msg" class="area" placeholder="Ex.: escolha os três momentos da semana em que a emoção foi mais forte." value="{{message}}" onChange="{{setMessage}}"></textarea>
+            <span class="mono" style="align-self: flex-end; font-size: 11px; color: #5C6385">{{messageCount}}/500</span>
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 12px">
+            <button type="button" role="switch" class="{{remCls}}" aria-checked="{{reminder}}" aria-labelledby="lbl-rem" onClick="{{toggleRem}}"></button>
+            <span id="lbl-rem" style="font-size: 14px">Enviar lembrete por e-mail 1 dia antes do prazo</span>
+          </div>
+
+          <div style="display: flex; gap: 10px; padding-top: 8px; border-top: 1px solid #DDE3F3">
+            <a href="Ficha.dc.html" class="btn btn-s">Cancelar</a>
+            <button type="submit" class="btn btn-p">Enviar para Júlia</button>
+          </div>
+        </form>
+
+        <aside class="rise" aria-label="Resumo" style="animation-delay: .2s; flex: 1 1 280px; min-width: 0; display: flex; flex-direction: column; gap: 16px">
+          <section style="padding: 24px; border-radius: 16px; background: #1C1A5E; color: #E8EBFB; display: flex; flex-direction: column; gap: 14px" aria-live="polite">
+            <h2 class="mono" style="margin: 0; font-size: 11px; font-weight: 500; letter-spacing: .14em; text-transform: uppercase; color: #A9B2E8">Resumo</h2>
+            <p style="margin: 0; display: flex; align-items: baseline; gap: 10px; color: #FFFFFF"><span class="num" style="font-size: 44px; font-weight: 600; letter-spacing: -0.03em">{{total}}</span><span style="font-size: 16px">{{totalLabel}}</span></p>
+            <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; font-size: 14px; line-height: 1.5; color: #C3CAF0">
+              <li>{{freqText}}</li>
+              <li>{{periodText}}</li>
+              <li>Cada envio fica aberto por {{prazo}} horas.</li>
+              <sc-if value="{{reminder}}" hint-placeholder-val="{{ true }}"><li class="fade">Lembrete por e-mail 1 dia antes do prazo.</li></sc-if>
+            </ul>
+          </section>
+          <p style="margin: 0; padding: 14px 16px; border-radius: 12px; background: #E6EAFD; color: #2B2E9E; font-size: 13px; line-height: 1.55">O e-mail avisa só que há uma atividade nova. As perguntas e as respostas ficam dentro do Acolhe.</p>
+        </aside>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{sent}}" hint-placeholder-val="{{ false }}">
+      <section class="fade" aria-live="polite" style="max-width: 560px; padding: 32px; border-radius: 18px; background: #FFFFFF; border: 1px solid #DDE3F3; display: flex; flex-direction: column; gap: 16px">
+        <span aria-hidden="true" style="width: 48px; height: 48px; border-radius: 50%; background: #E6EAFD; display: flex; align-items: center; justify-content: center">
+          <svg class="check" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#4040D6" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg>
+        </span>
+        <h2 style="margin: 0; font-size: 22px; font-weight: 600; letter-spacing: -0.02em">Atividade enviada para Júlia</h2>
+        <p style="margin: 0; font-size: 15px; line-height: 1.55; color: #3E4466">{{tpl.nome}} · {{total}} {{totalLabel}}. A primeira já aparece no app dela.</p>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap">
+          <a href="Ficha.dc.html" class="btn btn-p">Voltar para a ficha</a>
+          <button type="button" class="btn btn-s" onClick="{{reset}}">Atribuir outra</button>
+        </div>
+      </section>
+    </sc-if>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1000}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { open: false, query: '', tplId: 2, rec: 'semana', perWeek: 3, prazo: 48, periodo: 'datas', reminder: true, message: '', sent: false };
+  }
+  renderVals() {
+    const s = this.state;
+    const tpls = [
+      { id: 1, nome: 'Check-in diário de humor', meta: 'v3 · Pessoal · 2 campos' },
+      { id: 2, nome: 'Registro de pensamentos', meta: 'v2 · Pessoal · 4 campos' },
+      { id: 3, nome: 'Higiene do sono', meta: 'v1 · Clínica Travessia · 7 itens' },
+      { id: 4, nome: 'Diário de gratidão', meta: 'v1 · Pessoal · 1 campo' },
+      { id: 5, nome: 'Diário do sono', meta: 'v2 · Clínica Travessia · 4 campos' }
+    ];
+    const q = s.query.trim().toLowerCase();
+    const filtered = tpls.filter((t) => !q || t.nome.toLowerCase().indexOf(q) >= 0);
+    const tpl = tpls.find((t) => t.id === s.tplId);
+    const recDefs = [['uma', 'Uma vez'], ['diaria', 'Todo dia'], ['semana', 'Por semana']];
+    const recIdx = recDefs.findIndex((d) => d[0] === s.rec);
+    const weeks = s.periodo === 'sessao' ? 1 : 4;
+    const total = s.rec === 'uma' ? 1 : s.rec === 'diaria' ? 7 * weeks : s.perWeek * weeks;
+    const freqText = s.rec === 'uma' ? 'Envio único.' : s.rec === 'diaria' ? 'Um envio por dia.' : s.perWeek + ' envios por semana, em dias espaçados.';
+    const periodText = s.rec === 'uma' ? (s.periodo === 'sessao' ? 'Enviado hoje, com prazo antes da sessão de 16/10.' : 'Enviado em 10/10.') : (s.periodo === 'sessao' ? 'De hoje até a sessão de 16/10.' : 'De 10/10 a 06/11 (4 semanas).');
+    const opt = (key, list) => list.map((o) => ({ label: o[1], on: s[key] === o[0], cls: s[key] === o[0] ? 'chip on' : 'chip', pick: () => this.setState({ [key]: o[0] }) }));
+    return {
+      open: s.open,
+      comboCls: s.open ? 'combo open' : 'combo',
+      toggleOpen: () => this.setState({ open: !s.open, query: '' }),
+      query: s.query,
+      setQuery: (e) => this.setState({ query: e.target.value }),
+      tpl: tpl,
+      options: filtered.map((t) => ({ nome: t.nome, meta: t.meta, on: t.id === s.tplId, cls: t.id === s.tplId ? 'option on' : 'option', pick: () => this.setState({ tplId: t.id, open: false }) })),
+      noOptions: filtered.length === 0,
+      recPill: 'transform: translateX(' + (recIdx * 150) + 'px)',
+      recs: recDefs.map((d) => ({ label: d[1], on: s.rec === d[0], cls: s.rec === d[0] ? 'seg on' : 'seg', pick: () => this.setState({ rec: d[0] }) })),
+      isWeekly: s.rec === 'semana',
+      perWeek: s.perWeek,
+      decWeek: () => this.setState({ perWeek: Math.max(1, s.perWeek - 1) }),
+      incWeek: () => this.setState({ perWeek: Math.min(6, s.perWeek + 1) }),
+      minWeek: s.perWeek <= 1,
+      maxWeek: s.perWeek >= 6,
+      prazos: opt('prazo', [[24, '24 horas'], [48, '48 horas'], [72, '72 horas']]),
+      prazo: s.prazo,
+      periodos: opt('periodo', [['sessao', 'Até a próxima sessão'], ['datas', 'Escolher datas']]),
+      isDates: s.periodo === 'datas',
+      message: s.message,
+      messageCount: s.message.length,
+      setMessage: (e) => this.setState({ message: e.target.value.slice(0, 500) }),
+      reminder: s.reminder,
+      remCls: s.reminder ? 'switch on' : 'switch',
+      toggleRem: () => this.setState({ reminder: !s.reminder }),
+      total: total,
+      totalLabel: total === 1 ? 'envio' : 'envios',
+      freqText: freqText,
+      periodText: periodText,
+      notSent: !s.sent,
+      sent: s.sent,
+      send: (e) => { if (e && e.preventDefault) e.preventDefault(); this.setState({ sent: true, open: false }); },
+      reset: () => this.setState({ sent: false, message: '' })
+    };
+  }
+}
+</script>
+</body>
+</html>

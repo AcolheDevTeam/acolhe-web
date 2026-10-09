@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Acolhe — Ajustes da paciente</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&amp;family=Schibsted+Grotesk:wght@400;500;600;700&amp;display=swap">
+<style>
+body{margin:0}
+*{box-sizing:border-box}
+a{color:#4040D6}a:hover{color:#1C1A5E}
+.mono{font-family:'IBM Plex Mono',ui-monospace,monospace}
+@keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.rise{animation:rise .7s cubic-bezier(.2,.7,.2,1) both}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.fade{animation:fade .4s cubic-bezier(.2,.7,.2,1) both}
+@keyframes scrim{from{opacity:0}to{opacity:1}}
+@keyframes sheet{from{transform:translateY(100%)}to{transform:none}}
+.scrim{animation:scrim .3s ease both}
+.sheet{animation:sheet .45s cubic-bezier(.2,.7,.2,1) both}
+.scroll{scrollbar-width:none}.scroll::-webkit-scrollbar{display:none}
+.card{background:#FFFFFF;border:1px solid #DDE3F3;border-radius:16px}
+.row{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:52px;padding:10px 16px;border-top:1px solid #EFF2FB;font-size:14px;color:inherit;text-decoration:none}
+.row:first-child{border-top:0}
+a.row:hover{background:#F7F8FE}
+.sw{position:relative;flex:none;width:48px;height:28px;border:0;border-radius:14px;background:#CBD2EA;cursor:pointer;transition:background .3s ease;padding:0}
+.sw::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#FFFFFF;box-shadow:0 1px 3px rgba(22,26,58,.2);transition:transform .35s cubic-bezier(.2,.7,.2,1)}
+.sw.on{background:#4040D6}
+.sw.on::after{transform:translateX(20px)}
+.sw-wrap{display:flex;align-items:center;justify-content:center;width:52px;height:44px}
+.btn{height:48px;width:100%;border:0;border-radius:12px;font:inherit;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:background .25s ease,transform .25s cubic-bezier(.2,.7,.2,1)}
+.btn:active{transform:scale(.985)}
+.btn-danger{background:#A33A3A;color:#FFFFFF}.btn-danger:hover{background:#8A2F2F}
+.btn-s{background:#FFFFFF;color:#161A3A;border:1px solid #CBD2EA}.btn-s:hover{border-color:#A7AFCF}
+.tabbar a{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:56px;font-size:11px;font-weight:500;color:#5C6385;text-decoration:none}
+.tabbar a.on{color:#1C1A5E}
+:focus-visible{outline:2px solid #4040D6;outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition-duration:.01ms!important}}
+</style>
+</helmet>
+<div style="position: relative; width: 390px; height: 844px; display: flex; flex-direction: column; background: #F5F7FE; color: #161A3A; font-family: 'Schibsted Grotesk', ui-sans-serif, system-ui, sans-serif; overflow: hidden">
+
+  <div class="scroll" style="flex: 1; overflow-y: auto; padding: 24px 20px 28px; display: flex; flex-direction: column; gap: 22px">
+
+    <header class="rise" style="display: flex; align-items: center; gap: 8px">
+      <a href="Paciente.dc.html" aria-label="Voltar" style="width: 44px; height: 44px; margin-left: -10px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #161A3A"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg></a>
+      <h1 style="margin: 0; font-size: 24px; font-weight: 600; letter-spacing: -0.02em">Ajustes</h1>
+    </header>
+
+    <sc-if value="{{revoked}}" hint-placeholder-val="{{ false }}">
+      <div class="fade" role="status" style="padding: 14px 16px; border-radius: 12px; background: #FDEBE7; color: #9E3522; font-size: 14px; line-height: 1.5">Consentimento de dados de saúde revogado em 09/10/2026. O acompanhamento pelo app foi encerrado. Seus registros continuam guardados pelo prazo previsto em lei.</div>
+    </sc-if>
+
+    <section class="rise" aria-labelledby="t-dados" style="animation-delay: .05s; display: flex; flex-direction: column; gap: 8px">
+      <h2 id="t-dados" class="mono" style="margin: 0 4px; font-size: 11px; font-weight: 500; letter-spacing: .14em; text-transform: uppercase; color: #5C6385">Seus dados</h2>
+      <div class="card">
+        <div class="row"><span style="color: #5C6385">Nome</span><span>Júlia Andrade</span></div>
+        <div class="row"><span style="color: #5C6385">E-mail</span><span>julia@exemplo.com</span></div>
+        <div class="row"><span style="color: #5C6385">Telefone</span><span>(11) 98765-4342</span></div>
+        <a href="#" class="row" style="color: #4040D6; font-weight: 500">Editar dados</a>
+      </div>
+    </section>
+
+    <section class="rise" aria-labelledby="t-psi" style="animation-delay: .1s; display: flex; flex-direction: column; gap: 8px">
+      <h2 id="t-psi" class="mono" style="margin: 0 4px; font-size: 11px; font-weight: 500; letter-spacing: .14em; text-transform: uppercase; color: #5C6385">Sua psicóloga</h2>
+      <div class="card" style="padding: 14px 16px; display: flex; align-items: center; gap: 12px">
+        <span aria-hidden="true" style="width: 40px; height: 40px; border-radius: 50%; background: #1C1A5E; color: #FF8A70; font-size: 14px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex: none">MS</span>
+        <span style="display: flex; flex-direction: column; gap: 2px">
+          <span style="font-size: 15px; font-weight: 600">Mariana Sá</span>
+          <span style="font-size: 13px; color: #5C6385">CRP 06/123456 · desde out/2025</span>
+        </span>
+      </div>
+    </section>
+
+    <section class="rise" aria-labelledby="t-cons" style="animation-delay: .15s; display: flex; flex-direction: column; gap: 8px">
+      <h2 id="t-cons" class="mono" style="margin: 0 4px; font-size: 11px; font-weight: 500; letter-spacing: .14em; text-transform: uppercase; color: #5C6385">Consentimentos (LGPD)</h2>
+      <div class="card">
+        <sc-for list="{{consents}}" as="c" hint-placeholder-count="3">
+          <div class="row" style="align-items: flex-start; padding-top: 14px; padding-bottom: 14px">
+            <span style="display: flex; flex-direction: column; gap: 4px; min-width: 0">
+              <span id="{{c.labelId}}" style="font-size: 15px; font-weight: 500">{{c.title}}</span>
+              <span style="font-size: 13px; line-height: 1.45; color: #5C6385">{{c.desc}}</span>
+              <span class="mono" style="font-size: 11px; color: #5C6385">{{c.status}}</span>
+            </span>
+            <span class="sw-wrap"><button type="button" role="switch" class="{{c.cls}}" aria-checked="{{c.on}}" aria-labelledby="{{c.labelId}}" onClick="{{c.toggle}}"></button></span>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+    <section class="rise" aria-labelledby="t-priv" style="animation-delay: .2s; display: flex; flex-direction: column; gap: 8px">
+      <h2 id="t-priv" class="mono" style="margin: 0 4px; font-size: 11px; font-weight: 500; letter-spacing: .14em; text-transform: uppercase; color: #5C6385">Privacidade e conta</h2>
+      <div class="card">
+        <button type="button" class="row" onClick="{{requestData}}" style="width: 100%; border-left: 0; border-right: 0; border-bottom: 0; background: transparent; font: inherit; font-size: 14px; text-align: left; cursor: pointer">
+          <span style="display: flex; flex-direction: column; gap: 2px">
+            <span>Baixar meus dados</span>
+            <sc-if value="{{dataRequested}}" hint-placeholder-val="{{ false }}"><span class="fade" style="font-size: 13px; color: #2B2E9E">Pedido feito. O link chega por e-mail em até 24 horas.</span></sc-if>
+          </span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5C6385" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"></path></svg>
+        </button>
+        <a href="Compartilhar.dc.html" class="row"><span>Compartilhar com outra psicóloga</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5C6385" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg></a>
+        <a href="Senha.dc.html" class="row"><span>Trocar senha</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5C6385" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg></a>
+        <a href="Main.dc.html" class="row" style="color: #A33A3A; font-weight: 500">Sair</a>
+      </div>
+    </section>
+  </div>
+
+  <nav class="tabbar" aria-label="Navegação" style="display: flex; padding: 4px 8px 12px; background: #FFFFFF; border-top: 1px solid #DDE3F3">
+    <a href="Paciente.dc.html"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 11l8-6 8 6v8a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1z"></path></svg>Início</a>
+    <a href="AtividadesPaciente.dc.html"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5h10M9 12h10M9 19h10M4.5 5l.5.5L6.5 4M4.5 12l.5.5 1.5-1.5M4.5 19l.5.5 1.5-1.5"></path></svg>Atividades</a>
+    <a href="CheckinPaciente.dc.html"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><circle cx="12" cy="12" r="3.5"></circle></svg>Check-in</a>
+    <a href="ProntuarioPaciente.dc.html"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"></path><path d="M3 3v5h5M12 7v5l3 2"></path></svg>Histórico</a>
+  </nav>
+
+  <sc-if value="{{dialog}}" hint-placeholder-val="{{ false }}">
+    <div class="scrim" style="position: absolute; inset: 0; background: rgba(22,26,58,.45); display: flex; align-items: flex-end">
+      <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="t-dlg" style="width: 100%; padding: 24px 20px 28px; border-radius: 20px 20px 0 0; background: #FFFFFF; display: flex; flex-direction: column; gap: 14px">
+        <h2 id="t-dlg" style="margin: 0; font-size: 20px; font-weight: 600; letter-spacing: -0.01em">Revogar consentimento de dados de saúde?</h2>
+        <p style="margin: 0; font-size: 14px; line-height: 1.55; color: #3E4466">Sem esse consentimento, a Mariana não pode mais registrar check-ins, atividades e o prontuário pelo Acolhe, e o acompanhamento pelo app é encerrado.</p>
+        <p style="margin: 0; font-size: 14px; line-height: 1.55; color: #3E4466">Os registros feitos até hoje continuam guardados pelo prazo previsto em lei e você pode baixá-los quando quiser.</p>
+        <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 6px">
+          <button type="button" class="btn btn-danger" onClick="{{confirmRevoke}}">Revogar consentimento</button>
+          <button type="button" class="btn btn-s" onClick="{{closeDialog}}">Manter como está</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { saude: true, lembretes: true, estat: false, dialog: false, revoked: false, dataRequested: false };
+  }
+  renderVals() {
+    const s = this.state;
+    const defs = [
+      { key: 'saude', title: 'Dados de saúde', desc: 'Necessário para o acompanhamento: prontuário, atividades e check-ins.', since: '12/10/2025' },
+      { key: 'lembretes', title: 'Lembretes por e-mail', desc: 'Avisos de sessão e de atividades, sem conteúdo clínico no e-mail.', since: '12/10/2025' },
+      { key: 'estat', title: 'Estatística anônima', desc: 'Uso do app em números agregados, sem ligação com seus dados clínicos.', since: '' }
+    ];
+    return {
+      consents: defs.map((d) => {
+        const on = s[d.key];
+        return {
+          title: d.title, desc: d.desc, on: on,
+          labelId: 'cons-' + d.key,
+          cls: on ? 'sw on' : 'sw',
+          status: on ? 'Autorizado em ' + d.since : (d.key === 'saude' && s.revoked ? 'Revogado em 09/10/2026' : 'Não autorizado'),
+          toggle: () => {
+            if (d.key === 'saude' && on) { this.setState({ dialog: true }); return; }
+            this.setState({ [d.key]: !on });
+          }
+        };
+      }),
+      dialog: s.dialog,
+      closeDialog: () => this.setState({ dialog: false }),
+      confirmRevoke: () => this.setState({ dialog: false, saude: false, revoked: true }),
+      revoked: s.revoked,
+      dataRequested: s.dataRequested,
+      requestData: () => this.setState({ dataRequested: true })
+    };
+  }
+}
+</script>
+</body>
+</html>

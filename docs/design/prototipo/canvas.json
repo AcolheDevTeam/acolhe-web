@@ -1,0 +1,483 @@
+{
+  "v": 3,
+  "createdOnFiles": {
+    "v": 1,
+    "at": "2026-10-09T17:05:00Z"
+  },
+  "title": "Acolhe — novo design",
+  "launch": {
+    "view": "canvas"
+  },
+  "pages": [],
+  "boards": {
+    "Main.dc.html": {
+      "x": 0,
+      "y": 0,
+      "w": 1440,
+      "h": 900,
+      "title": "Login",
+      "expand": "fill",
+      "is_interactive": true
+    },
+    "Cadastro.dc.html": {
+      "x": 1520,
+      "y": 0,
+      "w": 1440,
+      "h": 900,
+      "title": "Cadastro da psicóloga",
+      "expand": "fill",
+      "is_interactive": true
+    },
+    "Convite.dc.html": {
+      "x": 3040,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "Paciente — Aceite do convite",
+      "is_interactive": true
+    },
+    "Senha.dc.html": {
+      "x": 3510,
+      "y": 0,
+      "w": 1440,
+      "h": 900,
+      "title": "Recuperar senha",
+      "expand": "fill",
+      "is_interactive": true
+    },
+    "Fundamentos.dc.html": {
+      "x": 5030,
+      "y": 0,
+      "w": 1440,
+      "h": 1240,
+      "title": "Fundamentos da identidade",
+      "is_interactive": true
+    },
+    "Dashboard.dc.html": {
+      "x": 0,
+      "y": 1660,
+      "w": 1440,
+      "h": 1000,
+      "title": "Início",
+      "expand": "fill",
+      "is_interactive": true
+    },
+    "Pacientes.dc.html": {
+      "x": 1520,
+      "y": 1660,
+      "w": 1440,
+      "h": 1000,
+      "title": "Lista de pacientes",
+      "expand": "fill",
+      "is_interactive": true
+    },
+    "Ficha.dc.html": {
+      "x": 3040,
+      "y": 1660,
+      "w": 1440,
+      "h": 1040,
+      "title": "Ficha da paciente",
+      "expand": "fill",
+      "is_interactive": true
+    },
+    "Agenda.dc.html": {
+      "x": 4560,
+      "y": 1660,
+      "w": 1440,
+      "h": 1000,
+      "title": "Agenda semanal",
+      "expand": "fill",
+      "is_interactive": true
+    },
+    "Sessao.dc.html": {
+      "x": 6080,
+      "y": 1660,
+      "w": 1440,
+      "h": 1100,
+      "title": "Registrar sessão",
+      "expand": "fill",
+      "is_interactive": true
+    },
+    "Registro.dc.html": {
+      "x": 7600,
+      "y": 1660,
+      "w": 1440,
+      "h": 1000,
+      "title": "Registro Documental",
+      "expand": "fill",
+      "is_interactive": true
+    },
+    "Templates.dc.html": {
+      "x": 0,
+      "y": 3180,
+      "w": 1440,
+      "h": 1000,
+      "title": "Biblioteca de templates",
+      "expand": "fill",
+      "is_interactive": true
+    },
+    "Builder.dc.html": {
+      "x": 1520,
+      "y": 3180,
+      "w": 1440,
+      "h": 1000,
+      "title": "Criar template",
+      "expand": "fill",
+      "is_interactive": true
+    },
+    "Atribuir.dc.html": {
+      "x": 3040,
+      "y": 3180,
+      "w": 1440,
+      "h": 1000,
+      "title": "Atribuir atividade",
+      "expand": "fill",
+      "is_interactive": true
+    },
+    "Revisar.dc.html": {
+      "x": 4560,
+      "y": 3180,
+      "w": 1440,
+      "h": 1040,
+      "title": "Revisar resposta",
+      "expand": "fill",
+      "is_interactive": true
+    },
+    "Declaracao.dc.html": {
+      "x": 0,
+      "y": 4640,
+      "w": 1440,
+      "h": 1000,
+      "title": "Emitir declaração",
+      "expand": "fill",
+      "is_interactive": true
+    },
+    "Exportacao.dc.html": {
+      "x": 1520,
+      "y": 4640,
+      "w": 1440,
+      "h": 1000,
+      "title": "Exportação LGPD",
+      "expand": "fill",
+      "is_interactive": true
+    },
+    "Paciente.dc.html": {
+      "x": 0,
+      "y": 6060,
+      "w": 390,
+      "h": 844,
+      "title": "Paciente — Início",
+      "is_interactive": true
+    },
+    "Responder.dc.html": {
+      "x": 470,
+      "y": 6060,
+      "w": 390,
+      "h": 844,
+      "title": "Paciente — Respondendo atividade",
+      "is_interactive": true
+    },
+    "ProntuarioPaciente.dc.html": {
+      "x": 940,
+      "y": 6060,
+      "w": 390,
+      "h": 844,
+      "title": "Paciente — Meu prontuário",
+      "is_interactive": true
+    },
+    "Compartilhar.dc.html": {
+      "x": 1410,
+      "y": 6060,
+      "w": 390,
+      "h": 844,
+      "title": "Paciente — Compartilhar histórico",
+      "is_interactive": true
+    },
+    "Planos.dc.html": {
+      "x": 0,
+      "y": 7324,
+      "w": 1440,
+      "h": 1080,
+      "title": "Planos",
+      "expand": "fill",
+      "is_interactive": true
+    },
+    "Checkout.dc.html": {
+      "x": 1520,
+      "y": 7324,
+      "w": 1440,
+      "h": 1000,
+      "title": "Checkout",
+      "expand": "fill",
+      "is_interactive": true
+    },
+    "Assinatura.dc.html": {
+      "x": 3040,
+      "y": 7324,
+      "w": 1440,
+      "h": 1000,
+      "title": "Assinatura e faturas",
+      "expand": "fill",
+      "is_interactive": true
+    },
+    "Equipe.dc.html": {
+      "x": 4560,
+      "y": 7324,
+      "w": 1440,
+      "h": 1000,
+      "title": "Clínica — Equipe",
+      "expand": "fill",
+      "is_interactive": true
+    },
+    "VerificarEmail.dc.html": {
+      "x": 6550,
+      "y": 0,
+      "w": 1440,
+      "h": 900,
+      "title": "Verificação de e-mail",
+      "expand": "fill",
+      "is_interactive": true
+    },
+    "CriarClinica.dc.html": {
+      "x": 8070,
+      "y": 0,
+      "w": 1440,
+      "h": 900,
+      "title": "Criar clínica",
+      "expand": "fill",
+      "is_interactive": true
+    },
+    "Atividades.dc.html": {
+      "x": 9120,
+      "y": 1660,
+      "w": 1440,
+      "h": 1000,
+      "title": "Fila de atividades",
+      "expand": "fill",
+      "is_interactive": true
+    },
+    "Documentos.dc.html": {
+      "x": 10640,
+      "y": 1660,
+      "w": 1440,
+      "h": 1000,
+      "title": "Documentos emitidos",
+      "expand": "fill",
+      "is_interactive": true
+    },
+    "Notificacoes.dc.html": {
+      "x": 12160,
+      "y": 1660,
+      "w": 1440,
+      "h": 1000,
+      "title": "Notificações",
+      "expand": "fill",
+      "is_interactive": true
+    },
+    "Busca.dc.html": {
+      "x": 13680,
+      "y": 1660,
+      "w": 1440,
+      "h": 1000,
+      "title": "Busca rápida (⌘K)",
+      "expand": "fill",
+      "is_interactive": true
+    },
+    "CheckinPaciente.dc.html": {
+      "x": 1880,
+      "y": 6060,
+      "w": 390,
+      "h": 844,
+      "title": "Paciente — Check-in",
+      "is_interactive": true
+    },
+    "AtividadesPaciente.dc.html": {
+      "x": 2350,
+      "y": 6060,
+      "w": 390,
+      "h": 844,
+      "title": "Paciente — Atividades",
+      "is_interactive": true
+    },
+    "AjustesPaciente.dc.html": {
+      "x": 2820,
+      "y": 6060,
+      "w": 390,
+      "h": 844,
+      "title": "Paciente — Ajustes e consentimentos",
+      "is_interactive": true
+    },
+    "PainelClinica.dc.html": {
+      "x": 6080,
+      "y": 7324,
+      "w": 1440,
+      "h": 1000,
+      "title": "Clínica — Painel do administrador",
+      "expand": "fill",
+      "is_interactive": true
+    },
+    "Perfil.dc.html": {
+      "x": 0,
+      "y": 8824,
+      "w": 1440,
+      "h": 1000,
+      "title": "Ajustes — Perfil",
+      "expand": "fill",
+      "is_interactive": true
+    },
+    "Seguranca.dc.html": {
+      "x": 1520,
+      "y": 8824,
+      "w": 1440,
+      "h": 1000,
+      "title": "Ajustes — Segurança",
+      "expand": "fill",
+      "is_interactive": true
+    },
+    "PrefNotificacoes.dc.html": {
+      "x": 3040,
+      "y": 8824,
+      "w": 1440,
+      "h": 1000,
+      "title": "Ajustes — Notificações",
+      "expand": "fill",
+      "is_interactive": true
+    },
+    "Admin.dc.html": {
+      "x": 0,
+      "y": 10244,
+      "w": 1440,
+      "h": 1000,
+      "title": "Equipe Acolhe — Assinaturas e cortesias",
+      "expand": "fill",
+      "is_interactive": true
+    },
+    "Bloqueio.dc.html": {
+      "x": 0,
+      "y": 11664,
+      "w": 1440,
+      "h": 1000,
+      "title": "Assinatura vencida (modo leitura)",
+      "expand": "fill",
+      "is_interactive": true
+    },
+    "Erro.dc.html": {
+      "x": 1520,
+      "y": 11664,
+      "w": 1440,
+      "h": 900,
+      "title": "Erros e sessão expirada",
+      "expand": "fill",
+      "is_interactive": true
+    }
+  },
+  "order": [
+    "Main.dc.html",
+    "Cadastro.dc.html",
+    "Convite.dc.html",
+    "Senha.dc.html",
+    "Fundamentos.dc.html",
+    "Dashboard.dc.html",
+    "Pacientes.dc.html",
+    "Ficha.dc.html",
+    "Agenda.dc.html",
+    "Sessao.dc.html",
+    "Registro.dc.html",
+    "Templates.dc.html",
+    "Builder.dc.html",
+    "Atribuir.dc.html",
+    "Revisar.dc.html",
+    "Declaracao.dc.html",
+    "Exportacao.dc.html",
+    "Paciente.dc.html",
+    "Responder.dc.html",
+    "ProntuarioPaciente.dc.html",
+    "Compartilhar.dc.html",
+    "Planos.dc.html",
+    "Checkout.dc.html",
+    "Assinatura.dc.html",
+    "Equipe.dc.html",
+    "VerificarEmail.dc.html",
+    "CriarClinica.dc.html",
+    "Atividades.dc.html",
+    "Documentos.dc.html",
+    "Notificacoes.dc.html",
+    "Busca.dc.html",
+    "CheckinPaciente.dc.html",
+    "AtividadesPaciente.dc.html",
+    "AjustesPaciente.dc.html",
+    "PainelClinica.dc.html",
+    "Perfil.dc.html",
+    "Seguranca.dc.html",
+    "PrefNotificacoes.dc.html",
+    "Admin.dc.html",
+    "Bloqueio.dc.html",
+    "Erro.dc.html"
+  ],
+  "notes": {
+    "row1": {
+      "x": 0,
+      "y": -320,
+      "text": "Entrada",
+      "kind": "title1",
+      "maxW": 9510
+    },
+    "row2": {
+      "x": 0,
+      "y": 1360,
+      "text": "Psicóloga · gestão clínica",
+      "kind": "title1",
+      "maxW": 15120
+    },
+    "row3": {
+      "x": 0,
+      "y": 2880,
+      "text": "Psicóloga · atividades",
+      "kind": "title1",
+      "maxW": 6000
+    },
+    "row4": {
+      "x": 0,
+      "y": 4340,
+      "text": "Documentos e privacidade",
+      "kind": "title1",
+      "maxW": 2960
+    },
+    "row5": {
+      "x": 0,
+      "y": 5760,
+      "text": "Paciente (celular)",
+      "kind": "title1",
+      "maxW": 3210
+    },
+    "row6": {
+      "x": 0,
+      "y": 7024,
+      "text": "Clínica e assinatura",
+      "kind": "title1",
+      "maxW": 7520
+    },
+    "row7": {
+      "x": 0,
+      "y": 8524,
+      "text": "Ajustes da conta",
+      "kind": "title1",
+      "maxW": 4480
+    },
+    "row8": {
+      "x": 0,
+      "y": 9944,
+      "text": "Equipe Acolhe (uso interno)",
+      "kind": "title1",
+      "maxW": 2960
+    },
+    "row9": {
+      "x": 0,
+      "y": 11364,
+      "text": "Estados e erros",
+      "kind": "title1",
+      "maxW": 2960
+    }
+  },
+  "designSystems": []
+}

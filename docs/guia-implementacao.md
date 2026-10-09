@@ -47,26 +47,25 @@ ela aponta novos itens.
 - Considere "conferido" apenas depois de olhar o resultado (screenshot ou navegador) em largura
   de celular.
 
-### A5. Padrão visual: seguir o que existe, sem inventar
+### A5. Padrão visual: seguir o protótipo novo, sem inventar
 
-- Use exclusivamente as fontes, cores, tamanhos e espaçamentos já definidos no projeto.
-- **Não** use emojis. **Não** use cores fortes, gradientes, sombras exageradas, ícones
-  chamativos ou qualquer elemento fora do escopo visual do produto.
-- O design pode mudar no futuro, mas será tudo de uma vez. Portanto **não gaste esforço em
-  refinamento visual nem antecipe redesign**: siga o padrão atual como está.
-
-Referência do padrão atual (já está no código, não é decisão nova):
+- Use exclusivamente os tokens, fontes, tamanhos e espaçamentos do projeto. Desde 2026-10-09
+  eles vêm do protótipo "Acolhe — novo design" (`docs/design/novo-design.md`, seção 1).
+- **Não** use emojis, gradientes, sombras exageradas nem cores fora dos tokens.
+- A troca de identidade é o "redesign de uma vez" previsto antes: as telas migram para o
+  protótipo por área (ordem em `novo-design.md`, seção 4). Até migrar, uma tela pode ficar no
+  visual antigo, mas sem misturar os dois dentro da mesma tela.
 
 | Aspecto | Onde / valor |
 |---|---|
 | Tokens | `assets/css/main.css` e `tailwind.config.ts` |
-| Título / display | serif, Newsreader (`font-serif`) |
-| Corpo | sans, Inter (`font-sans`) |
-| Rótulos | mono maiúsculo, JetBrains Mono, classe `label-mono` |
-| Paleta | fundo creme quente, tinta quase-preta, botões pretos, cinza quente em rótulos |
-| Semânticas | vermelho discreto (erro), verde discreto (sucesso), laranja contido (aviso) |
-| Raio | `--radius: 0.5rem` |
-| Tema escuro | existe e deve continuar funcionando |
+| Texto e títulos | Schibsted Grotesk (`font-sans`); títulos 600 com tracking negativo |
+| Rótulos e dados | IBM Plex Mono maiúsculo, classe `label-mono` |
+| Paleta | fundo névoa `#F5F7FE`, texto tinta `#161A3A`, ação índigo `#4040D6`, marca noite `#1C1A5E` |
+| Semânticas | positivo índigo claro (sem verde), aviso salmão/coral, erro `#A33A3A` |
+| Raio | `--radius: 0.625rem` (10px); cards 16px, diálogos 18px |
+| Movimento | curto, `cubic-bezier(.2,.7,.2,1)`; desligado com `prefers-reduced-motion` |
+| Tema escuro | continua funcionando, com paleta derivada do protótipo (decisão provisória de 2026-10-09: o protótipo não desenha o escuro) |
 
 ### A6. Erros sempre em português e compreensíveis para o usuário
 

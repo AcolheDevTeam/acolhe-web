@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Acolhe — Início da paciente</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&amp;family=Schibsted+Grotesk:wght@400;500;600;700&amp;display=swap">
+<style>
+body{margin:0}
+*{box-sizing:border-box}
+a{color:#4040D6}a:hover{color:#1C1A5E}
+.mono{font-family:'IBM Plex Mono',ui-monospace,monospace}
+@keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.rise{animation:rise .7s cubic-bezier(.2,.7,.2,1) both}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.fade{animation:fade .4s cubic-bezier(.2,.7,.2,1) both}
+@keyframes breathe{0%,100%{transform:scale(.6);opacity:.35}50%{transform:scale(1);opacity:1}}
+.ring{position:absolute;inset:0;margin:auto;border-radius:50%;border:1.5px solid #4040D6;animation:breathe 11s cubic-bezier(.45,0,.55,1) infinite}
+.scroll{scrollbar-width:none}.scroll::-webkit-scrollbar{display:none}
+.mood{flex:1 1 0;height:72px;border:1px solid #DDE3F3;border-radius:14px;background:#FFFFFF;font:inherit;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:#3E4466;transition:transform .35s cubic-bezier(.2,.7,.2,1),background .3s ease,border-color .3s ease,color .3s ease}
+.mood:hover{border-color:#A7AFCF}
+.mood.on{background:#4040D6;border-color:#4040D6;color:#FFFFFF;transform:translateY(-4px)}
+.chip{height:36px;padding:0 14px;border:1px solid #DDE3F3;border-radius:18px;background:#FFFFFF;font:inherit;font-size:14px;color:#3E4466;cursor:pointer;transition:background .25s ease,border-color .25s ease,color .25s ease}
+.chip.on{background:#E6EAFD;border-color:#93A9F0;color:#1C1A5E}
+.btn{height:48px;width:100%;border:0;border-radius:12px;font:inherit;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:background .25s ease,transform .25s cubic-bezier(.2,.7,.2,1)}
+.btn:active{transform:scale(.985)}
+.btn-p{background:#4040D6;color:#FFFFFF}.btn-p:hover{background:#3232B5}
+.btn-light{background:#FFFFFF;color:#1C1A5E}.btn-light:hover{background:#E8EBFB}
+.task{display:flex;align-items:center;gap:14px;padding:16px;border-radius:14px;background:#FFFFFF;border:1px solid #DDE3F3;text-decoration:none;color:inherit;transition:border-color .2s ease,transform .3s cubic-bezier(.2,.7,.2,1)}
+.task:hover{border-color:#A7AFCF;transform:translateX(2px)}
+.tabbar a{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:56px;font-size:11px;font-weight:500;color:#5C6385;text-decoration:none}
+.tabbar a.on{color:#1C1A5E}
+@keyframes drawc{from{stroke-dashoffset:24}to{stroke-dashoffset:0}}
+.check path{stroke-dasharray:24;animation:drawc .5s cubic-bezier(.2,.7,.2,1) .1s both}
+:focus-visible{outline:2px solid #4040D6;outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; display: flex; flex-direction: column; background: #F5F7FE; color: #161A3A; font-family: 'Schibsted Grotesk', ui-sans-serif, system-ui, sans-serif; overflow: hidden">
+
+  <div class="scroll" style="flex: 1; overflow-y: auto; padding: 28px 20px 24px; display: flex; flex-direction: column; gap: 24px">
+
+    <header class="rise" style="display: flex; align-items: center; justify-content: space-between">
+      <div style="display: flex; flex-direction: column; gap: 6px">
+        <p class="mono" style="margin: 0; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: #5C6385">Quinta · 9 out</p>
+        <h1 style="margin: 0; font-size: 30px; font-weight: 600; letter-spacing: -0.03em">Oi, Júlia.</h1>
+      </div>
+      <a href="AjustesPaciente.dc.html" aria-label="Seu perfil" style="width: 44px; height: 44px; border-radius: 50%; background: #E6EAFD; color: #2B2E9E; font-size: 14px; font-weight: 600; display: flex; align-items: center; justify-content: center; text-decoration: none">JA</a>
+    </header>
+
+    <section class="rise" aria-labelledby="t-sessao" style="animation-delay: .08s; padding: 20px; border-radius: 18px; background: #1C1A5E; color: #E8EBFB; display: flex; flex-direction: column; gap: 14px">
+      <h2 id="t-sessao" class="mono" style="margin: 0; font-size: 11px; font-weight: 500; letter-spacing: .14em; text-transform: uppercase; color: #A9B2E8">Sua próxima sessão</h2>
+      <div>
+        <p style="margin: 0; font-size: 24px; font-weight: 600; letter-spacing: -0.02em; color: #FFFFFF">Hoje, 14h00</p>
+        <p style="margin: 4px 0 0; font-size: 14px; color: #C3CAF0">Online · 50 min · com Mariana</p>
+      </div>
+      <div aria-live="polite">
+        <sc-if value="{{notConfirmed}}" hint-placeholder-val="{{ true }}">
+          <button type="button" class="btn btn-light" onClick="{{confirm}}">Confirmar presença</button>
+        </sc-if>
+        <sc-if value="{{confirmed}}" hint-placeholder-val="{{ false }}">
+          <p class="fade" style="margin: 0; height: 48px; display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 500; color: #FF8A70">
+            <svg class="check" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg>
+            Presença confirmada.
+          </p>
+        </sc-if>
+      </div>
+    </section>
+
+    <section class="rise" id="check-in" aria-labelledby="t-check" style="animation-delay: .16s; padding: 20px; border-radius: 18px; background: #FFFFFF; border: 1px solid #DDE3F3; display: flex; flex-direction: column; gap: 16px">
+      <sc-if value="{{notDone}}" hint-placeholder-val="{{ true }}">
+        <div style="display: flex; flex-direction: column; gap: 16px">
+          <div style="display: flex; justify-content: space-between; align-items: baseline">
+            <h2 id="t-check" style="margin: 0; font-size: 18px; font-weight: 600; letter-spacing: -0.01em">Como você está agora?</h2>
+            <span style="font-size: 12px; color: #5C6385">visível para você e sua psicóloga</span>
+          </div>
+          <div role="radiogroup" aria-label="Humor de agora" style="display: flex; gap: 6px">
+            <sc-for list="{{moods}}" as="m" hint-placeholder-count="5">
+              <button type="button" role="radio" class="{{m.cls}}" aria-checked="{{m.on}}" onClick="{{m.pick}}">
+                <span aria-hidden="true" style="width: 22px; height: 22px; border-radius: 50%; {{m.dot}}"></span>
+                <span style="font-size: 12px; font-weight: 500">{{m.label}}</span>
+              </button>
+            </sc-for>
+          </div>
+          <sc-if value="{{hasMood}}" hint-placeholder-val="{{ false }}">
+            <div class="fade" style="display: flex; flex-direction: column; gap: 14px">
+              <p style="margin: 0; font-size: 14px; color: #3E4466">Quer marcar o que está sentindo? <span style="color: #5C6385">(opcional)</span></p>
+              <div style="display: flex; flex-wrap: wrap; gap: 8px">
+                <sc-for list="{{feelings}}" as="f" hint-placeholder-count="6">
+                  <button type="button" class="{{f.cls}}" aria-pressed="{{f.on}}" onClick="{{f.pick}}">{{f.label}}</button>
+                </sc-for>
+              </div>
+              <button type="button" class="btn btn-p" onClick="{{save}}">Registrar</button>
+            </div>
+          </sc-if>
+        </div>
+      </sc-if>
+      <sc-if value="{{done}}" hint-placeholder-val="{{ false }}">
+        <div class="fade" aria-live="polite" style="display: flex; align-items: center; gap: 18px; padding: 4px 0">
+          <div aria-hidden="true" style="position: relative; width: 64px; height: 64px; flex: none">
+            <div class="ring" style="width: 64px; height: 64px"></div>
+            <div class="ring" style="width: 40px; height: 40px; animation-delay: .3s"></div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 4px">
+            <p style="margin: 0; font-size: 16px; font-weight: 600">Check-in salvo.</p>
+            <p style="margin: 0; font-size: 14px; line-height: 1.45; color: #3E4466">Você pode editar até o fim do dia.</p>
+            <button type="button" onClick="{{redo}}" style="align-self: flex-start; margin-top: 4px; padding: 0; border: 0; background: none; font: inherit; font-size: 13px; color: #4040D6; text-decoration: underline; text-underline-offset: 3px; cursor: pointer">Editar check-in de hoje</button>
+          </div>
+        </div>
+      </sc-if>
+    </section>
+
+    <section class="rise" id="atividades" aria-labelledby="t-ativ" style="animation-delay: .24s; display: flex; flex-direction: column; gap: 12px">
+      <div style="display: flex; justify-content: space-between; align-items: baseline">
+        <h2 id="t-ativ" style="margin: 0; font-size: 18px; font-weight: 600; letter-spacing: -0.01em">Atividades</h2>
+        <span class="mono" style="font-size: 12px; color: #5C6385">2 pendentes</span>
+      </div>
+      <a href="Responder.dc.html" class="task">
+        <span aria-hidden="true" style="width: 40px; height: 40px; border-radius: 12px; background: #E6EAFD; color: #4040D6; display: flex; align-items: center; justify-content: center; flex: none"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"></path></svg></span>
+        <span style="display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0">
+          <span style="font-size: 15px; font-weight: 600">Registro de pensamentos</span>
+          <span style="font-size: 13px; color: #9E3522">até amanhã, 14h · 4 perguntas</span>
+        </span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5C6385" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg>
+      </a>
+      <a href="#" class="task">
+        <span aria-hidden="true" style="width: 40px; height: 40px; border-radius: 12px; background: #E6EAFD; color: #4040D6; display: flex; align-items: center; justify-content: center; flex: none"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"></path></svg></span>
+        <span style="display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0">
+          <span style="font-size: 15px; font-weight: 600">Diário do sono</span>
+          <span style="font-size: 13px; color: #5C6385">esta semana · 3 perguntas</span>
+        </span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5C6385" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg>
+      </a>
+    </section>
+  </div>
+
+  <nav class="tabbar" aria-label="Navegação" style="display: flex; padding: 4px 8px 12px; background: #FFFFFF; border-top: 1px solid #DDE3F3">
+    <a href="Paciente.dc.html" class="on" aria-current="page"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 11l8-6 8 6v8a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1z"></path></svg>Início</a>
+    <a href="AtividadesPaciente.dc.html"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5h10M9 12h10M9 19h10M4.5 5l.5.5L6.5 4M4.5 12l.5.5 1.5-1.5M4.5 19l.5.5 1.5-1.5"></path></svg>Atividades</a>
+    <a href="CheckinPaciente.dc.html"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><circle cx="12" cy="12" r="3.5"></circle></svg>Check-in</a>
+    <a href="ProntuarioPaciente.dc.html"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"></path><path d="M3 3v5h5M12 7v5l3 2"></path></svg>Histórico</a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { confirmed: false, mood: 0, feelings: [], done: false };
+  }
+  renderVals() {
+    const s = this.state;
+    const labels = ['Difícil', 'Pesado', 'Neutro', 'Leve', 'Bem'];
+    const shades = ['#E9EDFB', '#C6D2F7', '#93A9F0', '#6470E6', '#4040D6'];
+    const feelingList = ['Ansiedade', 'Cansaço', 'Calma', 'Foco', 'Tristeza', 'Esperança'];
+    return {
+      notConfirmed: !s.confirmed,
+      confirmed: s.confirmed,
+      confirm: () => this.setState({ confirmed: true }),
+      moods: labels.map((label, i) => {
+        const on = s.mood === i + 1;
+        return {
+          label: label, on: on,
+          cls: on ? 'mood on' : 'mood',
+          dot: 'background: ' + shades[i] + (on ? '; box-shadow: 0 0 0 2px #FFFFFF' : '; box-shadow: inset 0 0 0 1px rgba(22,26,58,.12)'),
+          pick: () => this.setState({ mood: i + 1 })
+        };
+      }),
+      hasMood: s.mood > 0,
+      feelings: feelingList.map((f) => {
+        const on = s.feelings.indexOf(f) >= 0;
+        return {
+          label: f, on: on,
+          cls: on ? 'chip on' : 'chip',
+          pick: () => this.setState({ feelings: on ? s.feelings.filter((x) => x !== f) : s.feelings.concat([f]) })
+        };
+      }),
+      notDone: !s.done,
+      done: s.done,
+      save: () => this.setState({ done: true }),
+      redo: () => this.setState({ done: false })
+    };
+  }
+}
+</script>
+</body>
+</html>

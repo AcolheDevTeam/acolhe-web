@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Acolhe — Aceitar convite</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&amp;family=Schibsted+Grotesk:wght@400;500;600;700&amp;display=swap">
+<style>
+body{margin:0}
+*{box-sizing:border-box}
+a{color:#4040D6}a:hover{color:#1C1A5E}
+.mono{font-family:'IBM Plex Mono',ui-monospace,monospace}
+@keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.rise{animation:rise .7s cubic-bezier(.2,.7,.2,1) both}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.fade{animation:fade .4s cubic-bezier(.2,.7,.2,1) both}
+.rb path{stroke-dasharray:1;animation:arcdraw 1s cubic-bezier(.65,0,.35,1) backwards}
+.rb path:nth-child(2){animation-delay:.2s}.rb path:nth-child(3){animation-delay:.4s}
+@keyframes arcdraw{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+.scroll{scrollbar-width:none}.scroll::-webkit-scrollbar{display:none}
+.consent{display:flex;gap:14px;align-items:flex-start;padding:14px 0;border-bottom:1px solid #EFF2FB}
+.switch{position:relative;width:48px;height:28px;flex:none;border:0;border-radius:14px;background:#CBD2EA;cursor:pointer;transition:background .3s cubic-bezier(.2,.7,.2,1)}
+.switch::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#FFFFFF;box-shadow:0 1px 3px rgba(22,26,58,.2);transition:transform .35s cubic-bezier(.2,.7,.2,1)}
+.switch.on{background:#4040D6}
+.switch.on::after{transform:translateX(20px)}
+.inp{width:100%;height:48px;padding:0 14px;border:1px solid #CBD2EA;border-radius:10px;background:#FFFFFF;font:inherit;font-size:15px;color:#161A3A;outline:none;transition:border-color .2s ease,box-shadow .2s ease}
+.inp::placeholder{color:#868DAD}
+.inp:focus{border-color:#4040D6;box-shadow:0 0 0 4px rgba(64,64,214,.14)}
+.btn{height:50px;width:100%;border-radius:12px;font:inherit;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:background .25s ease,transform .25s cubic-bezier(.2,.7,.2,1),opacity .25s ease}
+.btn:active{transform:scale(.985)}
+.btn-p{border:0;background:#4040D6;color:#FFFFFF}.btn-p:hover{background:#3232B5}
+.btn-p:disabled{opacity:.45;cursor:not-allowed}
+.btn-q{border:0;background:transparent;color:#3E4466}.btn-q:hover{background:#ECEFFB}
+@keyframes drawc{from{stroke-dashoffset:24}to{stroke-dashoffset:0}}
+.drawc path{stroke-dasharray:24;animation:drawc .5s cubic-bezier(.2,.7,.2,1) .15s both}
+:focus-visible{outline:2px solid #4040D6;outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition-duration:.01ms!important}}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; display: flex; flex-direction: column; background: #F5F7FE; color: #161A3A; font-family: 'Schibsted Grotesk', ui-sans-serif, system-ui, sans-serif; overflow: hidden">
+
+  <header class="rise" style="display: flex; align-items: center; justify-content: space-between; padding: 20px 20px 12px">
+    <span style="display: flex; align-items: center; gap: 8px">
+      <svg class="rb" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#4040D6" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path pathLength="1" d="M22 17a10 10 0 0 0-20 0"></path><path pathLength="1" d="M18 17a6 6 0 0 0-12 0" stroke="#FF7A5C"></path><path pathLength="1" d="M14 17a2 2 0 0 0-4 0" stroke="#1C1A5E"></path></svg>
+      <span style="font-size: 18px; font-weight: 600; letter-spacing: -0.02em">Acolhe</span>
+    </span>
+    <span class="mono" style="font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: #5C6385">Convite</span>
+  </header>
+
+  <div class="scroll" style="flex: 1; overflow-y: auto; padding: 8px 20px 24px">
+
+    <sc-if value="{{isForm}}" hint-placeholder-val="{{ true }}">
+      <div style="display: flex; flex-direction: column; gap: 20px">
+        <section class="rise" style="animation-delay: .06s; display: flex; align-items: center; gap: 14px; padding: 16px; border-radius: 16px; background: #1C1A5E; color: #E8EBFB">
+          <span aria-hidden="true" style="width: 48px; height: 48px; border-radius: 50%; background: #FF8A70; color: #1C1A5E; font-size: 16px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex: none">MS</span>
+          <span style="display: flex; flex-direction: column; gap: 2px">
+            <span class="mono" style="font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: #A9B2E8">Convite de</span>
+            <span style="font-size: 17px; font-weight: 600; color: #FFFFFF">Mariana Sá</span>
+            <span style="font-size: 13px; color: #C3CAF0">Psicóloga · CRP 06/123456</span>
+          </span>
+        </section>
+
+        <div class="rise" style="animation-delay: .12s">
+          <h1 style="margin: 0; font-size: 26px; line-height: 1.2; font-weight: 600; letter-spacing: -0.025em">Olá, Júlia.</h1>
+          <p style="margin: 8px 0 0; font-size: 15px; line-height: 1.55; color: #3E4466">Antes de criar sua conta, veja como seus dados serão usados. Você pode mudar essas escolhas depois em Ajustes.</p>
+        </div>
+
+        <section class="rise" aria-labelledby="t-cons" style="animation-delay: .18s; padding: 4px 16px; border-radius: 16px; background: #FFFFFF; border: 1px solid #DDE3F3">
+          <h2 id="t-cons" class="mono" style="margin: 12px 0 0; font-size: 11px; font-weight: 500; letter-spacing: .14em; text-transform: uppercase; color: #5C6385">Consentimento · LGPD</h2>
+          <sc-for list="{{consents}}" as="c" hint-placeholder-count="3">
+            <div class="consent">
+              <span style="display: flex; flex-direction: column; gap: 4px; flex: 1">
+                <span id="{{c.id}}" style="font-size: 15px; font-weight: 600">{{c.title}} <span style="font-size: 12px; font-weight: 500; {{c.tagStyle}}">{{c.tag}}</span></span>
+                <span style="font-size: 13px; line-height: 1.5; color: #3E4466">{{c.text}}</span>
+              </span>
+              <button type="button" role="switch" class="{{c.cls}}" aria-checked="{{c.on}}" aria-labelledby="{{c.id}}" onClick="{{c.pick}}"></button>
+            </div>
+          </sc-for>
+          <p style="margin: 12px 0; font-size: 12px; line-height: 1.5; color: #5C6385">Seu aceite fica registrado com data, IP e versão do documento (Termos e Política de Privacidade v0.3).</p>
+        </section>
+
+        <section class="rise" aria-labelledby="t-senha" style="animation-delay: .24s; display: flex; flex-direction: column; gap: 12px">
+          <h2 id="t-senha" style="margin: 0; font-size: 17px; font-weight: 600">Crie sua senha</h2>
+          <div style="display: flex; flex-direction: column; gap: 6px"><span style="font-size: 13px; font-weight: 500">E-mail</span><p style="margin: 0; height: 48px; padding: 0 14px; border-radius: 10px; background: #EFF2FB; color: #3E4466; font-size: 15px; display: flex; align-items: center">julia@exemplo.com</p></div>
+          <div style="display: flex; flex-direction: column; gap: 6px"><label for="v-senha" style="font-size: 13px; font-weight: 500">Senha</label><input id="v-senha" class="inp" type="password" autocomplete="new-password" placeholder="Mínimo de 8 caracteres"></div>
+          <div style="display: flex; flex-direction: column; gap: 6px"><label for="v-senha2" style="font-size: 13px; font-weight: 500">Repita a senha</label><input id="v-senha2" class="inp" type="password" autocomplete="new-password"></div>
+        </section>
+
+        <div class="rise" style="animation-delay: .3s; display: flex; flex-direction: column; gap: 8px">
+          <button type="button" class="btn btn-p" disabled="{{cantAccept}}" onClick="{{accept}}">Aceitar e criar conta</button>
+          <sc-if value="{{cantAccept}}" hint-placeholder-val="{{ true }}"><p class="fade" style="margin: 0; font-size: 13px; text-align: center; color: #5C6385">O uso de dados de saúde é necessário para o acompanhamento.</p></sc-if>
+          <button type="button" class="btn btn-q" onClick="{{decline}}">Recusar convite</button>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{isDone}}" hint-placeholder-val="{{ false }}">
+      <div class="fade" aria-live="polite" style="min-height: 640px; display: flex; flex-direction: column; justify-content: center; gap: 18px">
+        <span aria-hidden="true" style="width: 64px; height: 64px; border-radius: 50%; background: #E6EAFD; color: #4040D6; display: flex; align-items: center; justify-content: center">
+          <svg class="drawc" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg>
+        </span>
+        <h1 style="margin: 0; font-size: 26px; font-weight: 600; letter-spacing: -0.025em">Conta criada</h1>
+        <p style="margin: 0; font-size: 15px; line-height: 1.55; color: #3E4466">Você já está vinculada à Mariana Sá. Sua próxima sessão e as atividades aparecem no início.</p>
+        <a href="Paciente.dc.html" class="btn btn-p" style="text-decoration: none">Ir para o início</a>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{isDeclined}}" hint-placeholder-val="{{ false }}">
+      <div class="fade" aria-live="polite" style="min-height: 640px; display: flex; flex-direction: column; justify-content: center; gap: 18px">
+        <h1 style="margin: 0; font-size: 26px; font-weight: 600; letter-spacing: -0.025em">Convite recusado</h1>
+        <p style="margin: 0; font-size: 15px; line-height: 1.55; color: #3E4466">Nenhuma conta foi criada e nenhum dado seu foi guardado. Se mudar de ideia, peça um novo convite à sua psicóloga.</p>
+        <button type="button" class="btn btn-q" style="border: 1px solid #CBD2EA" onClick="{{undo}}">Voltar ao convite</button>
+      </div>
+    </sc-if>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { view: 'form', on: [false, true, false] };
+  }
+  renderVals() {
+    const s = this.state;
+    const defs = [
+      ['Dados de saúde', 'Obrigatório', 'Sua psicóloga registra prontuário, atividades e respostas, conforme a Resolução CFP 01/2009.'],
+      ['Lembretes por e-mail', 'Opcional', 'Avisos de sessão e de atividades pendentes, sem conteúdo clínico no texto.'],
+      ['Estatística anônima', 'Opcional', 'Uso do Acolhe em números agregados, sem ligação com seus dados clínicos.']
+    ];
+    return {
+      isForm: s.view === 'form', isDone: s.view === 'done', isDeclined: s.view === 'declined',
+      consents: defs.map((d, i) => ({
+        id: 'cons-' + i, title: d[0], tag: d[1], text: d[2], on: s.on[i],
+        tagStyle: i === 0 ? 'color: #9E3522' : 'color: #5C6385',
+        cls: s.on[i] ? 'switch on' : 'switch',
+        pick: () => { const n = s.on.slice(); n[i] = !n[i]; this.setState({ on: n }); }
+      })),
+      cantAccept: !s.on[0],
+      accept: () => this.setState({ view: 'done' }),
+      decline: () => this.setState({ view: 'declined' }),
+      undo: () => this.setState({ view: 'form' })
+    };
+  }
+}
+</script>
+</body>
+</html>

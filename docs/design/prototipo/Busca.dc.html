@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Acolhe — Busca rápida</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&amp;family=Schibsted+Grotesk:wght@400;500;600;700&amp;display=swap">
+<style>
+body{margin:0;background:#F5F7FE}
+*{box-sizing:border-box}
+a{color:#4040D6}a:hover{color:#1C1A5E}
+.mono{font-family:'IBM Plex Mono',ui-monospace,monospace}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.fade{animation:fade .3s cubic-bezier(.2,.7,.2,1) both}
+@keyframes dim{from{opacity:0}to{opacity:1}}
+.scrim{animation:dim .35s ease both}
+@keyframes pop{from{opacity:0;transform:scale(.96) translateY(8px)}to{opacity:1;transform:none}}
+.dialog{animation:pop .42s cubic-bezier(.2,.7,.2,1) .05s both}
+.qin{width:100%;height:56px;padding:0 16px 0 48px;border:0;border-bottom:1px solid #DDE3F3;background:transparent;font:inherit;font-size:17px;color:#161A3A;outline:none}
+.qin::placeholder{color:#868DAD}
+.res{display:flex;align-items:center;gap:12px;min-height:48px;padding:8px 12px;border-radius:10px;color:#161A3A;text-decoration:none;transition:background .2s ease}
+.res:hover{color:#161A3A}
+.res.sel{background:#E6EAFD}
+.res .enter{opacity:0;transition:opacity .2s ease}
+.res.sel .enter{opacity:1}
+.kbd{min-width:28px;height:26px;padding:0 7px;border:1px solid #CBD2EA;border-bottom-width:2px;border-radius:6px;background:#FFFFFF;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:12px;color:#3E4466;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;transition:background .2s ease,border-color .2s ease}
+.kbd:hover{background:#F5F7FE;border-color:#A7AFCF}
+.qchip{height:30px;padding:0 12px;border:1px solid #DDE3F3;border-radius:15px;background:#FFFFFF;font:inherit;font-size:13px;color:#3E4466;cursor:pointer;transition:background .2s ease,border-color .2s ease,color .2s ease}
+.qchip:hover{border-color:#A7AFCF}
+.qchip.on{background:#1C1A5E;border-color:#1C1A5E;color:#FFFFFF}
+.bgcard{background:#FFFFFF;border:1px solid #DDE3F3;border-radius:16px}
+:focus-visible{outline:2px solid #4040D6;outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition-duration:.01ms!important}}
+</style>
+</helmet>
+<div style="position: relative; min-height: 1000px; background: #F5F7FE; color: #161A3A; font-family: 'Schibsted Grotesk', ui-sans-serif, system-ui, sans-serif; overflow: hidden">
+
+  <div aria-hidden="true" style="display: flex; flex-wrap: wrap; min-height: 1000px; filter: saturate(.7)">
+    <div style="flex: 1 1 248px; max-width: 264px; padding: 24px 16px; border-right: 1px solid #DDE3F3; display: flex; flex-direction: column; gap: 10px">
+      <div style="display: flex; align-items: center; gap: 10px; padding: 0 12px 16px">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#4040D6" stroke-width="2" stroke-linecap="round"><path d="M22 17a10 10 0 0 0-20 0"></path><path d="M18 17a6 6 0 0 0-12 0" stroke="#FF7A5C"></path><path d="M14 17a2 2 0 0 0-4 0" stroke="currentColor"></path></svg>
+        <span style="font-size: 18px; font-weight: 600; letter-spacing: -0.02em">Acolhe</span>
+      </div>
+      <div style="height: 40px; border-radius: 10px; background: #E6EAFD"></div>
+      <div style="height: 14px; width: 60%; margin: 13px 12px; border-radius: 7px; background: #DDE3F3"></div>
+      <div style="height: 14px; width: 50%; margin: 13px 12px; border-radius: 7px; background: #DDE3F3"></div>
+      <div style="height: 14px; width: 65%; margin: 13px 12px; border-radius: 7px; background: #DDE3F3"></div>
+      <div style="height: 14px; width: 55%; margin: 13px 12px; border-radius: 7px; background: #DDE3F3"></div>
+    </div>
+    <div style="flex: 999 1 560px; min-width: 0; padding: 24px clamp(16px, 4vw, 48px); display: flex; flex-direction: column; gap: 28px">
+      <div style="height: 40px; max-width: 480px; border: 1px solid #DDE3F3; border-radius: 10px; background: #FFFFFF"></div>
+      <div style="display: flex; flex-direction: column; gap: 10px">
+        <span class="mono" style="font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: #5C6385">Quinta · 9 de outubro</span>
+        <span style="font-size: 40px; font-weight: 600; letter-spacing: -0.03em">Bom dia, Mariana.</span>
+      </div>
+      <div style="display: flex; flex-wrap: wrap; gap: 24px">
+        <div class="bgcard" style="flex: 2 1 460px; height: 360px"></div>
+        <div class="bgcard" style="flex: 1 1 300px; height: 360px"></div>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px">
+        <div class="bgcard" style="height: 96px"></div>
+        <div class="bgcard" style="height: 96px"></div>
+        <div class="bgcard" style="height: 96px"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="scrim" aria-hidden="true" style="position: absolute; inset: 0; background: rgba(22,26,58,.42)"></div>
+
+  <div style="position: absolute; inset: 0; display: flex; justify-content: center; align-items: flex-start; padding: 96px 16px 24px">
+    <div class="dialog" role="dialog" aria-modal="true" aria-label="Busca rápida" style="width: 100%; max-width: 640px; background: #FFFFFF; border-radius: 18px; box-shadow: 0 30px 80px rgba(22,26,58,.35); overflow: hidden; display: flex; flex-direction: column">
+      <div style="position: relative">
+        <label for="q" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Buscar no Acolhe</label>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4040D6" stroke-width="2" stroke-linecap="round" aria-hidden="true" style="position: absolute; left: 16px; top: 18px"><circle cx="11" cy="11" r="6.5"></circle><path d="M20 20l-4-4"></path></svg>
+        <input id="q" class="qin" type="text" autocomplete="off" placeholder="Buscar paciente, sessão, documento ou ação" value="{{query}}" onChange="{{setQuery}}" autofocus="{{ true }}" aria-controls="resultados" aria-activedescendant="{{activeId}}">
+        <span class="kbd" aria-hidden="true" style="position: absolute; right: 14px; top: 15px; cursor: default">Esc</span>
+      </div>
+
+      <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 12px 16px; border-bottom: 1px solid #EFF2FB">
+        <span style="font-size: 12px; color: #5C6385">Exemplos:</span>
+        <sc-for list="{{examples}}" as="e" hint-placeholder-count="4">
+          <button type="button" class="{{e.cls}}" aria-pressed="{{e.on}}" onClick="{{e.pick}}">{{e.label}}</button>
+        </sc-for>
+      </div>
+
+      <div id="resultados" role="listbox" aria-label="Resultados" class="{{listCls}}" style="max-height: 440px; overflow-y: auto; padding: 8px">
+        <sc-if value="{{isEmpty}}" hint-placeholder-val="{{ false }}">
+          <div class="fade" style="padding: 40px 16px; display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center">
+            <p style="margin: 0; font-size: 15px; font-weight: 600">Nenhum resultado para "{{query}}".</p>
+            <p style="margin: 0; font-size: 14px; color: #5C6385">Confira a grafia ou busque pelo nome da paciente.</p>
+          </div>
+        </sc-if>
+        <sc-for list="{{groups}}" as="g" hint-placeholder-count="4">
+          <div class="fade" role="group" aria-label="{{g.title}}" style="padding: 4px 0 8px">
+            <p class="mono" style="margin: 6px 12px; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: #5C6385">{{g.title}}</p>
+            <sc-for list="{{g.items}}" as="r" hint-placeholder-count="3">
+              <a id="{{r.domId}}" href="{{r.href}}" role="option" aria-selected="{{r.sel}}" class="{{r.cls}}" onMouseEnter="{{r.hover}}">
+                <span aria-hidden="true" style="width: 32px; height: 32px; flex: none; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; {{r.iconStyle}}">{{r.badge}}</span>
+                <span style="display: flex; flex-direction: column; gap: 1px; flex: 1; min-width: 0">
+                  <span style="font-size: 15px; font-weight: 500">{{r.title}}</span>
+                  <span style="font-size: 13px; color: #5C6385">{{r.meta}}</span>
+                </span>
+                <span class="enter mono" aria-hidden="true" style="font-size: 12px; color: #2B2E9E">Enter ↵</span>
+              </a>
+            </sc-for>
+          </div>
+        </sc-for>
+      </div>
+
+      <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 16px; padding: 12px 16px; border-top: 1px solid #DDE3F3; background: #FAFBFF; font-size: 12px; color: #5C6385">
+        <span style="display: inline-flex; align-items: center; gap: 6px">
+          <button type="button" class="kbd" aria-label="Resultado anterior" onClick="{{up}}">↑</button>
+          <button type="button" class="kbd" aria-label="Próximo resultado" onClick="{{down}}">↓</button>
+          navegar
+        </span>
+        <span style="display: inline-flex; align-items: center; gap: 6px"><a href="{{activeHref}}" class="kbd" style="text-decoration: none" aria-label="Abrir resultado selecionado">Enter</a>abrir</span>
+        <span style="display: inline-flex; align-items: center; gap: 6px"><a href="Dashboard.dc.html" class="kbd" style="text-decoration: none" aria-label="Fechar busca">Esc</a>fechar</span>
+        <span style="margin-left: auto">{{countText}}</span>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1000}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { query: '', sel: 0 };
+  }
+  renderVals() {
+    const s = this.state;
+    const P = 'background: #E6EAFD; color: #2B2E9E';
+    const S = 'background: #EFF2FB; color: #3E4466';
+    const D = 'background: #FDEBE7; color: #9E3522';
+    const A = 'background: #1C1A5E; color: #FF8A70';
+    const data = [
+      { group: 'Pacientes', title: 'Júlia Andrade', meta: 'TCC · próxima sessão hoje, 14h', badge: 'JA', icon: P, href: 'Ficha.dc.html', keys: 'julia andrade ju' },
+      { group: 'Pacientes', title: 'Pedro Tavares', meta: 'TCC · 1 resposta para revisar', badge: 'PT', icon: P, href: 'Ficha.dc.html', keys: 'pedro tavares' },
+      { group: 'Pacientes', title: 'Rita Lopes', meta: 'Esquema · sem acesso há 5 dias', badge: 'RL', icon: P, href: 'Ficha.dc.html', keys: 'rita lopes' },
+      { group: 'Pacientes', title: 'Henrique Brito', meta: 'ACT · próxima sessão terça, 10h', badge: 'HB', icon: P, href: 'Ficha.dc.html', keys: 'henrique brito' },
+      { group: 'Sessões', title: 'Sessão 28 · Júlia Andrade', meta: 'Hoje, 14h · online', badge: 'S28', icon: S, href: 'Sessao.dc.html', keys: 'sessao sessão julia ju 28' },
+      { group: 'Sessões', title: 'Sessão 42 · Pedro Tavares', meta: 'Hoje, 9h · realizada', badge: 'S42', icon: S, href: 'Sessao.dc.html', keys: 'sessao sessão pedro 42' },
+      { group: 'Sessões', title: 'Sessão 9 · Rita Lopes', meta: 'Hoje, 11h · falta registrada', badge: 'S9', icon: S, href: 'Sessao.dc.html', keys: 'sessao sessão rita 9' },
+      { group: 'Documentos', title: 'Declaração de comparecimento 0941-DC-2026', meta: 'Júlia Andrade · 9 out', badge: 'DC', icon: D, href: 'Documentos.dc.html', keys: 'declaracao declaração documento julia ju 0941' },
+      { group: 'Documentos', title: 'Recibo 0938-RC-2026', meta: 'Pedro Tavares · 8 out', badge: 'RC', icon: D, href: 'Documentos.dc.html', keys: 'recibo documento pedro 0938' },
+      { group: 'Ações', title: 'Agendar sessão', meta: 'Abre a agenda com um novo horário', badge: '+', icon: A, href: 'Agenda.dc.html', keys: 'agendar sessao sessão nova horario' },
+      { group: 'Ações', title: 'Novo paciente', meta: 'Cadastrar e enviar convite', badge: '+', icon: A, href: 'Pacientes.dc.html', keys: 'novo paciente convite cadastrar' },
+      { group: 'Ações', title: 'Emitir declaração', meta: 'Comparecimento, atestado ou recibo', badge: '+', icon: A, href: 'Declaracao.dc.html', keys: 'emitir declaracao declaração documento atestado recibo' }
+    ];
+    const q = s.query.trim().toLowerCase();
+    const norm = (t) => t.normalize('NFD').replace(/[̀-ͯ]/g, '');
+    const found = data.filter((d) => !q || norm(d.keys + ' ' + d.title.toLowerCase()).indexOf(norm(q)) >= 0);
+    const flat = q ? found : found.filter((d, i) => d.group !== 'Pacientes' || i < 3);
+    const sel = flat.length ? Math.min(s.sel, flat.length - 1) : 0;
+    const titles = ['Pacientes', 'Sessões', 'Documentos', 'Ações'];
+    const groups = titles.map((t) => ({
+      title: t,
+      items: flat.map((d, idx) => ({ d: d, idx: idx })).filter((x) => x.d.group === t).map((x) => ({
+        domId: 'res-' + x.idx,
+        title: x.d.title, meta: x.d.meta, badge: x.d.badge, iconStyle: x.d.icon, href: x.d.href,
+        sel: x.idx === sel,
+        cls: x.idx === sel ? 'res sel' : 'res',
+        hover: () => this.setState({ sel: x.idx })
+      }))
+    })).filter((g) => g.items.length > 0);
+    const exampleList = ['', 'ju', 'sessão', 'declaração', 'xyz'];
+    return {
+      query: s.query,
+      setQuery: (e) => this.setState({ query: e && e.target ? e.target.value : '', sel: 0 }),
+      examples: exampleList.map((x) => ({ label: x || 'Vazio', on: s.query === x, cls: s.query === x ? 'qchip on' : 'qchip', pick: () => this.setState({ query: x, sel: 0 }) })),
+      listCls: 'fade q-' + q,
+      isEmpty: flat.length === 0,
+      groups: groups,
+      activeId: flat.length ? 'res-' + sel : '',
+      activeHref: flat.length ? flat[sel].href : '#',
+      up: () => this.setState({ sel: Math.max(0, sel - 1) }),
+      down: () => this.setState({ sel: Math.min(flat.length - 1, sel + 1) }),
+      countText: flat.length === 1 ? '1 resultado' : flat.length + ' resultados'
+    };
+  }
+}
+</script>
+</body>
+</html>

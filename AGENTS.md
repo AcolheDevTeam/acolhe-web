@@ -25,22 +25,27 @@ Em caso de conflito entre este `AGENTS.md` e o guia, o guia prevalece.
 
 ## Regra 1 — sempre consultar o design antes de mexer em tela
 
-O design de referência está versionado no repo:
+O design de referência, desde 2026-10-09, é o protótipo "Acolhe — novo design"
+(41 telas), versionado no repo:
 
 ```
-docs/design/acolhe-telas.pdf
+docs/design/prototipo/*.dc.html      # uma tela por arquivo (HTML com estilos inline)
+docs/design/prototipo/canvas.json    # título de cada tela e as seções
+docs/design/novo-design.md           # tokens, componentes e mapa tela × rota
 ```
 
-Antes de **criar ou alterar qualquer tela/componente visual**, abra o PDF e
-localize a tela correspondente — layout, textos, hierarquia e navegação devem
-espelhar o print. As telas são numeradas (ex.: "14 / 20 — Revisar resposta") e
-agrupadas por seção ("PSICÓLOGO · ATIVIDADES"). Para achar a página certa:
+Antes de **criar ou alterar qualquer tela/componente visual**, abra o arquivo da
+tela correspondente (o título está em `canvas.json`) e o mapa em
+`novo-design.md` — layout, textos, hierarquia e navegação devem espelhar o
+protótipo. Os `.dc.html` são protótipos: `{{x}}`, `<sc-if>` e `<sc-for>` são
+marcação de protótipo, não código a copiar. Para achar a tela:
 
 ```bash
-pdftotext docs/design/acolhe-telas.pdf - | grep -ni "<termo>"
+grep -l "<termo>" docs/design/prototipo/*.dc.html
 ```
 
-Se um comportamento não estiver no PDF, siga o padrão das telas irmãs já
+O PDF antigo (`docs/design/acolhe-telas.pdf`, v0.3) fica só como histórico. Se um
+comportamento não estiver no protótipo, siga o padrão das telas irmãs já
 implementadas — não invente um layout novo.
 
 ## Regra 2 — UI é shadcn-vue + design system editorial

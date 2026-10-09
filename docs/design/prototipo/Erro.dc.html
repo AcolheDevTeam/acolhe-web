@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Acolhe — Erros</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&amp;family=Schibsted+Grotesk:wght@400;500;600;700&amp;display=swap">
+<style>
+body{margin:0;background:#F5F7FE}
+*{box-sizing:border-box}
+a{color:#4040D6}a:hover{color:#1C1A5E}
+.mono{font-family:'IBM Plex Mono',ui-monospace,monospace}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.fade{animation:fade .45s cubic-bezier(.2,.7,.2,1) both}
+.rb path{stroke-dasharray:1;animation:arcdraw 1s cubic-bezier(.65,0,.35,1) backwards}
+.rb path:nth-child(1){animation-delay:.1s}.rb path:nth-child(2){animation-delay:.3s}.rb path:nth-child(3){animation-delay:.5s}
+@keyframes arcdraw{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+.btn{height:48px;padding:0 20px;border-radius:12px;font:inherit;font-size:15px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;transition:background .25s ease,box-shadow .25s ease,transform .25s cubic-bezier(.2,.7,.2,1),border-color .25s ease}
+.btn:active{transform:scale(.985)}
+.btn-p{border:0;background:#4040D6;color:#FFFFFF}.btn-p:hover{background:#3232B5;color:#FFFFFF;box-shadow:0 6px 18px rgba(64,64,214,.22)}
+.btn-s{border:1px solid #CBD2EA;background:#FFFFFF;color:#161A3A}.btn-s:hover{border-color:#A7AFCF;background:#F7F8FE;color:#161A3A}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spinner{width:16px;height:16px;border-radius:50%;border:2px solid rgba(255,255,255,.35);border-top-color:#FFFFFF;animation:spin .8s linear infinite}
+.st{height:32px;padding:0 12px;border:0;border-radius:8px;background:transparent;font:inherit;font-size:13px;color:#5C6385;cursor:pointer;transition:background .25s ease,color .25s ease}
+.st:hover{color:#161A3A}
+.st.on{background:#FFFFFF;color:#161A3A;box-shadow:0 1px 2px rgba(22,26,58,.1)}
+:focus-visible{outline:2px solid #4040D6;outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition-duration:.01ms!important}}
+</style>
+</helmet>
+<div style="min-height: 900px; display: flex; flex-direction: column; background: #F5F7FE; color: #161A3A; font-family: 'Schibsted Grotesk', ui-sans-serif, system-ui, sans-serif; padding: 32px clamp(16px, 4vw, 48px)">
+
+  <header style="display: flex; flex-wrap: wrap; gap: 16px; align-items: center; justify-content: space-between">
+    <a href="Dashboard.dc.html" style="display: flex; align-items: center; gap: 8px; color: #161A3A; text-decoration: none">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4040D6" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M22 17a10 10 0 0 0-20 0"></path><path d="M18 17a6 6 0 0 0-12 0" stroke="#FF7A5C"></path><path d="M14 17a2 2 0 0 0-4 0" stroke="#1C1A5E"></path></svg>
+      <span style="font-size: 17px; font-weight: 600; letter-spacing: -0.02em">Acolhe</span>
+    </a>
+    <div role="group" aria-label="Tipo de erro de exemplo" style="display: flex; flex-wrap: wrap; gap: 4px; padding: 3px; background: #E7EBF8; border-radius: 10px">
+      <sc-for list="{{kinds}}" as="k" hint-placeholder-count="4">
+        <button type="button" class="{{k.cls}}" aria-pressed="{{k.on}}" onClick="{{k.pick}}">{{k.label}}</button>
+      </sc-for>
+    </div>
+  </header>
+
+  <main style="flex: 1; display: flex; align-items: center; justify-content: center; padding: 48px 0" aria-live="polite">
+
+    <sc-if value="{{is404}}" hint-placeholder-val="{{ true }}">
+      <div class="fade" style="max-width: 460px; display: flex; flex-direction: column; align-items: center; gap: 18px; text-align: center">
+        <svg class="rb" width="88" height="88" viewBox="0 0 24 24" fill="none" stroke="#C6D2F7" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path pathLength="1" d="M22 17a10 10 0 0 0-20 0"></path><path pathLength="1" d="M18 17a6 6 0 0 0-12 0" stroke="#FFC2B4"></path><path pathLength="1" d="M14 17a2 2 0 0 0-4 0" stroke="#93A9F0"></path></svg>
+        <p class="mono" style="margin: 0; font-size: 12px; letter-spacing: .14em; color: #5C6385">ERRO 404</p>
+        <h1 style="margin: 0; font-size: 32px; font-weight: 600; letter-spacing: -0.03em">Página não encontrada</h1>
+        <p style="margin: 0; font-size: 15px; line-height: 1.55; color: #3E4466">O endereço pode estar errado, ou a página foi removida. Se você chegou aqui por um link do Acolhe, avise o suporte.</p>
+        <a href="Dashboard.dc.html" class="btn btn-p">Voltar para o início</a>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{is500}}" hint-placeholder-val="{{ false }}">
+      <div class="fade" style="max-width: 460px; display: flex; flex-direction: column; align-items: center; gap: 18px; text-align: center">
+        <svg class="rb" width="88" height="88" viewBox="0 0 24 24" fill="none" stroke="#C6D2F7" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path pathLength="1" d="M22 17a10 10 0 0 0-20 0"></path><path pathLength="1" d="M18 17a6 6 0 0 0-12 0" stroke="#FFC2B4"></path><path pathLength="1" d="M14 17a2 2 0 0 0-4 0" stroke="#93A9F0"></path></svg>
+        <p class="mono" style="margin: 0; font-size: 12px; letter-spacing: .14em; color: #5C6385">ERRO 500</p>
+        <h1 style="margin: 0; font-size: 32px; font-weight: 600; letter-spacing: -0.03em">Algo deu errado do nosso lado</h1>
+        <p style="margin: 0; font-size: 15px; line-height: 1.55; color: #3E4466">Nenhum dado foi perdido. Tente de novo em alguns segundos. Se continuar, envie o código abaixo para o suporte.</p>
+        <div style="display: flex; align-items: center; gap: 8px; padding: 10px 14px; border: 1px solid #DDE3F3; border-radius: 10px; background: #FFFFFF">
+          <span class="mono" style="font-size: 13px; color: #3E4466">Código: 7F2A-91C4</span>
+          <button type="button" onClick="{{copy}}" style="height: 28px; padding: 0 10px; border: 0; border-radius: 6px; background: #E6EAFD; color: #2B2E9E; font: inherit; font-size: 12px; font-weight: 500; cursor: pointer">{{copyLabel}}</button>
+        </div>
+        <button type="button" class="btn btn-p" onClick="{{retry}}" disabled="{{retrying}}">
+          <sc-if value="{{retrying}}" hint-placeholder-val="{{ false }}"><span class="spinner" aria-hidden="true"></span></sc-if>
+          {{retryLabel}}
+        </button>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{isExpired}}" hint-placeholder-val="{{ false }}">
+      <div class="fade" style="max-width: 460px; display: flex; flex-direction: column; align-items: center; gap: 18px; text-align: center">
+        <div aria-hidden="true" style="width: 72px; height: 72px; border-radius: 50%; background: #E6EAFD; color: #4040D6; display: flex; align-items: center; justify-content: center">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="10.5" width="14" height="10" rx="2"></rect><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"></path></svg>
+        </div>
+        <h1 style="margin: 0; font-size: 32px; font-weight: 600; letter-spacing: -0.03em">Sua sessão foi encerrada</h1>
+        <p style="margin: 0; font-size: 15px; line-height: 1.55; color: #3E4466">Por segurança, sua sessão foi encerrada depois de 30 minutos sem uso. O que estava salvo continua salvo.</p>
+        <a href="Main.dc.html" class="btn btn-p">Entrar de novo</a>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{isOffline}}" hint-placeholder-val="{{ false }}">
+      <div class="fade" style="max-width: 460px; display: flex; flex-direction: column; align-items: center; gap: 18px; text-align: center">
+        <div aria-hidden="true" style="width: 72px; height: 72px; border-radius: 50%; background: #FDEBE7; color: #9E3522; display: flex; align-items: center; justify-content: center">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2 8.5a15 15 0 0 1 20 0M5 12a10 10 0 0 1 14 0M8.5 15.5a5 5 0 0 1 7 0"></path><circle cx="12" cy="19" r=".8" fill="currentColor"></circle><path d="M3 3l18 18"></path></svg>
+        </div>
+        <h1 style="margin: 0; font-size: 32px; font-weight: 600; letter-spacing: -0.03em">Sem conexão</h1>
+        <p style="margin: 0; font-size: 15px; line-height: 1.55; color: #3E4466">Verifique sua internet. O texto que você estava digitando fica guardado neste navegador até a conexão voltar.</p>
+        <button type="button" class="btn btn-s" onClick="{{retry}}" disabled="{{retrying}}">{{retryLabel}}</button>
+      </div>
+    </sc-if>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { kind: '404', retrying: false, copied: false };
+  }
+  componentWillUnmount() {
+    clearTimeout(this.t);
+    clearTimeout(this.c);
+  }
+  renderVals() {
+    const s = this.state;
+    const defs = [['404', 'Não encontrada'], ['500', 'Erro do servidor'], ['expired', 'Sessão expirada'], ['offline', 'Sem conexão']];
+    return {
+      kinds: defs.map((d) => ({
+        label: d[1],
+        on: s.kind === d[0],
+        cls: s.kind === d[0] ? 'st on' : 'st',
+        pick: () => { clearTimeout(this.t); this.setState({ kind: d[0], retrying: false }); }
+      })),
+      is404: s.kind === '404',
+      is500: s.kind === '500',
+      isExpired: s.kind === 'expired',
+      isOffline: s.kind === 'offline',
+      retrying: s.retrying,
+      retryLabel: s.retrying ? 'Tentando…' : 'Tentar de novo',
+      retry: () => {
+        this.setState({ retrying: true });
+        this.t = setTimeout(() => this.setState({ retrying: false }), 1500);
+      },
+      copyLabel: s.copied ? 'Copiado' : 'Copiar',
+      copy: () => {
+        this.setState({ copied: true });
+        this.c = setTimeout(() => this.setState({ copied: false }), 1800);
+      }
+    };
+  }
+}
+</script>
+</body>
+</html>

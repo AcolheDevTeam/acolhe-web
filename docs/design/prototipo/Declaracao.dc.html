@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Acolhe — Emitir declaração</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&amp;family=Schibsted+Grotesk:wght@400;500;600;700&amp;display=swap">
+<style>
+body{margin:0;background:#F5F7FE}
+*{box-sizing:border-box}
+a{color:#4040D6}a:hover{color:#1C1A5E}
+.mono{font-family:'IBM Plex Mono',ui-monospace,monospace}
+@keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.rise{animation:rise .7s cubic-bezier(.2,.7,.2,1) both}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.fade{animation:fade .36s cubic-bezier(.2,.7,.2,1) both}
+.nav{display:flex;align-items:center;gap:12px;height:40px;padding:0 12px;border-radius:10px;color:#3E4466;text-decoration:none;font-size:14px;font-weight:500;transition:background .2s ease,color .2s ease}
+.nav:hover{background:#ECEFFB;color:#161A3A}
+.nav.on{background:#E6EAFD;color:#1C1A5E}
+.btn{height:44px;padding:0 18px;border-radius:10px;font:inherit;font-size:14px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;transition:background .25s ease,box-shadow .25s ease,transform .25s cubic-bezier(.2,.7,.2,1),border-color .25s ease;white-space:nowrap}
+.btn:active{transform:scale(.985)}
+.btn-p{border:0;background:#4040D6;color:#FFFFFF}.btn-p:hover{background:#3232B5;box-shadow:0 6px 18px rgba(64,64,214,.22)}
+.btn-s{border:1px solid #CBD2EA;background:#FFFFFF;color:#161A3A}.btn-s:hover{border-color:#A7AFCF;background:#F7F8FE}
+.card{background:#FFFFFF;border:1px solid #DDE3F3;border-radius:16px}
+.opt{display:flex;flex-direction:column;align-items:flex-start;gap:4px;padding:14px;border:1px solid #DDE3F3;border-radius:12px;background:#FFFFFF;font:inherit;text-align:left;cursor:pointer;transition:border-color .25s ease,background .25s ease,box-shadow .25s ease}
+.opt:hover{border-color:#A7AFCF}
+.opt.on{border-color:#4040D6;background:#F7F8FE;box-shadow:0 0 0 3px rgba(64,64,214,.12)}
+.chk{display:flex;align-items:center;gap:12px;width:100%;min-height:44px;padding:8px 12px;border:0;border-radius:10px;background:transparent;font:inherit;font-size:14px;color:#161A3A;text-align:left;cursor:pointer;transition:background .2s ease}
+.chk:hover{background:#F5F7FE}
+.box{width:20px;height:20px;border-radius:6px;border:1.5px solid #A7AFCF;display:flex;align-items:center;justify-content:center;flex:none;transition:background .2s ease,border-color .2s ease}
+.box.on{background:#4040D6;border-color:#4040D6}
+.inp{width:100%;height:44px;padding:0 14px;border:1px solid #CBD2EA;border-radius:10px;background:#FFFFFF;font:inherit;font-size:14px;color:#161A3A;outline:none;transition:border-color .2s ease,box-shadow .2s ease}
+.inp:focus{border-color:#4040D6;box-shadow:0 0 0 4px rgba(64,64,214,.14)}
+.paper{transition:box-shadow .3s ease}
+@keyframes spin{to{transform:rotate(360deg)}}
+.tab{position:relative;height:44px;padding:0 4px;margin-right:24px;border:0;background:transparent;font:inherit;font-size:15px;font-weight:500;color:#5C6385;cursor:pointer;transition:color .25s ease}
+.tab::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;border-radius:2px;background:#4040D6;transform:scaleX(0);transition:transform .42s cubic-bezier(.2,.7,.2,1)}
+.tab.on{color:#161A3A}.tab.on::after{transform:scaleX(1)}
+:focus-visible{outline:2px solid #4040D6;outline-offset:2px}
+@media (max-width:760px){.side{max-width:none!important}.side nav{flex-direction:row!important;flex-wrap:wrap}.side .sec{display:none!important}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition-duration:.01ms!important}}
+</style>
+</helmet>
+<div style="min-height: 1000px; display: flex; flex-wrap: wrap; background: #F5F7FE; color: #161A3A; font-family: 'Schibsted Grotesk', ui-sans-serif, system-ui, sans-serif">
+
+  <aside class="side" style="flex: 1 1 248px; max-width: 264px; padding: 24px 16px; border-right: 1px solid #DDE3F3; display: flex; flex-direction: column; gap: 24px">
+    <a href="Main.dc.html" aria-label="Acolhe, ir para o login" style="display: flex; align-items: center; gap: 10px; padding: 0 12px; color: #161A3A; text-decoration: none">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#4040D6" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M22 17a10 10 0 0 0-20 0"></path><path d="M18 17a6 6 0 0 0-12 0" stroke="#FF7A5C"></path><path d="M14 17a2 2 0 0 0-4 0" stroke="currentColor"></path></svg>
+      <span style="font-size: 18px; font-weight: 600; letter-spacing: -0.02em">Acolhe</span>
+    </a>
+    <nav aria-label="Principal" style="display: flex; flex-direction: column; gap: 2px">
+      <a href="Dashboard.dc.html" class="nav">Início</a>
+      <a href="Pacientes.dc.html" class="nav">Pacientes<span class="mono" style="margin-left: auto; font-size: 12px; color: #5C6385">14</span></a>
+      <a href="Agenda.dc.html" class="nav">Agenda</a>
+      <a href="Atividades.dc.html" class="nav">Atividades</a>
+      <a href="#" class="nav on" aria-current="page">Documentos</a>
+      <a href="Templates.dc.html" class="nav">Templates</a>
+      <p class="mono sec" style="margin: 18px 12px 6px; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: #5C6385">Só você</p>
+      <a href="Registro.dc.html" class="nav">Registro Documental</a>
+      <p class="mono sec" style="margin: 18px 12px 6px; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: #5C6385">Clínica</p>
+      <a href="PainelClinica.dc.html" class="nav">Painel</a>
+      <a href="Equipe.dc.html" class="nav">Equipe</a>
+      <a href="Assinatura.dc.html" class="nav">Assinatura</a>
+    </nav>
+  </aside>
+
+  <main style="flex: 999 1 560px; min-width: 0; padding: 28px clamp(16px, 4vw, 48px) 56px; display: flex; flex-direction: column; gap: 24px">
+    <header class="rise" style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 16px">
+      <div style="display: flex; flex-direction: column; gap: 8px">
+        <p class="mono" style="margin: 0; font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: #5C6385">Documentos</p>
+        <h1 style="margin: 0; font-size: 32px; font-weight: 600; letter-spacing: -0.03em">Emitir documento</h1>
+      </div>
+    </header>
+
+    <div class="rise" role="tablist" aria-label="Seções" style="animation-delay: .06s; display: flex; border-bottom: 1px solid #DDE3F3">
+      <button type="button" role="tab" class="{{tabNovoCls}}" aria-selected="{{isNovo}}" onClick="{{showNovo}}">Novo documento</button>
+      <button type="button" role="tab" class="{{tabEmitCls}}" aria-selected="{{isEmit}}" onClick="{{showEmit}}">Emitidos · 4</button>
+    </div>
+
+    <sc-if value="{{isNovo}}" hint-placeholder-val="{{ true }}">
+      <div class="fade" style="display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start">
+
+        <section class="card" aria-label="Dados do documento" style="flex: 1 1 360px; min-width: 0; padding: 24px; display: flex; flex-direction: column; gap: 22px">
+          <fieldset style="margin: 0; padding: 0; border: 0; display: flex; flex-direction: column; gap: 10px">
+            <legend style="padding: 0; margin-bottom: 10px; font-size: 14px; font-weight: 600">Tipo de documento</legend>
+            <div role="radiogroup" aria-label="Tipo de documento" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px">
+              <sc-for list="{{tipos}}" as="t" hint-placeholder-count="3">
+                <button type="button" role="radio" class="{{t.cls}}" aria-checked="{{t.on}}" onClick="{{t.pick}}">
+                  <span style="font-size: 14px; font-weight: 600">{{t.label}}</span>
+                  <span style="font-size: 12px; color: #5C6385">{{t.desc}}</span>
+                </button>
+              </sc-for>
+            </div>
+          </fieldset>
+
+          <div style="display: flex; flex-direction: column; gap: 8px">
+            <span id="lbl-pac" style="font-size: 14px; font-weight: 600">Paciente</span>
+            <button type="button" aria-labelledby="lbl-pac" class="inp" style="display: flex; align-items: center; justify-content: space-between; cursor: pointer; text-align: left">
+              <span>Júlia Andrade</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5C6385" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg>
+            </button>
+          </div>
+
+          <sc-if value="{{showSessoes}}" hint-placeholder-val="{{ true }}">
+            <fieldset class="fade" style="margin: 0; padding: 0; border: 0; display: flex; flex-direction: column; gap: 4px">
+              <legend style="padding: 0; margin-bottom: 8px; font-size: 14px; font-weight: 600">Sessões incluídas</legend>
+              <sc-for list="{{sessoes}}" as="s" hint-placeholder-count="5">
+                <button type="button" role="checkbox" class="chk" aria-checked="{{s.on}}" onClick="{{s.pick}}">
+                  <span class="{{s.boxCls}}" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></span>
+                  <span style="flex: 1">{{s.label}}</span>
+                  <span class="mono" style="font-size: 12px; color: #5C6385">{{s.hora}}</span>
+                </button>
+              </sc-for>
+            </fieldset>
+          </sc-if>
+
+          <div style="display: flex; flex-direction: column; gap: 8px">
+            <label for="fin" style="font-size: 14px; font-weight: 600">Finalidade <span style="font-weight: 400; color: #5C6385">(opcional)</span></label>
+            <input id="fin" class="inp" type="text" placeholder="Ex.: apresentação ao empregador">
+          </div>
+
+          <div aria-live="polite" style="display: flex; flex-direction: column; gap: 12px; padding-top: 8px; border-top: 1px solid #DDE3F3">
+            <sc-if value="{{notGenerated}}" hint-placeholder-val="{{ true }}">
+              <div style="display: flex; flex-wrap: wrap; gap: 10px">
+                <button type="button" class="btn btn-s">Baixar rascunho</button>
+                <button type="button" class="btn btn-p" onClick="{{gerar}}" disabled="{{busy}}">
+                  <sc-if value="{{isBusy}}" hint-placeholder-val="{{ false }}"><span style="width: 16px; height: 16px; border-radius: 50%; border: 2px solid rgba(255,255,255,.35); border-top-color: #FFFFFF; animation: spin .8s linear infinite"></span></sc-if>
+                  {{gerarLabel}}
+                </button>
+              </div>
+            </sc-if>
+            <sc-if value="{{generated}}" hint-placeholder-val="{{ false }}">
+              <div class="fade" style="display: flex; flex-direction: column; gap: 12px; padding: 16px; border-radius: 12px; background: #E6EAFD; color: #1C1A5E">
+                <p style="margin: 0; font-size: 15px; font-weight: 600">PDF assinado gerado</p>
+                <p style="margin: 0; font-size: 14px; color: #2B2E9E">O link de download vale por 24 horas. Envie para a paciente ou baixe agora.</p>
+                <div style="display: flex; flex-wrap: wrap; gap: 10px">
+                  <button type="button" class="btn btn-p">Baixar PDF</button>
+                  <button type="button" class="btn btn-s" onClick="{{copiar}}">{{copyLabel}}</button>
+                </div>
+              </div>
+            </sc-if>
+          </div>
+        </section>
+
+        <section aria-label="Pré-visualização" style="flex: 1 1 420px; min-width: 0; display: flex; flex-direction: column; gap: 10px">
+          <p class="mono" style="margin: 0; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: #5C6385">Pré-visualização</p>
+          <article class="paper" style="background: #FFFFFF; border: 1px solid #DDE3F3; border-radius: 6px; box-shadow: 0 18px 40px rgba(22,26,58,.08); padding: 48px 44px; aspect-ratio: 210 / 297; display: flex; flex-direction: column; gap: 20px; font-size: 13px; line-height: 1.7; color: #161A3A">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px solid #DDE3F3; padding-bottom: 14px">
+              <div style="display: flex; flex-direction: column; gap: 2px">
+                <span style="font-size: 14px; font-weight: 600">Mariana Sá</span>
+                <span class="mono" style="font-size: 10px; color: #5C6385">Psicóloga · CRP 06/123456</span>
+              </div>
+              <span class="mono" style="font-size: 10px; color: #5C6385">{{codigo}}</span>
+            </div>
+            <h2 class="fade" style="margin: 0; font-size: 18px; font-weight: 600; text-align: center; letter-spacing: -0.01em">{{titulo}}</h2>
+            <p class="fade" style="margin: 0; text-align: justify">{{corpo}}</p>
+            <sc-if value="{{showSessoes}}" hint-placeholder-val="{{ true }}">
+              <ul style="margin: 0; padding-left: 18px">
+                <sc-for list="{{selecionadas}}" as="s" hint-placeholder-count="3">
+                  <li class="fade">{{s.label}}, {{s.hora}}</li>
+                </sc-for>
+              </ul>
+            </sc-if>
+            <div style="margin-top: auto; display: flex; flex-direction: column; gap: 28px">
+              <p style="margin: 0">São Paulo, 9 de outubro de 2026.</p>
+              <div style="display: flex; flex-direction: column; gap: 2px; width: 220px; border-top: 1px solid #161A3A; padding-top: 6px">
+                <span style="font-weight: 600">Mariana Sá</span>
+                <span class="mono" style="font-size: 10px; color: #5C6385">CRP 06/123456</span>
+              </div>
+              <p class="mono" style="margin: 0; font-size: 9px; color: #5C6385; word-break: break-all">Verificação: hash 9af3 b21e c4d0 e51a 8ff2 7b6c 1d40 c290 · acolhe.app/verificar</p>
+            </div>
+          </article>
+        </section>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{isEmit}}" hint-placeholder-val="{{ false }}">
+      <section class="card fade" aria-label="Documentos emitidos" style="padding: 8px; overflow-x: auto">
+        <sc-for list="{{emitidos}}" as="d" hint-placeholder-count="4">
+          <div class="fade" style="{{d.anim}}; display: flex; flex-wrap: wrap; align-items: center; gap: 16px; padding: 16px; border-bottom: 1px solid #EFF2FB">
+            <span style="display: flex; flex-direction: column; gap: 2px; flex: 1 1 240px">
+              <span style="font-size: 15px; font-weight: 600">{{d.tipo}}</span>
+              <span style="font-size: 13px; color: #5C6385">{{d.paciente}} · {{d.data}}</span>
+            </span>
+            <span class="mono" style="font-size: 12px; color: #5C6385">{{d.codigo}}</span>
+            <button type="button" class="btn btn-s" style="height: 36px">Baixar</button>
+          </div>
+        </sc-for>
+      </section>
+    </sc-if>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1000}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { tab: 'novo', tipo: 'comp', sel: [true, true, true, false, false], phase: 'idle', copied: false };
+  }
+  componentWillUnmount() { clearTimeout(this.t); }
+  renderVals() {
+    const s = this.state;
+    const defs = [
+      ['comp', 'Declaração de comparecimento', 'Datas e horários das sessões'],
+      ['atest', 'Atestado psicológico', 'Exige avaliação registrada'],
+      ['recibo', 'Recibo', 'Valor e forma de pagamento']
+    ];
+    const sess = [['Sessão 28 · 9 out 2026', '14:00'], ['Sessão 27 · 2 out 2026', '14:00'], ['Sessão 26 · 25 set 2026', '14:00'], ['Sessão 25 · 18 set 2026', '14:00'], ['Sessão 24 · 11 set 2026', '14:00']];
+    const titles = { comp: 'Declaração de comparecimento', atest: 'Atestado psicológico', recibo: 'Recibo' };
+    const bodies = {
+      comp: 'Declaro, para os devidos fins, que Júlia Andrade compareceu a atendimento psicológico comigo nas datas e horários abaixo:',
+      atest: 'Atesto, para os devidos fins, que Júlia Andrade está em acompanhamento psicológico comigo desde outubro de 2025. [CONCLUSÃO DA AVALIAÇÃO]',
+      recibo: 'Recebi de Júlia Andrade o valor de [VALOR] referente às sessões de psicoterapia listadas abaixo:'
+    };
+    const sessoes = sess.map((x, i) => ({
+      label: x[0], hora: x[1], on: s.sel[i],
+      boxCls: s.sel[i] ? 'box on' : 'box',
+      pick: () => { const sel = s.sel.slice(); sel[i] = !sel[i]; this.setState({ sel: sel }); }
+    }));
+    const isNovo = s.tab === 'novo';
+    return {
+      isNovo: isNovo, isEmit: !isNovo,
+      tabNovoCls: isNovo ? 'tab on' : 'tab', tabEmitCls: isNovo ? 'tab' : 'tab on',
+      showNovo: () => this.setState({ tab: 'novo' }), showEmit: () => this.setState({ tab: 'emit' }),
+      tipos: defs.map((d) => ({ label: d[1], desc: d[2], on: s.tipo === d[0], cls: s.tipo === d[0] ? 'opt on' : 'opt', pick: () => this.setState({ tipo: d[0], phase: 'idle' }) })),
+      showSessoes: s.tipo !== 'atest',
+      sessoes: sessoes,
+      selecionadas: sessoes.filter((x) => x.on),
+      titulo: titles[s.tipo], corpo: bodies[s.tipo],
+      codigo: 'DOC-2026-0938',
+      notGenerated: s.phase !== 'done', generated: s.phase === 'done',
+      busy: s.phase === 'busy', isBusy: s.phase === 'busy',
+      gerarLabel: s.phase === 'busy' ? 'Gerando…' : 'Gerar PDF assinado',
+      gerar: () => { if (this.state.phase !== 'idle') return; this.setState({ phase: 'busy' }); this.t = setTimeout(() => this.setState({ phase: 'done' }), 1300); },
+      copyLabel: s.copied ? 'Link copiado' : 'Copiar link',
+      copiar: () => this.setState({ copied: true }),
+      emitidos: [
+        { tipo: 'Declaração de comparecimento', paciente: 'Júlia Andrade', data: '2 out 2026', codigo: 'DOC-2026-0921' },
+        { tipo: 'Recibo', paciente: 'Pedro Tavares', data: '30 set 2026', codigo: 'DOC-2026-0917' },
+        { tipo: 'Declaração de comparecimento', paciente: 'Bruno Felix', data: '22 set 2026', codigo: 'DOC-2026-0902' },
+        { tipo: 'Recibo', paciente: 'Sofia Lima', data: '15 set 2026', codigo: 'DOC-2026-0888' }
+      ].map((d, i) => Object.assign(d, { anim: 'animation-delay: ' + (i * 0.06) + 's' }))
+    };
+  }
+}
+</script>
+</body>
+</html>
