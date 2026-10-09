@@ -15,15 +15,18 @@ export function usePatient(patientId: MaybeRefOrGetter<string>) {
 export function usePatientCheckins(patientId: MaybeRefOrGetter<string>, enabled: MaybeRefOrGetter<boolean> = true) {
   const id = toRef(patientId)
   const requestFetch = useRequestFetch()
-  return useAsyncData<PatientCheckin[]>(
+  const request = useAsyncData<PatientCheckin[]>(
     () => `patient-checkins-${id.value}`,
     () => toValue(enabled)
       ? requestFetch<PatientCheckin[]>(`/api/patients/${id.value}/checkins`)
       : Promise.resolve([]),
-    {
-      default: () => [],
-      immediate: toValue(enabled),
-      watch: [() => toValue(enabled)],
-    },
+    { default: () => [], immediate: false },
   )
+  // Busca no cliente assim que a ficha confirma o vínculo ativo (e a cada troca de paciente).
+  if (import.meta.client) {
+    watch(() => [id.value, toValue(enabled)] as const, ([, on]) => {
+      if (on) void request.refresh()
+    }, { immediate: true })
+  }
+  return request
 }
