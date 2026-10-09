@@ -37,7 +37,7 @@ const { data: session, error, refresh } = useSession(sessionId)
     </template>
   </PageHeader>
 
-  <div class="mx-auto w-full max-w-2xl px-4 py-6 md:px-8 md:py-8">
+  <div class="mx-auto w-full max-w-2xl px-4 py-6 md:px-8 md:py-8 lg:px-12">
     <div v-if="session" class="flex flex-col gap-6">
       <div class="flex flex-col gap-1">
         <h1 class="display-serif text-3xl">

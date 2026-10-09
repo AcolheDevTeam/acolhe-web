@@ -46,7 +46,7 @@ async function create(values: TemplateRequest) {
     </template>
   </PageHeader>
 
-  <div class="px-4 py-6 md:px-8 md:py-8">
+  <div class="px-4 py-6 md:px-8 md:py-8 lg:px-12">
     <TemplateForm :initial="initial" presets @submit="create" />
   </div>
 </template>

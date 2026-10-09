@@ -90,7 +90,7 @@ const meta = computed(() => {
     </template>
   </PageHeader>
 
-  <div class="px-4 py-6 md:px-8 md:py-8">
+  <div class="px-4 py-6 md:px-8 md:py-8 lg:px-12">
     <!-- Perfil -->
     <div class="flex items-start gap-4">
       <Avatar class="size-16">
@@ -124,9 +124,9 @@ const meta = computed(() => {
         :key="t.key"
         :to="t.to"
         :class="[
-          '-mb-px border-b-2 pb-3 text-sm transition-colors',
+          '-mb-px border-b-2 pb-3 text-[15px] font-medium transition-colors',
           active === t.key
-            ? 'border-foreground font-medium text-foreground'
+            ? 'border-primary text-foreground'
             : 'border-transparent text-muted-foreground hover:text-foreground',
         ]"
       >

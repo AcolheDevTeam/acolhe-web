@@ -45,7 +45,7 @@ function open(id: string) {
 </script>
 
 <template>
-  <PageHeader title="Pacientes">
+  <PageHeader eyebrow="Pacientes" title="Seus pacientes">
     <template #actions>
       <div class="relative hidden w-56 lg:block">
         <Search class="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
@@ -64,7 +64,7 @@ function open(id: string) {
     </template>
   </PageHeader>
 
-  <div class="px-4 py-6 md:px-8 md:py-8">
+  <div class="px-4 py-6 md:px-8 md:py-8 lg:px-12">
     <Tabs default-value="active">
       <TabsList>
         <TabsTrigger v-for="t in tabs" :key="t.value" :value="t.value">

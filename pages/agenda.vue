@@ -41,7 +41,7 @@ function position(iso: string, minutes: number) {
       <NewSessionDialog><Button size="sm"><Plus />Agendar sessão</Button></NewSessionDialog>
     </template>
   </PageHeader>
-  <div class="flex flex-col gap-6 px-4 py-6 md:px-8 md:py-8">
+  <div class="flex flex-col gap-6 px-4 py-6 md:px-8 md:py-8 lg:px-12">
     <div class="flex flex-wrap items-center gap-2">
       <Button variant="outline" size="icon" aria-label="Semana anterior" @click="moveWeek(-1)"><ChevronLeft /></Button>
       <div class="w-44"><DatePicker v-model="selectedDate" aria-label="Escolher semana" /></div>

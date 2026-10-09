@@ -28,7 +28,7 @@ const tabs = computed(() => [
 </script>
 
 <template>
-  <PageHeader title="Templates">
+  <PageHeader eyebrow="Atividades" title="Templates" description="Modelos de atividade para enviar às pacientes. Editar um template cria uma nova versão.">
     <template #actions>
       <div class="relative hidden w-56 lg:block">
         <Search class="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
@@ -44,7 +44,7 @@ const tabs = computed(() => [
     </template>
   </PageHeader>
 
-  <div class="flex flex-col gap-6 px-4 py-6 md:px-8 md:py-8">
+  <div class="flex flex-col gap-6 px-4 py-6 md:px-8 md:py-8 lg:px-12">
     <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
       <div class="relative flex-1 lg:hidden">
         <Search class="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />

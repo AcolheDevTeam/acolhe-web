@@ -11,9 +11,9 @@ const grouped = computed(() => groupActivityQueue(activities.value ?? []))
 </script>
 
 <template>
-  <PageHeader title="Atividades" />
+  <PageHeader eyebrow="Atividades" title="Fila de atividades" />
 
-  <div class="px-4 py-6 md:px-8 md:py-8">
+  <div class="px-4 py-6 md:px-8 md:py-8 lg:px-12">
     <div v-if="grouped.length" class="flex flex-col gap-8">
       <section v-for="g in grouped" :key="g.key" class="flex flex-col gap-3">
         <p class="label-mono">{{ g.label }} · {{ g.rows.length }}</p>

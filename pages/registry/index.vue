@@ -6,8 +6,8 @@ const page = ref(1)
 const { data, error, status, refresh } = useDocumentaryPatients(page)
 </script>
 <template>
-  <PageHeader title="Registro Documental" />
-  <div class="mx-auto flex max-w-5xl flex-col gap-6 px-4 py-6 md:px-8 md:py-8">
+  <PageHeader eyebrow="Só você" title="Registro Documental" />
+  <div class="mx-auto flex max-w-5xl flex-col gap-6 px-4 py-6 md:px-8 md:py-8 lg:px-12">
     <div class="rounded-lg border bg-muted/40 p-5 text-sm">
       <p class="font-medium">Espaço restrito · sigilo profissional</p>
       <p class="mt-2 text-muted-foreground">
