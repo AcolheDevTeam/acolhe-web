@@ -37,6 +37,9 @@ describe('conta existente que passa a atender (ACO-62)', async () => {
   })
   it('link cortado na prévia não fala de formulário', () => {
     expect(invitationErrorMessage({ statusCode: 400 }, 'preview')).toContain('link está completo')
+  })
+})
+
 describe('mensagens da área da clínica (ACO-62)', async () => {
   const { clinicErrorMessage, deliveryMessage } = await import('../utils/clinic')
   const err = (statusCode: number, message: string) => ({ statusCode, data: { message } })
