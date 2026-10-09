@@ -1,17 +1,11 @@
 <script setup lang="ts">
 definePageMeta({ middleware: ['auth', 'psychologist-only'] })
-const route = useRoute()
 const identity = useDocumentaryIdentity()
-const patientId = computed(() => String(route.params.id))
-const { data: patient } = usePatient(patientId)
+const { patientId } = usePatientFicha()
 </script>
 <template>
-  <PatientShell
-    :patient="patient ?? null"
+  <DocumentaryEditor
+    :key="`${identity}:${patientId}`"
     :patient-id="patientId"
-    active="registry"
-    ><DocumentaryEditor
-      :key="`${identity}:${patientId}`"
-      :patient-id="patientId"
-  /></PatientShell>
+  />
 </template>
