@@ -42,25 +42,33 @@ const meta = computed(() => {
 const badge = computed(() => patient ? relationshipBadge(patient) : null)
 
 // No celular a aba ativa pode ficar fora da fileira (ex.: Check-ins): rola só a
-// fileira até ela, sem mexer na página.
+// fileira até ela, sem mexer na página. A ficha não remonta ao trocar de aba,
+// então isso roda a cada troca, não só ao montar.
 const tabsNav = ref<HTMLElement>()
-onMounted(() => {
+function revealActiveTab() {
   const nav = tabsNav.value
   const current = nav?.querySelector<HTMLElement>('[aria-current="page"]')
   if (!nav || !current) return
   const overflow = current.offsetLeft + current.offsetWidth - (nav.scrollLeft + nav.clientWidth)
   if (overflow > 0) nav.scrollLeft += overflow + 16
-})
+  else if (current.offsetLeft < nav.scrollLeft) nav.scrollLeft = Math.max(0, current.offsetLeft - 16)
+}
+onMounted(revealActiveTab)
+watch(() => active, () => nextTick(revealActiveTab))
+
+// Na visão geral o nome é a página atual; nas outras abas volta para ela.
+const crumbs = computed(() => [
+  { label: 'Pacientes', to: '/patients' },
+  active === 'overview'
+    ? { label: patient?.fullName ?? '—' }
+    : { label: patient?.fullName ?? '—', to: `/patients/${patientId}` },
+])
 </script>
 
 <template>
   <PageHeader>
     <template #title>
-      <nav aria-label="Caminho" class="flex min-w-0 items-center gap-2 font-mono text-xs tracking-[.06em] text-muted-foreground">
-        <NuxtLink to="/patients" class="underline-offset-[3px] hover:text-foreground hover:underline">Pacientes</NuxtLink>
-        <span aria-hidden="true">/</span>
-        <span class="truncate text-foreground">{{ patient?.fullName ?? '—' }}</span>
-      </nav>
+      <Breadcrumb :items="crumbs" />
     </template>
   </PageHeader>
 
@@ -151,14 +159,7 @@ onMounted(() => {
       </p>
     </InlineNotice>
 
-    <!-- Conteúdo: coluna principal e lateral quebram em uma coluna no celular. -->
-    <div class="flex flex-wrap items-start gap-6">
-      <div class="min-w-0 flex-[2_1_460px]">
-        <slot />
-      </div>
-      <aside v-if="$slots.aside" class="flex min-w-0 flex-[1_1_280px] flex-col gap-6">
-        <slot name="aside" />
-      </aside>
-    </div>
+    <!-- Conteúdo da aba (rota filha). -->
+    <slot />
   </div>
 </template>

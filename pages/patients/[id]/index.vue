@@ -9,10 +9,8 @@ import type { PatientInvitation } from '~/types'
 
 definePageMeta({ middleware: ['auth', 'psychologist-only'] })
 
-const route = useRoute()
-const patientId = computed(() => route.params.id as string)
-
-const { data: patient } = usePatient(patientId)
+// Aba "Visão geral" da ficha; paciente, cabeçalho e abas vêm de pages/patients/[id].vue.
+const { patientId, patient, clinicalAccess } = usePatientFicha()
 const { data: activities } = usePatientActivities(patientId)
 const { data: appointments } = useAppointments()
 const nextAppointment = computed(() => (appointments.value ?? [])
@@ -20,9 +18,7 @@ const nextAppointment = computed(() => (appointments.value ?? [])
   .sort((a, b) => a.scheduledFor.localeCompare(b.scheduledFor))[0])
 const isActive = computed(() => patientLinkActive(patient.value))
 // Check-ins só são pedidos com o vínculo ativo (nenhuma requisição antes disso).
-// Conferir o id evita usar a ficha anterior, ainda em tela, ao trocar de paciente.
-const canLoadCheckins = computed(() => isActive.value && patient.value?.id === patientId.value)
-const { data: checkins, status: checkinsStatus, error: checkinsError } = usePatientCheckins(patientId, canLoadCheckins)
+const { data: checkins, status: checkinsStatus, error: checkinsError } = usePatientCheckins(patientId, clinicalAccess)
 const isPending = computed(() => patient.value?.relationshipStatus === 'pending')
 const invitation = ref<PatientInvitation>()
 const isGeneratingInvitation = ref(false)
@@ -90,101 +86,103 @@ const consentLabel = computed(() => {
 </script>
 
 <template>
-  <PatientShell :patient="patient ?? null" :patient-id="patientId" active="overview">
-    <!-- Visão geral -->
-    <div v-if="isActive" class="flex flex-col gap-6">
-      <Card role="region" aria-labelledby="ficha-humor" class="animate-fade flex flex-col gap-4 p-6">
-        <div class="flex flex-wrap items-baseline justify-between gap-2">
-          <h2 id="ficha-humor" class="label-mono">Humor · últimos 30 dias</h2>
-          <span v-if="mood.avgLabel" class="text-sm text-secondary-foreground">
-            <strong class="text-[22px] font-semibold text-foreground">{{ mood.avgLabel }}</strong> de 5 em média
-          </span>
-        </div>
-        <Sparkline
-          v-if="mood.count >= 2"
-          :values="mood.series"
-          :width="600"
-          :height="120"
-          :min="1"
-          :max="5"
-          :stroke-width="2.5"
-          guides
-          role="img"
-          :aria-label="`Humor dos check-ins dos últimos 30 dias: média ${mood.avgLabel} de 5 em ${mood.count} registros`"
-          class="h-[120px] w-full text-primary"
-        />
-        <p v-else-if="checkinsStatus === 'pending' || checkinsStatus === 'idle'" class="text-sm text-muted-foreground" role="status">Carregando check-ins…</p>
-        <p v-else-if="checkinsError" class="text-sm">
-          {{ apiErrorMessage(checkinsError, { 403: 'Seu vínculo precisa estar ativo para consultar o humor.', default: 'Não foi possível carregar os check-ins desta paciente.' }) }}
-        </p>
-        <EmptyState v-else compact>
-          {{ mood.count ? 'Só um check-in nos últimos 30 dias. O gráfico aparece a partir de dois.' : 'Nenhum check-in nos últimos 30 dias.' }}
-        </EmptyState>
-        <p class="text-xs text-muted-foreground">Média dos check-ins diários feitos pela paciente.</p>
-      </Card>
+  <!-- Coluna principal e lateral quebram em uma coluna no celular. -->
+  <div class="flex flex-wrap items-start gap-6">
+    <div class="min-w-0 flex-[2_1_460px]">
+      <div v-if="isActive" class="flex flex-col gap-6">
+        <Card role="region" aria-labelledby="ficha-humor" class="animate-fade flex flex-col gap-4 p-6">
+          <div class="flex flex-wrap items-baseline justify-between gap-2">
+            <h2 id="ficha-humor" class="label-mono">Humor · últimos 30 dias</h2>
+            <span v-if="mood.avgLabel" class="text-sm text-secondary-foreground">
+              <strong class="text-[22px] font-semibold text-foreground">{{ mood.avgLabel }}</strong> de 5 em média
+            </span>
+          </div>
+          <Sparkline
+            v-if="mood.count >= 2"
+            :values="mood.series"
+            :width="600"
+            :height="120"
+            :min="1"
+            :max="5"
+            :stroke-width="2.5"
+            guides
+            role="img"
+            :aria-label="`Humor dos check-ins dos últimos 30 dias: média ${mood.avgLabel} de 5 em ${mood.count} registros`"
+            class="h-[120px] w-full text-primary"
+          />
+          <p v-else-if="checkinsStatus === 'pending' || checkinsStatus === 'idle'" class="text-sm text-muted-foreground" role="status">Carregando check-ins…</p>
+          <p v-else-if="checkinsError" class="text-sm">
+            {{ apiErrorMessage(checkinsError, { 403: 'Seu vínculo precisa estar ativo para consultar o humor.', default: 'Não foi possível carregar os check-ins desta paciente.' }) }}
+          </p>
+          <EmptyState v-else compact>
+            {{ mood.count ? 'Só um check-in nos últimos 30 dias. O gráfico aparece a partir de dois.' : 'Nenhum check-in nos últimos 30 dias.' }}
+          </EmptyState>
+          <p class="text-xs text-muted-foreground">Média dos check-ins diários feitos pela paciente.</p>
+        </Card>
 
-      <NuxtIsland name="PatientTimeline" lazy :props="{ patientId }">
-        <template #fallback>
-          <Card class="flex flex-col gap-3 p-6">
-            <p class="label-mono">Linha do tempo</p>
-            <div class="h-24 animate-pulse rounded-lg bg-secondary" />
-          </Card>
-        </template>
-      </NuxtIsland>
-    </div>
-
-    <EmptyState
-      v-else-if="patient"
-      class="animate-fade"
-      :title="isPending ? 'Aguardando aceite' : 'Vínculo não está ativo'"
-      :description="isPending
-        ? 'Os dados clínicos ficam indisponíveis até a paciente aceitar o convite e o consentimento.'
-        : 'Os dados clínicos ficam indisponíveis enquanto o vínculo não estiver ativo.'"
-    >
-      <template v-if="isPending" #action>
-        <div class="flex w-full max-w-md flex-col items-center gap-3">
-          <template v-if="!invitation">
-            <p class="text-xs text-muted-foreground">
-              Um novo link é gerado e enviado por e-mail; qualquer link anterior deixa de funcionar.
-            </p>
-            <Button type="button" variant="outline" :loading="isGeneratingInvitation" @click="reissueInvitation">
-              <Send v-if="!isGeneratingInvitation" />
-              Reenviar convite
-            </Button>
+        <NuxtIsland name="PatientTimeline" lazy :props="{ patientId }">
+          <template #fallback>
+            <Card class="flex flex-col gap-3 p-6">
+              <p class="label-mono">Linha do tempo</p>
+              <div class="h-24 animate-pulse rounded-lg bg-secondary" />
+            </Card>
           </template>
+        </NuxtIsland>
+      </div>
 
-          <template v-else>
-            <InlineNotice :tone="invitationDelivery.tone === 'warning' ? 'warning' : 'positive'" class="text-left">
-              {{ invitationDelivery.showLink
-                ? invitationDelivery.short
-                : `E-mail reenviado para ${invitation.email}.` }}
-              Válido até {{ formatDateTime(invitation.expiresAt) }}. O link anterior deixou de valer.
-            </InlineNotice>
-            <div v-if="invitationDelivery.showLink" class="flex w-full gap-2">
-              <Input :model-value="invitation.url" readonly aria-label="Link do convite" class="min-w-0 text-xs" />
-              <Button
-                type="button"
-                variant="outline"
-                size="icon"
-                aria-label="Copiar convite"
-                @click="copyInvitationUrl(invitation.url)"
-              >
+      <EmptyState
+        v-else-if="patient"
+        class="animate-fade"
+        :title="isPending ? 'Aguardando aceite' : 'Vínculo não está ativo'"
+        :description="isPending
+          ? 'Os dados clínicos ficam indisponíveis até a paciente aceitar o convite e o consentimento.'
+          : 'Os dados clínicos ficam indisponíveis enquanto o vínculo não estiver ativo.'"
+      >
+        <template v-if="isPending" #action>
+          <div class="flex w-full max-w-md flex-col items-center gap-3">
+            <template v-if="!invitation">
+              <p class="text-xs text-muted-foreground">
+                Um novo link é gerado e enviado por e-mail; qualquer link anterior deixa de funcionar.
+              </p>
+              <Button type="button" variant="outline" :loading="isGeneratingInvitation" @click="reissueInvitation">
+                <Send v-if="!isGeneratingInvitation" />
+                Reenviar convite
+              </Button>
+            </template>
+
+            <template v-else>
+              <InlineNotice :tone="invitationDelivery.tone === 'warning' ? 'warning' : 'positive'" class="text-left">
+                {{ invitationDelivery.showLink
+                  ? invitationDelivery.short
+                  : `E-mail reenviado para ${invitation.email}.` }}
+                Válido até {{ formatDateTime(invitation.expiresAt) }}. O link anterior deixou de valer.
+              </InlineNotice>
+              <div v-if="invitationDelivery.showLink" class="flex w-full gap-2">
+                <Input :model-value="invitation.url" readonly aria-label="Link do convite" class="min-w-0 text-xs" />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  aria-label="Copiar convite"
+                  @click="copyInvitationUrl(invitation.url)"
+                >
+                  <Check v-if="invitationCopied" />
+                  <Copy v-else />
+                </Button>
+              </div>
+              <Button v-else type="button" variant="ghost" size="sm" @click="copyInvitationUrl(invitation.url)">
                 <Check v-if="invitationCopied" />
                 <Copy v-else />
+                Copiar link por outro canal
               </Button>
-            </div>
-            <Button v-else type="button" variant="ghost" size="sm" @click="copyInvitationUrl(invitation.url)">
-              <Check v-if="invitationCopied" />
-              <Copy v-else />
-              Copiar link por outro canal
-            </Button>
-          </template>
-        </div>
-      </template>
-    </EmptyState>
+            </template>
+          </div>
+        </template>
+      </EmptyState>
+    </div>
 
     <!-- Coluna lateral -->
-    <template #aside>
+    <aside class="flex min-w-0 flex-[1_1_280px] flex-col gap-6">
       <section
         v-if="isActive && nextAppointment"
         aria-labelledby="ficha-proxima"
@@ -264,6 +262,6 @@ const consentLabel = computed(() => {
           </div>
         </dl>
       </Card>
-    </template>
-  </PatientShell>
+    </aside>
+  </div>
 </template>

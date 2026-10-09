@@ -30,13 +30,7 @@ async function create(values: TemplateRequest) {
 <template>
   <PageHeader>
     <template #title>
-      <div class="flex min-w-0 items-center gap-2 font-mono text-xs tracking-[0.06em] text-muted-foreground">
-        <nav aria-label="Caminho">
-          <NuxtLink to="/templates" class="underline-offset-[3px] hover:text-foreground hover:underline">Templates</NuxtLink>
-        </nav>
-        <span aria-hidden="true">/</span>
-        <h1 class="truncate font-normal text-foreground">Novo template</h1>
-      </div>
+      <Breadcrumb :items="[{ label: 'Templates', to: '/templates' }, { label: 'Novo template' }]" current-tag="h1" />
     </template>
     <template #actions>
       <Button variant="ghost" as-child>

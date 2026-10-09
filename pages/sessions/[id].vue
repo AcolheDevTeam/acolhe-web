@@ -14,6 +14,13 @@ const { data: session, error, refresh } = useSession(sessionId)
 const saveState = ref<'idle' | 'dirty' | 'saving' | 'saved' | 'error'>('idle')
 
 const sessionTitle = computed(() => session.value?.number ? `Sessão ${session.value.number}` : 'Sessão')
+const crumbs = computed(() => [
+  { label: 'Pacientes', to: '/patients', hideOnMobile: true },
+  ...(session.value?.patientId
+    ? [{ label: session.value.patientName ?? 'Paciente', to: `/patients/${session.value.patientId}` }]
+    : []),
+  { label: sessionTitle.value },
+])
 
 // Dados da sessão em card (protótipo): só o que a API devolve.
 const details = computed(() => {
@@ -31,20 +38,8 @@ const details = computed(() => {
 <template>
   <PageHeader>
     <template #title>
-      <nav aria-label="Caminho" class="flex min-w-0 items-center gap-2 font-mono text-xs tracking-[.06em] text-muted-foreground">
-        <!-- No celular só o trecho final do caminho aparece. -->
-        <NuxtLink to="/patients" class="hidden underline-offset-[3px] hover:text-foreground hover:underline sm:inline">Pacientes</NuxtLink>
-        <span class="hidden sm:inline" aria-hidden="true">/</span>
-        <NuxtLink
-          v-if="session?.patientId"
-          :to="`/patients/${session.patientId}/sessions`"
-          class="min-w-0 truncate underline-offset-[3px] hover:text-foreground hover:underline"
-        >
-          {{ session?.patientName ?? 'Paciente' }}
-        </NuxtLink>
-        <span aria-hidden="true">/</span>
-        <span class="shrink-0 text-foreground">{{ sessionTitle }}</span>
-      </nav>
+      <!-- No celular só o trecho final do caminho aparece. -->
+      <Breadcrumb :items="crumbs" />
     </template>
     <template #actions>
       <RecordExportButton />

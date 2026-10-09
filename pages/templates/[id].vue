@@ -66,14 +66,8 @@ async function onArchived() {
 <template>
   <PageHeader>
     <template #title>
-      <div class="flex min-w-0 items-center gap-2 font-mono text-xs tracking-[0.06em] text-muted-foreground">
-        <nav aria-label="Caminho">
-          <NuxtLink to="/templates" class="underline-offset-[3px] hover:text-foreground hover:underline">Templates</NuxtLink>
-        </nav>
-        <span aria-hidden="true">/</span>
-        <h1 class="truncate font-normal text-foreground">{{ template?.title ?? 'Template' }}</h1>
-        <span v-if="template" class="shrink-0 tabular-nums">v{{ template.version }}</span>
-      </div>
+      <Breadcrumb :items="[{ label: 'Templates', to: '/templates' }, { label: template?.title ?? 'Template' }]" current-tag="h1" />
+      <span v-if="template" class="shrink-0 font-mono text-xs tabular-nums tracking-[.06em] text-muted-foreground">v{{ template.version }}</span>
     </template>
     <template #actions>
       <template v-if="template">
