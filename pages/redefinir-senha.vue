@@ -86,6 +86,8 @@ async function save() {
       <Button size="xl" class="w-full" as-child><NuxtLink to="/esqueci-senha">Pedir um novo link</NuxtLink></Button>
     </div>
 
+    <div v-else-if="!ready" class="flex justify-center py-12"><Spinner class="size-5 text-muted-foreground" label="Carregando" /></div>
+
     <form v-else class="animate-rise flex flex-col gap-[22px]" novalidate @submit.prevent="save">
       <h1 class="text-[32px] font-semibold leading-[1.15] tracking-[-0.025em]">Crie uma senha nova</h1>
       <div class="flex flex-col gap-2">
@@ -110,7 +112,7 @@ async function save() {
       <p v-if="tooLong" class="text-sm text-destructive">A senha está longa demais. Use até 72 caracteres sem acento.</p>
       <p v-if="errorMessage" class="text-sm text-destructive" role="alert">{{ errorMessage }}</p>
       <Button v-if="linkProblem" size="xl" class="w-full" as-child><NuxtLink to="/esqueci-senha">Pedir um novo link</NuxtLink></Button>
-      <Button v-else type="submit" size="xl" class="w-full" :disabled="weak || !ready" :loading="saving">{{ saving ? 'Salvando…' : 'Salvar senha' }}</Button>
+      <Button v-else type="submit" size="xl" class="w-full" :disabled="weak" :loading="saving">{{ saving ? 'Salvando…' : 'Salvar senha' }}</Button>
     </form>
   </AuthShell>
 </template>
