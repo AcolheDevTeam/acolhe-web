@@ -44,7 +44,11 @@ const avgAdherence = computed(() => {
 </script>
 
 <template>
-  <PageHeader title="Início">
+  <PageHeader
+    :eyebrow="today"
+    :title="`${greeting}${firstName ? `, ${firstName}` : ''}.`"
+    :description="`Você tem ${sessionsToday.length} ${sessionsToday.length === 1 ? 'sessão' : 'sessões'} hoje e ${reviews.length} ${reviews.length === 1 ? 'atividade aguardando' : 'atividades aguardando'} revisão.`"
+  >
     <template #actions>
       <div class="relative hidden w-56 lg:block">
         <Search class="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
@@ -71,14 +75,6 @@ const avgAdherence = computed(() => {
   <div class="grid flex-1 gap-8 px-4 py-6 md:px-8 md:py-8 lg:px-12 lg:grid-cols-[1fr_320px] lg:gap-10">
     <!-- Coluna principal -->
     <div class="flex flex-col gap-10">
-      <div class="flex flex-col gap-2">
-        <p class="text-sm text-muted-foreground">{{ today }}</p>
-        <h1 class="display-serif text-4xl">{{ greeting }}{{ firstName ? `, ${firstName}` : '' }}.</h1>
-        <p class="max-w-xl text-sm text-muted-foreground">
-          Você tem <span class="font-medium text-foreground">{{ sessionsToday.length }} sessões hoje</span>,
-          {{ reviews.length }} atividades aguardando revisão.
-        </p>
-      </div>
 
       <section class="flex flex-col gap-3">
         <div class="flex items-center justify-between">
