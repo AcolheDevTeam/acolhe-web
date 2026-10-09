@@ -1,49 +1,12 @@
 <script setup lang="ts">
-import { useNow } from '@vueuse/core'
-import { toast } from 'vue-sonner'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { appointmentConflictMessage, finalStatusConfirmation, type FinalAppointmentStatus } from '~/utils/appointment-errors'
 
 definePageMeta({ middleware: ['auth', 'psychologist-only'] })
 const route = useRoute()
 const appointmentId = computed(() => route.params.id as string)
 const { data: appointment, error, refresh } = useAppointment(appointmentId)
-const changingStatus = ref(false)
-const { opening, openRecord: openAppointmentRecord } = useOpenAppointmentRecord()
-const busy = computed(() => changingStatus.value || opening.value !== null)
-const now = useNow({ interval: 60000 })
-const active = computed(() => ['scheduled', 'confirmed'].includes(appointment.value?.status ?? ''))
-const hasStarted = computed(() => appointment.value && new Date(appointment.value.scheduledFor) <= now.value)
-
-// Ações sem volta passam por confirmação (ACO-83; regra A2, sem confirm() nativo).
-const pendingStatus = ref<FinalAppointmentStatus | null>(null)
-const confirmation = computed(() => pendingStatus.value ? finalStatusConfirmation[pendingStatus.value] : null)
-function askStatus(status: FinalAppointmentStatus) {
-  if (!busy.value) pendingStatus.value = status
-}
-async function decideStatus(confirmed: boolean) {
-  const status = pendingStatus.value
-  pendingStatus.value = null
-  if (confirmed && status) await changeStatus(status)
-}
-
-async function changeStatus(status: string) {
-  if (busy.value) return
-  changingStatus.value = true
-  try {
-    await $fetch(`/api/appointments/${appointmentId.value}/status`, { method: 'PUT', body: { status } })
-    await refresh()
-    await refreshNuxtData('appointments-all')
-    toast.success('Agendamento atualizado.')
-  } catch (error) {
-    toast.error(appointmentConflictMessage(error) ?? apiErrorMessage(error, { 404: 'Este agendamento não está disponível para você.', 409: 'O status mudou ou esta ação não é permitida. Recarregue o agendamento.', default: 'Não foi possível atualizar o agendamento.' }))
-  } finally { changingStatus.value = false }
-}
-async function openRecord() {
-  if (!busy.value && appointment.value) await openAppointmentRecord(appointment.value)
-}
-
+const { busy, active, hasStarted, pendingStatus, confirmation, askStatus, decideStatus, changeStatus, openRecord } = useAppointmentStatus(appointment)
 </script>
 
 <template>
