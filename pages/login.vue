@@ -50,7 +50,7 @@ const onSubmit = handleSubmit(async (values) => {
 <template>
   <main class="flex min-h-dvh flex-wrap bg-background min-[900px]:h-dvh min-[900px]:flex-nowrap">
     <!-- Painel da marca -->
-    <section class="relative flex min-h-[420px] flex-[1_1_520px] flex-col justify-between gap-6 overflow-hidden bg-secondary px-6 py-8 min-[900px]:min-h-0 md:px-14 md:py-12">
+    <section class="relative hidden min-h-[420px] flex-[1_1_520px] flex-col justify-between gap-6 overflow-hidden bg-secondary px-6 py-8 min-[900px]:flex min-[900px]:min-h-0 md:px-14 md:py-12">
       <AppLogo class="animate-rise" animated :size="34" />
       <div class="flex min-h-0 flex-1 items-center justify-center">
         <img
@@ -72,8 +72,10 @@ const onSubmit = handleSubmit(async (values) => {
     </section>
 
     <!-- Formulário -->
-    <section class="flex flex-[1_1_480px] justify-center px-6 py-14 min-[900px]:overflow-y-auto min-[900px]:py-8">
+    <section class="flex flex-[1_1_480px] justify-center px-6 py-8 min-[900px]:overflow-y-auto min-[900px]:py-8">
       <div class="my-auto flex w-full max-w-[400px] flex-col gap-7">
+        <!-- No celular o painel da marca some: só o logo, e o formulário logo abaixo. -->
+        <AppLogo class="min-[900px]:hidden" :size="28" />
         <header class="animate-rise flex flex-col gap-2.5 [animation-delay:.1s]">
           <p class="label-mono text-xs">Acolhe</p>
           <h1 class="text-[34px] font-semibold leading-[1.15] tracking-[-0.025em]">Entrar na sua conta</h1>
