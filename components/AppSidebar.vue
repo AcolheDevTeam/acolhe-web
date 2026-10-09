@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import type { Component } from 'vue'
 import {
+  BarChart3,
   BookMarked,
+  Building2,
   CalendarDays,
   ClipboardList,
   FileLock2,
@@ -11,12 +13,12 @@ import {
   Settings,
   Users,
 } from 'lucide-vue-next'
-import type { Patient, UserRole } from '~/types'
+import type { Patient, UserRole, WorkspaceContext } from '~/types'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 
 const { user } = defineProps<{
-  user?: { email?: string; name?: string; crp?: string; role?: UserRole } | null
+  user?: { email?: string; name?: string; crp?: string; role?: UserRole; workspace?: WorkspaceContext } | null
 }>()
 
 const { data: patients } = await useFetch<Patient[]>('/api/patients', {
@@ -33,7 +35,16 @@ type NavItem = {
   disabled?: boolean
 }
 
-const main = computed<NavItem[]>(() => [
+// Quem só administra a clínica não tem área clínica (ADR 0002 da API).
+const adminOnly = computed(() => user?.role === 'org_admin')
+const clinicItems: NavItem[] = [
+  { label: 'Clínica', to: '/clinica', icon: BarChart3 },
+  { label: 'Equipe', to: '/clinica/equipe', icon: Building2 },
+]
+const clinic = computed<NavItem[]>(() => isClinicAdmin(user as never) ? clinicItems : [])
+const home = computed(() => homeFor(user as never))
+
+const clinical = computed<NavItem[]>(() => [
   { label: 'Início', to: '/dashboard', icon: Home },
   {
     label: 'Pacientes',
@@ -45,6 +56,7 @@ const main = computed<NavItem[]>(() => [
   { label: 'Atividades', to: '/activities', icon: ClipboardList },
   { label: 'Documentos', to: '/documents', icon: FileText, disabled: true },
 ])
+const main = computed<NavItem[]>(() => adminOnly.value ? clinic.value : clinical.value)
 
 const personal: NavItem[] = [
   { label: 'Registro Documental', to: '/registry', icon: FileLock2 },
@@ -54,6 +66,8 @@ const personal: NavItem[] = [
 const route = useRoute()
 const NuxtLinkComponent = resolveComponent('NuxtLink')
 function isActive(to: string) {
+  // "Clínica" é a raiz da área; "Equipe" fica embaixo dela e tem destaque próprio.
+  if (to === '/clinica') return route.path === to
   return route.path === to || route.path.startsWith(`${to}/`)
 }
 
@@ -74,7 +88,7 @@ const initials = computed(() =>
 <template>
   <aside class="flex h-dvh w-60 shrink-0 flex-col border-r bg-card/40">
     <div class="flex h-16 items-center px-6">
-      <NuxtLink to="/dashboard">
+      <NuxtLink :to="home">
         <AppLogo />
       </NuxtLink>
     </div>
@@ -105,27 +119,47 @@ const initials = computed(() =>
         </span>
       </component>
 
+      <template v-if="!adminOnly">
       <p class="label-mono px-3 pb-2 pt-6">Espaço pessoal</p>
+  
+        <component
+          :is="item.disabled ? 'span' : NuxtLinkComponent"
+          v-for="item in personal"
+          :key="item.to"
+          :to="item.disabled ? undefined : item.to"
+          :aria-disabled="item.disabled || undefined"
+          :title="item.disabled ? 'Em breve' : undefined"
+          :class="[
+            'flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors',
+            item.disabled
+              ? 'cursor-not-allowed text-muted-foreground/45'
+              : isActive(item.to)
+              ? 'bg-accent font-medium text-accent-foreground'
+              : 'text-muted-foreground hover:bg-accent/60 hover:text-foreground',
+          ]"
+        >
+          <component :is="item.icon" class="size-4 shrink-0" :stroke-width="1.75" />
+          <span class="flex-1">{{ item.label }}</span>
+        </component>
+      </template>
 
-      <component
-        :is="item.disabled ? 'span' : NuxtLinkComponent"
-        v-for="item in personal"
-        :key="item.to"
-        :to="item.disabled ? undefined : item.to"
-        :aria-disabled="item.disabled || undefined"
-        :title="item.disabled ? 'Em breve' : undefined"
-        :class="[
-          'flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors',
-          item.disabled
-            ? 'cursor-not-allowed text-muted-foreground/45'
-            : isActive(item.to)
-            ? 'bg-accent font-medium text-accent-foreground'
-            : 'text-muted-foreground hover:bg-accent/60 hover:text-foreground',
-        ]"
-      >
-        <component :is="item.icon" class="size-4 shrink-0" :stroke-width="1.75" />
-        <span class="flex-1">{{ item.label }}</span>
-      </component>
+      <template v-if="!adminOnly && clinic.length">
+        <p class="label-mono px-3 pb-2 pt-6">Clínica</p>
+        <NuxtLink
+          v-for="item in clinic"
+          :key="item.to"
+          :to="item.to"
+          :class="[
+            'flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors',
+            isActive(item.to)
+              ? 'bg-accent font-medium text-accent-foreground'
+              : 'text-muted-foreground hover:bg-accent/60 hover:text-foreground',
+          ]"
+        >
+          <component :is="item.icon" class="size-4 shrink-0" :stroke-width="1.75" />
+          <span class="flex-1">{{ item.label }}</span>
+        </NuxtLink>
+      </template>
     </nav>
 
     <div class="mt-auto flex flex-col gap-1 border-t p-3">

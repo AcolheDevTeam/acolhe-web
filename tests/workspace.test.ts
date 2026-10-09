@@ -13,6 +13,10 @@ describe('destino por tipo de acesso (ADR 0002)', () => {
   it('quem só administra vai à área da clínica', () => {
     expect(homeFor({ role: 'org_admin', workspace: clinic(['clinic_admin']) })).toBe('/clinica')
   })
+  it('org_admin sem área de clínica vai à página que explica', () => {
+    expect(homeFor({ role: 'org_admin', workspace: { ...clinic(['clinic_admin']), type: 'individual' } })).toBe('/sem-acesso')
+    expect(homeFor({ role: 'org_admin', workspace: clinic(['clinical_supervisor']) })).toBe('/sem-acesso')
+  })
   it('vínculo inativo vai à página que explica', () => {
     expect(homeFor({ role: 'psychologist', workspace: clinic(['psychologist'], false) })).toBe('/espaco-inativo')
   })
@@ -22,6 +26,7 @@ describe('destino por tipo de acesso (ADR 0002)', () => {
   it('administração da clínica é por papel do vínculo, não pelo papel efetivo', () => {
     expect(isClinicAdmin({ role: 'psychologist', workspace: clinic(['clinic_owner', 'psychologist']) })).toBe(true)
     expect(isClinicAdmin({ role: 'psychologist', workspace: clinic(['psychologist']) })).toBe(false)
+    expect(isClinicAdmin({ role: 'org_admin', workspace: { ...clinic(['clinic_admin']), type: 'individual' } })).toBe(false)
   })
   it('rótulos dos papéis em português', () => {
     expect(workspaceRoleLabel('clinic_owner')).toBe('Responsável')
