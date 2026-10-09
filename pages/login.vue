@@ -100,8 +100,10 @@ const onSubmit = handleSubmit(async (values) => {
           </div>
 
           <div class="flex flex-col gap-2">
-            <!-- "Esqueci a senha" volta quando a recuperação de senha existir na API. -->
-            <Label for="password">Senha</Label>
+            <div class="flex items-baseline justify-between">
+              <Label for="password">Senha</Label>
+              <NuxtLink to="/esqueci-senha" class="text-[13px] text-primary underline-offset-[3px] hover:underline">Esqueci a senha</NuxtLink>
+            </div>
             <PasswordInput
               id="password"
               v-model="password"
