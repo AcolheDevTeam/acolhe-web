@@ -11,7 +11,9 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 
 definePageMeta({ layout: 'auth' })
-useHead({ title: 'Criar conta · Acolhe' })
+// Abaixo de md quem rola é a página: o scroll-padding no <html> impede que o
+// foco por Tab deixe um campo embaixo do rodapé sticky. Só vale nesta página.
+useHead({ title: 'Criar conta · Acolhe', htmlAttrs: { class: 'max-md:scroll-pb-28' } })
 
 const stepNames = signupSteps.map((step) => step.name)
 const lastStep = signupSteps.length - 1
