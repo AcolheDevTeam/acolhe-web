@@ -32,7 +32,7 @@ const isReviewed = computed(() => activity.status === 'reviewed')
       <span v-if="showPatient" class="truncate text-[13px] text-muted-foreground">{{ activity.title }}</span>
     </span>
     <span
-      class="min-w-0 flex-[0_1_170px] text-[13px]"
+      class="min-w-0 flex-[0_1_220px] text-[13px]"
       :class="overdue ? 'font-medium text-destructive' : 'text-foreground'"
     >
       {{ activitySummary(activity) }}

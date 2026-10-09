@@ -95,7 +95,7 @@ const filterTriggerClass = 'h-10 w-auto gap-2.5 rounded-lg border-border bg-card
   <div class="flex flex-col gap-6 px-4 pb-14 pt-6 md:px-8 lg:px-12">
     <Tabs v-model="tab" class="animate-rise max-w-full self-start [animation-delay:60ms]">
       <TabsList aria-label="Situação">
-        <TabsTrigger v-for="t in tabs" :key="t.value" :value="t.value" class="w-[120px] sm:w-[150px]">
+        <TabsTrigger v-for="t in tabs" :key="t.value" :value="t.value" class="sm:w-[150px]">
           {{ t.label }} <span class="font-mono text-xs text-muted-foreground">{{ t.items.length }}</span>
         </TabsTrigger>
       </TabsList>

@@ -9,6 +9,8 @@ import { Card } from '@/components/ui/card'
 import { EmptyState } from '@/components/ui/empty-state'
 import { InlineNotice } from '@/components/ui/inline-notice'
 
+type ReviewField = Extract<ActivityReviewDetail, { state: 'submitted' }>['submission']['fields'][number]
+
 definePageMeta({ middleware: ['auth', 'psychologist-only'] })
 
 // Revisar resposta (protótipo "Revisar"): respostas por campo em cards e a
@@ -110,6 +112,15 @@ function choiceOptions(config: Record<string, unknown>, value: unknown) {
   return list.map(label => ({ label, on: marked.includes(label) }))
 }
 
+// Escolha única chega como texto; com opções na config, vira pílulas também.
+function choicePills(field: ReviewField) {
+  if (field.kind === 'json') return choiceOptions(field.config, field.value)
+  if (field.kind === 'text' && field.fieldType === 'single_choice' && Array.isArray(field.config.options)) {
+    return choiceOptions(field.config, field.value)
+  }
+  return null
+}
+
 // Escala vira a fileira de valores com o escolhido destacado.
 function scaleSteps(config: Record<string, unknown>) {
   const min = typeof config.min === 'number' ? config.min : 1
@@ -157,8 +168,9 @@ async function markReviewed() {
       </nav>
     </template>
     <template v-if="queueIndex >= 0" #actions>
+      <!-- No celular só "1 de 3", para os botões caberem na linha. -->
       <span class="font-mono text-xs text-muted-foreground">
-        {{ queueIndex + 1 }} de {{ queue.length }} aguardando revisão
+        {{ queueIndex + 1 }} de {{ queue.length }}<span class="hidden sm:inline"> aguardando revisão</span>
       </span>
       <div class="flex items-center gap-2">
         <Button v-if="prevItem" variant="outline" as-child>
@@ -224,7 +236,22 @@ async function markReviewed() {
               </span>
               <h2 class="text-base font-semibold">{{ field.label }}</h2>
 
-              <p v-if="field.kind === 'text'" class="whitespace-pre-line text-[15px] leading-relaxed">
+              <ul
+                v-if="choicePills(field)"
+                class="flex flex-wrap gap-2"
+              >
+                <li
+                  v-for="option in choicePills(field)"
+                  :key="option.label"
+                  class="inline-flex h-8 items-center gap-1.5 rounded-full px-3 text-[13px]"
+                  :class="option.on ? 'bg-primary text-primary-foreground' : 'border border-border bg-card text-muted-foreground'"
+                >
+                  <Check v-if="option.on" class="size-3.5" aria-hidden="true" />
+                  {{ option.label }}
+                  <span class="sr-only">{{ option.on ? '(marcada)' : '(não marcada)' }}</span>
+                </li>
+              </ul>
+              <p v-else-if="field.kind === 'text'" class="whitespace-pre-line text-[15px] leading-relaxed">
                 {{ field.value }}
               </p>
               <template v-else-if="field.kind === 'number'">
@@ -256,19 +283,7 @@ async function markReviewed() {
               <p v-else-if="field.kind === 'datetime'" class="text-[15px]">
                 {{ formatDateTime(field.value) }}
               </p>
-              <ul v-else-if="field.kind === 'json'" class="flex flex-wrap gap-2">
-                <li
-                  v-for="option in choiceOptions(field.config, field.value)"
-                  :key="option.label"
-                  class="inline-flex h-8 items-center gap-1.5 rounded-full px-3 text-[13px]"
-                  :class="option.on ? 'bg-primary text-primary-foreground' : 'border border-border bg-card text-muted-foreground'"
-                >
-                  <Check v-if="option.on" class="size-3.5" aria-hidden="true" />
-                  {{ option.label }}
-                  <span class="sr-only">{{ option.on ? '(marcada)' : '(não marcada)' }}</span>
-                </li>
-              </ul>
-              <div v-else class="flex w-fit items-center gap-2 rounded-lg border px-3 py-2 text-sm">
+              <div v-else-if="field.kind === 'attachment'" class="flex w-fit items-center gap-2 rounded-lg border px-3 py-2 text-sm">
                 <FileText class="size-4" />
                 {{ field.value.mimeType }} · {{ field.value.sizeBytes }} bytes
               </div>
