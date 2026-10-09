@@ -16,7 +16,8 @@ watch(() => route.fullPath, () => { menuOpen.value = false })
 
 <template>
   <div class="flex min-h-dvh bg-background">
-    <AppSidebar class="hidden md:flex" :user="user as any" />
+    <!-- Fixo ao rolar: o menu e o rodapé da conta ficam sempre à vista. -->
+    <AppSidebar class="sticky top-0 hidden self-start md:flex" collapsible :user="user as any" />
 
     <div class="flex min-w-0 flex-1 flex-col">
       <!-- Barra superior só no celular -->
