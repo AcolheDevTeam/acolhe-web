@@ -223,6 +223,7 @@ async function persist(restoreRevision?: number) {
 }
 async function openVersion(revision: number) {
   if (!saved.value) return
+  compareRequest++ // invalida a comparação pendente da versão anterior
   versionBusy.value = true
   historyError.value = ''
   comparedVersion.value = null
@@ -263,7 +264,8 @@ async function compareVersion(revision: string) {
     if (isCurrent() && request === compareRequest && saved.value?.id === id)
       comparedVersion.value = result
   } catch (err) {
-    if (isCurrent()) historyError.value = errorText(err)
+    if (isCurrent() && request === compareRequest)
+      historyError.value = errorText(err)
   }
 }
 const comparisonOptions = computed(() => {
