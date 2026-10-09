@@ -1,13 +1,11 @@
 <script setup lang="ts">
-import type { PatientCheckin } from '~/types'
 import { Button } from '@/components/ui/button'
+import { Card } from '@/components/ui/card'
 definePageMeta({ middleware: ['auth', 'psychologist-only'] })
 const route = useRoute()
 const patientId = computed(() => route.params.id as string)
 const { data: patient } = usePatient(patientId)
-const { data: checkins, error, status, refresh } = useFetch<PatientCheckin[]>(() => `/api/patients/${patientId.value}/checkins`, {
-  key: () => `patient-checkins-${patientId.value}`, default: () => [],
-})
+const { data: checkins, error, status, refresh } = usePatientCheckins(patientId)
 // Sem vínculo ativo a API devolve lista vazia; dizer o motivo em vez de "nenhum check-in".
 const inactiveMessage = computed(() => patient.value && patient.value.relationshipStatus !== 'active'
   ? 'O vínculo com esta paciente não está ativo. Os check-ins aparecem enquanto o vínculo estiver ativo.'
@@ -24,7 +22,7 @@ const inactiveMessage = computed(() => patient.value && patient.value.relationsh
         <Button variant="outline" @click="refresh()">Tentar novamente</Button>
       </div>
       <p v-else-if="status === 'pending'" class="text-sm text-muted-foreground">Carregando check-ins…</p>
-      <div v-else class="rounded-xl border bg-card p-5"><CheckinHistory :items="checkins ?? []" :empty-message="inactiveMessage" /></div>
+      <Card v-else class="p-6"><CheckinHistory :items="checkins ?? []" :empty-message="inactiveMessage" /></Card>
     </div>
   </PatientShell>
 </template>
