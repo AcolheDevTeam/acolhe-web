@@ -42,6 +42,17 @@ const meta = computed(() => {
   return [p.age ? `${p.age} anos` : null, p.approach].filter(Boolean) as string[]
 })
 const badge = computed(() => patient ? relationshipBadge(patient) : null)
+
+// No celular a aba ativa pode ficar fora da fileira (ex.: Check-ins): rola só a
+// fileira até ela, sem mexer na página.
+const tabsNav = ref<HTMLElement>()
+onMounted(() => {
+  const nav = tabsNav.value
+  const current = nav?.querySelector<HTMLElement>('[aria-current="page"]')
+  if (!nav || !current) return
+  const overflow = current.offsetLeft + current.offsetWidth - (nav.scrollLeft + nav.clientWidth)
+  if (overflow > 0) nav.scrollLeft += overflow + 16
+})
 </script>
 
 <template>
@@ -78,16 +89,17 @@ const badge = computed(() => patient ? relationshipBadge(patient) : null)
           <Badge v-if="badge" :variant="badge.variant" class="h-6">{{ badge.label }}</Badge>
         </div>
       </div>
-      <div v-if="isActive" class="flex flex-wrap items-center gap-2.5">
+      <!-- No celular as três ações dividem uma linha (sem ícone nos botões). -->
+      <div v-if="isActive" class="flex w-full items-center gap-2 sm:w-auto sm:gap-2.5">
         <AssignActivityDialog :patient-id="patientId">
-          <Button variant="outline">
-            <Plus />
+          <Button variant="outline" class="min-w-0 flex-1 px-3 sm:flex-none sm:px-4">
+            <Plus class="max-sm:hidden" />
             Atribuir atividade
           </Button>
         </AssignActivityDialog>
         <NewSessionDialog :patient-id="patientId">
-          <Button>
-            <CalendarDays />
+          <Button class="min-w-0 flex-1 px-3 sm:flex-none sm:px-4">
+            <CalendarDays class="max-sm:hidden" />
             Agendar sessão
           </Button>
         </NewSessionDialog>
@@ -110,8 +122,9 @@ const badge = computed(() => patient ? relationshipBadge(patient) : null)
     <!-- Abas sublinhadas: a barra de 2px cresce a partir do centro. No celular
          a fileira rola sozinha, sem rolar a página. -->
     <nav
+      ref="tabsNav"
       aria-label="Seções da ficha"
-      class="animate-rise -mx-4 flex overflow-x-auto border-b px-4 [animation-delay:120ms] [scrollbar-width:none] md:mx-0 md:px-0 [&::-webkit-scrollbar]:hidden"
+      class="animate-rise relative -mx-4 flex overflow-x-auto border-b px-4 [animation-delay:120ms] [scrollbar-width:none] md:mx-0 md:px-0 [&::-webkit-scrollbar]:hidden"
     >
       <NuxtLink
         v-for="t in tabs"

@@ -82,7 +82,8 @@ const activeActivities = computed(() =>
 const consentLabel = computed(() => {
   const consent = patient.value?.healthConsent
   if (!consent) return 'Sem registro'
-  const detail = `${consent.version} · ${formatDate(consent.decidedAt)}`
+  const version = consent.version.startsWith('v') ? consent.version : `v${consent.version}`
+  const detail = `${version} · ${formatDate(consent.decidedAt)}`
   return consent.accepted ? detail : `Não aceito · ${detail}`
 })
 </script>
