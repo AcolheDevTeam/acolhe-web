@@ -68,6 +68,11 @@ const stateIcon = computed(() => {
   }
 })
 
+const statusAnnouncement = computed(() => {
+  if (confirming.value) return 'Confirmando seu e-mail…'
+  return feedback.value ? `${feedback.value.title}. ${feedback.value.message}` : ''
+})
+
 // Reenvio: com sessão pendente o e-mail já é conhecido; sem sessão, pede o campo.
 const resendMessage = ref('')
 const resendError = ref('')
@@ -135,32 +140,37 @@ async function goToPanel() {
       <NuxtLink v-if="!me" to="/login" class="text-sm font-medium text-primary underline-offset-[3px] hover:underline">Entrar</NuxtLink>
     </template>
 
-    <div class="animate-rise flex flex-col items-center gap-5 rounded-[20px] border bg-card px-6 py-8 text-center sm:p-10" aria-live="polite">
+    <div class="animate-rise flex flex-col items-center gap-5 rounded-[20px] border bg-card px-6 py-8 text-center sm:p-10 [@media(max-height:700px)]:gap-4 [@media(max-height:700px)]:py-6">
+      <!-- Região viva estável e só com a mensagem de estado: o bloco abaixo
+           remonta a cada troca de estado, e montar já anunciando não é confiável. -->
+      <p class="sr-only" aria-live="polite">{{ statusAnnouncement }}</p>
       <!-- Confirmando: só o spinner e o título. -->
       <div v-if="confirming" class="animate-fade flex flex-col items-center gap-[18px] py-6">
-        <Spinner class="size-11 border-[3px] border-accent border-t-primary" label="Confirmando seu e-mail" />
+        <Spinner class="size-11 border-[3px] border-accent border-t-primary" />
         <h1 class="text-2xl font-semibold tracking-[-0.02em]">Confirmando seu e-mail…</h1>
       </div>
 
-      <div v-else :key="feedback?.state ?? 'pending'" class="animate-fade flex w-full flex-col items-center gap-[18px]">
+      <div v-else :key="feedback?.state ?? 'pending'" class="animate-fade flex w-full flex-col items-center gap-[18px] [@media(max-height:700px)]:gap-3.5">
         <span
           aria-hidden="true"
-          class="flex size-[72px] items-center justify-center rounded-full"
+          class="flex size-[72px] shrink-0 items-center [@media(max-height:700px)]:size-14 justify-center rounded-full"
           :class="stateIcon.warn ? 'bg-warning-soft text-warning' : 'bg-accent text-primary'"
         >
           <component :is="stateIcon.icon" class="size-8" :stroke-width="feedback?.state === 'confirmed' ? 2.4 : 1.7" />
         </span>
 
-        <h1 class="text-[28px] font-semibold leading-tight tracking-[-0.025em]">{{ feedback ? feedback.title : 'Confira seu e-mail' }}</h1>
+        <div class="flex flex-col items-center gap-[18px] [@media(max-height:700px)]:gap-2.5">
+          <h1 class="text-[28px] font-semibold leading-tight tracking-[-0.025em]">{{ feedback ? feedback.title : 'Confira seu e-mail' }}</h1>
 
-        <p v-if="feedback" class="text-[15px] leading-relaxed text-secondary-foreground">{{ feedback.message }}</p>
-        <p v-else-if="pendingEmail" class="text-[15px] leading-relaxed text-secondary-foreground">
-          Enviamos um link de confirmação para <strong class="font-semibold text-foreground">{{ pendingEmail }}</strong>.
-          O link vale por 24 horas. Confira também a caixa de spam.
-        </p>
-        <p v-else class="text-[15px] leading-relaxed text-secondary-foreground">
-          Use o link que enviamos para o e-mail do seu cadastro. Ele vale por 24 horas. Se venceu, peça um novo abaixo.
-        </p>
+          <p v-if="feedback" class="text-[15px] leading-relaxed text-secondary-foreground">{{ feedback.message }}</p>
+          <p v-else-if="pendingEmail" class="text-[15px] leading-relaxed text-secondary-foreground">
+            Enviamos um link de confirmação para <strong class="font-semibold text-foreground">{{ pendingEmail }}</strong>.
+            O link vale por 24 horas. Confira também a caixa de spam.
+          </p>
+          <p v-else class="text-[15px] leading-relaxed text-secondary-foreground">
+            Use o link que enviamos para o e-mail do seu cadastro. Ele vale por 24 horas. Se venceu, peça um novo abaixo.
+          </p>
+        </div>
 
         <InlineNotice v-if="deliveryFailed && !feedback" tone="warning" class="w-full text-left">
           Não conseguimos enviar o e-mail de confirmação agora. Sua conta foi criada;

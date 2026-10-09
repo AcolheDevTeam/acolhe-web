@@ -57,4 +57,5 @@ export const crpRegions = [
   { value: '24', name: 'Rondônia e Acre', uf: 'RO/AC' },
 ] as const
 
-export const signupApproaches = ['TCC', 'Psicanálise', 'Humanista', 'Sistêmica', 'ACT', 'Outra'] as const
+// Sem "Outra": gravaria a palavra literal como abordagem.
+export const signupApproaches = ['TCC', 'Psicanálise', 'Humanista', 'Sistêmica', 'ACT'] as const

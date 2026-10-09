@@ -49,9 +49,17 @@ async function goTo(index: number) {
   stepHeading.value?.focus()
 }
 
+// Trava o avanço enquanto a validação roda: dois Enter seguidos pulariam etapa.
+const advancing = ref(false)
 async function nextStep() {
-  const results = await Promise.all(signupSteps[step.value].fields.map((field) => validateField(field)))
-  if (results.every((result) => result.valid)) await goTo(step.value + 1)
+  if (advancing.value) return
+  advancing.value = true
+  try {
+    const results = await Promise.all(signupSteps[step.value].fields.map((field) => validateField(field)))
+    if (results.every((result) => result.valid)) await goTo(step.value + 1)
+  } finally {
+    advancing.value = false
+  }
 }
 
 function previousStep() {
@@ -103,15 +111,15 @@ const canSubmit = computed(() => acceptTerms.value === true && acceptPrivacy.val
       </p>
     </template>
 
-    <div class="flex flex-col gap-7">
+    <div class="flex flex-col gap-7 [@media(max-height:700px)]:gap-5">
       <StepProgress :steps="stepNames" :current="step" label="Etapas do cadastro" class="animate-rise [animation-delay:.08s]" />
 
       <form
-        class="rounded-[20px] border bg-card p-5 sm:p-9"
+        class="rounded-[20px] border bg-card px-5 pt-5 sm:px-9 sm:pt-9 [@media(max-height:700px)]:px-6 [@media(max-height:700px)]:pt-6"
         novalidate
         @submit.prevent="step === lastStep ? onSubmit() : nextStep()"
       >
-        <div :key="step" class="step-in flex flex-col gap-5">
+        <div :key="step" class="step-in flex flex-col gap-5 [@media(max-height:700px)]:gap-4">
           <!-- 1. Conta -->
           <template v-if="step === 0">
             <div>
@@ -176,7 +184,7 @@ const canSubmit = computed(() => acceptTerms.value === true && acceptPrivacy.val
             <div class="flex flex-col gap-2">
               <span class="text-sm font-medium">Comprovante do CRP</span>
               <!-- Sem fluxo de upload no backend: a área fica desligada e explica por quê. -->
-              <div class="flex flex-col items-center gap-2.5 rounded-[14px] border-[1.5px] border-dashed border-input-hover bg-card p-6 text-center" aria-disabled="true">
+              <div class="flex flex-col items-center gap-2.5 rounded-[14px] border-[1.5px] border-dashed border-input-hover bg-card p-6 text-center [@media(max-height:700px)]:p-4" aria-disabled="true">
                 <Upload class="size-7 text-muted-foreground" :stroke-width="1.7" aria-hidden="true" />
                 <p class="text-sm font-medium text-secondary-foreground">Envio do comprovante indisponível por enquanto</p>
                 <p class="max-w-[420px] text-xs leading-relaxed text-muted-foreground">O arquivo não é aceito, enviado nem armazenado até existir um fluxo privado com varredura, limite e expiração.</p>
@@ -238,12 +246,15 @@ const canSubmit = computed(() => acceptTerms.value === true && acceptPrivacy.val
           </template>
         </div>
 
-        <div class="mt-7 flex items-center justify-between gap-3 border-t pt-5">
-          <Button v-if="step > 0" type="button" variant="ghost" size="xl" class="px-5" :disabled="isSubmitting" @click="previousStep">Voltar</Button>
-          <span v-else />
-          <Button type="submit" size="xl" :loading="isSubmitting" :disabled="step === lastStep && !canSubmit">
-            {{ step < lastStep ? 'Continuar' : isSubmitting ? 'Criando conta…' : 'Criar conta' }}
-          </Button>
+        <!-- Rodapé fixo no fim da área que rola: a ação principal fica sempre à vista. -->
+        <div class="sticky bottom-0 z-10 -mx-5 mt-7 rounded-b-[20px] bg-card px-5 pb-5 sm:-mx-9 sm:px-9 sm:pb-9 [@media(max-height:700px)]:-mx-6 [@media(max-height:700px)]:mt-5 [@media(max-height:700px)]:px-6 [@media(max-height:700px)]:pb-5">
+          <div class="flex items-center justify-between gap-3 border-t pt-5 [@media(max-height:700px)]:pt-4">
+            <Button v-if="step > 0" type="button" variant="ghost" size="xl" class="px-5" :disabled="isSubmitting" @click="previousStep">Voltar</Button>
+            <span v-else />
+            <Button type="submit" size="xl" :loading="isSubmitting || advancing" :disabled="step === lastStep && !canSubmit">
+              {{ step < lastStep ? 'Continuar' : isSubmitting ? 'Criando conta…' : 'Criar conta' }}
+            </Button>
+          </div>
         </div>
       </form>
     </div>
