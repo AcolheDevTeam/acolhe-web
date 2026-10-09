@@ -6,7 +6,7 @@ import type {
   PatientProcessSummary,
   User,
 } from '~/types'
-import { patientPortalCacheKey } from '~/utils/patient-portal'
+import { patientPortalCacheKey, sessionExpired } from '~/utils/patient-portal'
 
 export function usePatientPortal() {
   const { data: me } = useFetch<User | null>('/api/me', { key: 'me' })
@@ -54,6 +54,13 @@ export function usePatientPortal() {
 
   const pending = computed(() => requests.some(request => request.pending.value))
   const error = computed(() => requests.find(request => request.error.value)?.error.value ?? null)
+
+  // Sessão expirada em qualquer tela do portal volta para o login.
+  watch(error, (value) => {
+    if (import.meta.client && sessionExpired(value as { statusCode?: number } | null)) {
+      navigateTo('/login')
+    }
+  })
 
   return { me, context, nextSession, activities, checkins, summary, pending, error }
 }
