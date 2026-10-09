@@ -52,7 +52,11 @@ export function usePatientPortal() {
     void Promise.all(requests.map(request => request.execute()))
   }, { immediate: true })
 
-  const pending = computed(() => requests.some(request => request.pending.value))
+  // Skeleton só na primeira carga: ao trocar de aba os dados em cache aparecem
+  // na hora e a atualização acontece por baixo.
+  const loaded = ref(false)
+  watch(() => requests.every(request => request.status.value === 'success'), (done) => { if (done) loaded.value = true }, { immediate: true })
+  const pending = computed(() => !loaded.value && requests.some(request => request.pending.value || request.status.value === 'idle'))
   const error = computed(() => requests.find(request => request.error.value)?.error.value ?? null)
 
   // Sessão expirada em qualquer tela do portal volta para o login.

@@ -10,6 +10,8 @@ const items = [
   { label: 'Atividades', to: '/patient/activities', icon: ListChecks },
   { label: 'Check-in', to: '/patient/check-in', icon: CircleDot },
 ]
+// Ao responder uma atividade, a barra de ação é a única coisa fixa embaixo.
+const hideTabbar = computed(() => /^\/patient\/activities\/[^/]+/.test(route.path))
 function isActive(to: string) {
   if (to === '/patient') return route.path === to
   return route.path === to || route.path.startsWith(`${to}/`)
@@ -17,7 +19,7 @@ function isActive(to: string) {
 </script>
 
 <template>
-  <div class="min-h-dvh bg-background pb-24 text-foreground md:pb-0">
+  <div :class="['min-h-dvh bg-background text-foreground md:pb-0', hideTabbar ? '' : 'pb-24']">
     <header class="hidden border-b bg-card md:block">
       <div class="mx-auto flex h-16 max-w-3xl items-center justify-between px-8">
         <NuxtLink to="/patient" aria-label="Ir para o início"><AppLogo /></NuxtLink>
@@ -40,7 +42,7 @@ function isActive(to: string) {
     <main class="mx-auto flex max-w-3xl flex-col px-5 pt-6 md:px-8 md:py-10">
       <slot />
     </main>
-    <nav class="fixed inset-x-0 bottom-0 z-20 border-t bg-card px-2 pb-[max(12px,env(safe-area-inset-bottom))] pt-1 md:hidden" aria-label="Navegação da paciente">
+    <nav v-if="!hideTabbar" class="fixed inset-x-0 bottom-0 z-20 border-t bg-card px-2 pb-[max(12px,env(safe-area-inset-bottom))] pt-1 md:hidden" aria-label="Navegação da paciente">
       <div class="mx-auto flex max-w-md">
         <NuxtLink
           v-for="item in items"
