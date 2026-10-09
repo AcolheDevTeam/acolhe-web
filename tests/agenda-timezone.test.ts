@@ -64,9 +64,8 @@ describe('409 da agenda com mensagem específica (A6)', () => {
 })
 
 describe('BFF repassa o motivo do 4xx (ACO-83)', async () => {
-  // createError é auto-importado no Nitro; aqui vem do h3.
-  const { createError } = await import('h3')
-  ;(globalThis as { createError?: unknown }).createError = createError
+  // createError é auto-importado no Nitro; no teste basta guardar as opções.
+  ;(globalThis as { createError?: unknown }).createError = (options: object) => ({ ...options })
   const { relayApiError } = await import('../server/utils/apiFetch')
 
   it('4xx leva status e a mensagem curta da API em data', () => {
