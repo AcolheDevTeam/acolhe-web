@@ -125,7 +125,7 @@ onBeforeUnmount(() => {
       </div>
     </div>
     <!-- No celular o rodapé fica preso embaixo para o salvar estar sempre ao alcance. -->
-    <div class="sticky bottom-0 z-10 -mx-4 flex animate-rise flex-wrap justify-end gap-2.5 border-t bg-background px-4 py-3 [animation-delay:.3s] md:static md:mx-0 md:px-0 md:pb-0 md:pt-2">
+    <div class="sticky bottom-0 z-10 -mx-4 flex animate-rise flex-wrap justify-end gap-2.5 border-t bg-background px-4 pt-3 pb-[max(12px,env(safe-area-inset-bottom))] [animation-delay:.3s] md:static md:mx-0 md:px-0 md:pb-0 md:pt-2">
       <Button
         v-if="!session.locked"
         type="button"
