@@ -15,7 +15,7 @@ defineProps<{ heading: string, support?: string }>()
         <p v-if="support" class="max-w-[400px] text-[15px] leading-relaxed text-secondary-foreground">{{ support }}</p>
       </div>
     </section>
-    <section class="flex flex-[1_1_480px] justify-center px-6 py-8 min-[900px]:overflow-y-auto min-[900px]:py-8">
+    <section class="flex flex-[1_1_480px] justify-center px-6 py-8 min-[900px]:overflow-y-auto">
       <div class="my-auto w-full max-w-[400px]">
         <!-- No celular o painel da marca some: só o logo acima do conteúdo. -->
         <NuxtLink to="/login" class="mb-8 inline-flex min-[900px]:hidden" aria-label="Acolhe, voltar para o login">
