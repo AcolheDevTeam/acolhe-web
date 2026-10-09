@@ -146,6 +146,7 @@ export type ActivityStatus = 'pending' | 'in_progress' | 'submitted' | 'reviewed
 
 export interface Activity {
   id: string
+  templateId?: string
   patientId: string
   patientName?: string
   title: string
