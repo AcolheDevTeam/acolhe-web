@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { newPasswordSchema } from './password'
 import { signupTermsVersion } from '~/schemas/signup'
 
 // Convite para workspace (ACO-62; API: ADR 0002, fase 4). O token do link é a
@@ -37,7 +38,7 @@ export function acceptExistingSchema(needsCrp: boolean) {
 export function acceptNewAccountSchema(needsCrp: boolean) {
   return z.object({
     fullName: z.string().trim().min(2, 'Informe seu nome completo.').max(200, 'Nome muito longo.'),
-    password: z.string().min(8, 'Mínimo de 8 caracteres.').max(128, 'Máximo de 128 caracteres.'),
+    password: newPasswordSchema,
     crpNumber: needsCrp ? crpNumber : z.string().optional(),
     crpState: needsCrp ? crpState : z.string().optional(),
     acceptTerms: z.boolean().refine(value => value, 'Aceite os termos para continuar.'),
