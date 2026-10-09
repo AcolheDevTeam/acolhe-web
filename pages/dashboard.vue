@@ -31,13 +31,9 @@ const today = computed(() => {
 })
 
 const sessionsToday = computed(() => {
-  const now = new Date()
-  return (allAppointments.value ?? []).filter((session) => {
-    const occurredAt = new Date(session.scheduledFor)
-    return ['scheduled', 'confirmed', 'completed'].includes(session.status) && occurredAt.getFullYear() === now.getFullYear()
-      && occurredAt.getMonth() === now.getMonth()
-      && occurredAt.getDate() === now.getDate()
-  })
+  const today = zonedDay()
+  return (allAppointments.value ?? []).filter(session =>
+    ['scheduled', 'confirmed', 'completed'].includes(session.status) && zonedDay(session.scheduledFor) === today)
 })
 const reviews = computed(() => (allActivities.value ?? []).filter(activity => activity.status === 'submitted'))
 const activePatients = computed(() => (patients.value ?? []).filter((p) => p.status === 'active'))

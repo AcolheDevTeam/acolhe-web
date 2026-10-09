@@ -62,3 +62,28 @@ describe('409 da agenda com mensagem específica (A6)', () => {
     expect(Object.keys(finalStatusConfirmation).sort()).toEqual(['canceled', 'completed', 'no_show'])
   })
 })
+
+describe('BFF repassa o motivo do 4xx (ACO-83)', async () => {
+  // createError é auto-importado no Nitro; aqui vem do h3.
+  const { createError } = await import('h3')
+  ;(globalThis as { createError?: unknown }).createError = createError
+  const { relayApiError } = await import('../server/utils/apiFetch')
+
+  it('4xx leva status e a mensagem curta da API em data', () => {
+    const relayed = relayApiError({ response: { status: 409 }, data: { message: 'conflito de horário na agenda' } }) as { statusCode: number, data?: { message?: string } }
+    expect(relayed.statusCode).toBe(409)
+    expect(relayed.data?.message).toBe('conflito de horário na agenda')
+    expect(appointmentConflictMessage(relayed)).toContain('outra sessão neste horário')
+  })
+
+  it('5xx não leva detalhe nenhum', () => {
+    const relayed = relayApiError({ response: { status: 500 }, data: { message: 'erro interno' } }) as { statusCode: number, data?: unknown }
+    expect(relayed.statusCode).toBe(500)
+    expect(relayed.data).toBeUndefined()
+  })
+
+  it('falha de rede segue como está', () => {
+    const network = new Error('fetch failed')
+    expect(relayApiError(network)).toBe(network)
+  })
+})

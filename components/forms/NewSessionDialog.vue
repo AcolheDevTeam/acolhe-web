@@ -83,7 +83,7 @@ const onSubmit = handleSubmit(async (values) => {
       403: 'O vínculo com esta paciente ainda não está ativo: ela precisa aceitar o convite antes do agendamento.',
       400: 'Confira a data, a hora, a duração e a modalidade.',
       404: 'Esta paciente ou este agendamento não está disponível para você.',
-      409: 'Não foi possível agendar: o agendamento mudou. Recarregue e tente de novo.',
+      409: 'Não foi possível agendar neste horário: ele conflita com outra sessão da agenda.',
       default: 'Não foi possível salvar o agendamento agora.',
     }))
   }

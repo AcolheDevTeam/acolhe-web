@@ -55,7 +55,7 @@ export default defineEventHandler(async (event) => {
       verificationDelivery: result.verificationDelivery,
     }
   } catch (error: unknown) {
-    const statusCode = (error as { response?: { status?: number } }).response?.status
+    const statusCode = (error as { statusCode?: number }).statusCode
     if (statusCode === 409) {
       throw createError({ statusCode: 409, statusMessage: 'Não foi possível concluir o cadastro.' })
     }
