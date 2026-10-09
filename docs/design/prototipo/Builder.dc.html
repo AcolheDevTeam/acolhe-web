@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Acolhe — Criar template</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&amp;family=Schibsted+Grotesk:wght@400;500;600;700&amp;display=swap">
+<style>
+body{margin:0;background:#F5F7FE}
+*{box-sizing:border-box}
+a{color:#4040D6}a:hover{color:#1C1A5E}
+.mono{font-family:'IBM Plex Mono',ui-monospace,monospace}
+@keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.rise{animation:rise .7s cubic-bezier(.2,.7,.2,1) both}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.fade{animation:fade .36s cubic-bezier(.2,.7,.2,1) both}
+@keyframes enter{from{opacity:0;transform:translateY(-6px) scale(.98)}to{opacity:1;transform:none}}
+.fitem{animation:enter .45s cubic-bezier(.2,.7,.2,1) both}
+.nav{display:flex;align-items:center;gap:12px;height:40px;padding:0 12px;border-radius:10px;color:#3E4466;text-decoration:none;font-size:14px;font-weight:500;transition:background .2s ease,color .2s ease}
+.nav:hover{background:#ECEFFB;color:#161A3A}
+.nav.on{background:#E6EAFD;color:#1C1A5E}
+.btn{height:40px;padding:0 16px;border-radius:10px;font:inherit;font-size:14px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:8px;text-decoration:none;transition:background .25s ease,box-shadow .25s ease,transform .25s cubic-bezier(.2,.7,.2,1),border-color .25s ease,color .25s ease;white-space:nowrap}
+.btn:active{transform:scale(.985)}
+.btn-p{border:0;background:#4040D6;color:#FFFFFF}.btn-p:hover{background:#3232B5;color:#FFFFFF;box-shadow:0 6px 18px rgba(64,64,214,.22)}
+.btn-s{border:1px solid #CBD2EA;background:#FFFFFF;color:#161A3A}.btn-s:hover{border-color:#A7AFCF;background:#F7F8FE;color:#161A3A}
+.btn-q{border:0;background:transparent;color:#3E4466}.btn-q:hover{background:#EFF2FB;color:#161A3A}
+.btn-sent{border:1px solid #E6EAFD;background:#E6EAFD;color:#2B2E9E;cursor:default}
+.ptype{display:flex;align-items:center;gap:10px;width:100%;height:40px;padding:0 10px;border:1px solid transparent;border-radius:10px;background:transparent;font:inherit;font-size:14px;color:#3E4466;cursor:pointer;text-align:left;transition:background .2s ease,border-color .2s ease,color .2s ease}
+.ptype:hover{background:#FFFFFF;border-color:#DDE3F3;color:#161A3A}
+.ptype .plus{margin-left:auto;opacity:0;transition:opacity .2s ease}
+.ptype:hover .plus{opacity:1}
+.fcard{background:#FFFFFF;border:1px solid #DDE3F3;border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:12px;transition:border-color .25s ease,box-shadow .25s ease}
+.fcard:focus-within{border-color:#B9C3F4;box-shadow:0 0 0 4px rgba(64,64,214,.08)}
+.inp{width:100%;height:40px;padding:0 12px;border:1px solid #DDE3F3;border-radius:10px;background:#FFFFFF;font:inherit;font-size:14px;color:#161A3A;outline:none;transition:border-color .2s ease,box-shadow .2s ease}
+.inp:focus{border-color:#4040D6;box-shadow:0 0 0 4px rgba(64,64,214,.14)}
+.title-inp{width:100%;border:0;background:transparent;font:inherit;font-size:30px;font-weight:600;letter-spacing:-0.03em;color:#161A3A;outline:none;padding:4px 0;border-bottom:2px solid transparent;transition:border-color .2s ease}
+.title-inp:focus{border-color:#4040D6}
+.icon-btn{width:34px;height:34px;border:0;border-radius:8px;background:transparent;color:#5C6385;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s ease,color .2s ease}
+.icon-btn:hover{background:#EFF2FB;color:#161A3A}
+.icon-btn:disabled{opacity:.35;cursor:default;background:transparent}
+.switch{position:relative;width:38px;height:22px;border:0;border-radius:11px;background:#CBD2EA;cursor:pointer;transition:background .25s ease;flex:none}
+.switch::after{content:"";position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#FFFFFF;box-shadow:0 1px 2px rgba(22,26,58,.2);transition:transform .3s cubic-bezier(.2,.7,.2,1)}
+.switch.on{background:#4040D6}
+.switch.on::after{transform:translateX(16px)}
+.opt{flex:1 1 0;height:36px;border:1px solid #DDE3F3;border-radius:9px;background:#FFFFFF;font:inherit;font-size:13px;font-weight:500;color:#3E4466;cursor:pointer;transition:background .25s ease,border-color .25s ease,color .25s ease}
+.opt.on{background:#E6EAFD;border-color:#B9C3F4;color:#2B2E9E}
+.pv-box{height:36px;border:1px solid #DDE3F3;border-radius:8px;background:#F7F8FE}
+.pv-num{flex:1 1 0;height:30px;border:1px solid #DDE3F3;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:12px;color:#3E4466;background:#FFFFFF}
+:focus-visible{outline:2px solid #4040D6;outline-offset:2px}
+@media (max-width:760px){.side{max-width:none!important}.side nav{flex-direction:row!important;flex-wrap:wrap}.side .sec{display:none!important}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition-duration:.01ms!important}}
+</style>
+</helmet>
+<div style="min-height: 1000px; display: flex; flex-wrap: wrap; background: #F5F7FE; color: #161A3A; font-family: 'Schibsted Grotesk', ui-sans-serif, system-ui, sans-serif">
+
+  <aside class="side" style="flex: 1 1 248px; max-width: 264px; padding: 24px 16px; border-right: 1px solid #DDE3F3; display: flex; flex-direction: column; gap: 24px; background: #F5F7FE">
+    <a href="Main.dc.html" aria-label="Acolhe, ir para o login" style="display: flex; align-items: center; gap: 10px; padding: 0 12px; color: #161A3A; text-decoration: none">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#4040D6" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M22 17a10 10 0 0 0-20 0"></path><path d="M18 17a6 6 0 0 0-12 0" stroke="#FF7A5C"></path><path d="M14 17a2 2 0 0 0-4 0" stroke="currentColor"></path></svg>
+      <span style="font-size: 18px; font-weight: 600; letter-spacing: -0.02em">Acolhe</span>
+    </a>
+    <button type="button" class="sec" style="display: flex; align-items: center; gap: 10px; width: 100%; padding: 10px 12px; border: 1px solid #DDE3F3; border-radius: 12px; background: #FFFFFF; font: inherit; text-align: left; cursor: pointer">
+      <span aria-hidden="true" style="width: 32px; height: 32px; border-radius: 8px; background: #1C1A5E; color: #FF8A70; font-size: 13px; font-weight: 600; display: flex; align-items: center; justify-content: center">CT</span>
+      <span style="display: flex; flex-direction: column; flex: 1; min-width: 0">
+        <span style="font-size: 14px; font-weight: 600">Clínica Travessia</span>
+        <span style="font-size: 12px; color: #5C6385">Trocar clínica</span>
+      </span>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5C6385" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 9l4-4 4 4M8 15l4 4 4-4"></path></svg>
+    </button>
+    <nav aria-label="Principal" style="display: flex; flex-direction: column; gap: 2px">
+      <a href="Dashboard.dc.html" class="nav"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 11l8-6 8 6v8a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1z"></path></svg>Início</a>
+      <a href="Pacientes.dc.html" class="nav"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"></circle><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.5a3.5 3.5 0 0 1 0 7M18.5 14a6.5 6.5 0 0 1 3 6"></path></svg>Pacientes<span class="mono" style="margin-left: auto; font-size: 12px; color: #5C6385">14</span></a>
+      <a href="Agenda.dc.html" class="nav"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="2"></rect><path d="M3.5 10h17M8 3v4M16 3v4"></path></svg>Agenda</a>
+      <a href="Atividades.dc.html" class="nav"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5h10M9 12h10M9 19h10M4.5 5l.5.5L6.5 4M4.5 12l.5.5 1.5-1.5M4.5 19l.5.5 1.5-1.5"></path></svg>Atividades<span class="mono" style="margin-left: auto; font-size: 12px; color: #4040D6">2</span></a>
+      <a href="Documentos.dc.html" class="nav"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3h7l5 5v12a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"></path><path d="M14 3v5h5M9 13h6M9 17h6"></path></svg>Documentos</a>
+      <a href="Templates.dc.html" class="nav on" aria-current="page"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h11l3 3v13H5z"></path><path d="M9 4v5h6"></path></svg>Templates</a>
+      <p class="mono sec" style="margin: 18px 12px 6px; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: #5C6385">Só você</p>
+      <a href="Registro.dc.html" class="nav"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="2"></rect><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"></path></svg>Registro Documental</a>
+      <p class="mono sec" style="margin: 18px 12px 6px; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: #5C6385">Clínica</p>
+      <a href="PainelClinica.dc.html" class="nav"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"></path></svg>Painel</a>
+      <a href="Equipe.dc.html" class="nav"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21h18M5 21V8l7-4 7 4v13M10 21v-5h4v5"></path></svg>Equipe</a>
+      <a href="Assinatura.dc.html" class="nav"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5.5" width="18" height="13" rx="2"></rect><path d="M3 10h18M7 15h3"></path></svg>Assinatura</a>
+    </nav>
+  </aside>
+
+  <main style="flex: 999 1 560px; min-width: 0; padding: 24px clamp(16px, 3vw, 40px) 56px; display: flex; flex-direction: column; gap: 24px">
+
+    <div class="rise" style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between">
+      <nav aria-label="Caminho" class="mono" style="font-size: 12px; letter-spacing: .06em; color: #5C6385; display: flex; gap: 8px">
+        <a href="Templates.dc.html" style="color: #5C6385; text-underline-offset: 3px">Templates</a><span aria-hidden="true">/</span><span style="color: #161A3A">Novo template</span>
+      </nav>
+      <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center" aria-live="polite">
+        <sc-if value="{{savedDraft}}" hint-placeholder-val="{{ false }}"><span class="fade mono" style="font-size: 12px; color: #5C6385">Rascunho salvo às 14:32</span></sc-if>
+        <a href="Templates.dc.html" class="btn btn-q">Descartar</a>
+        <button type="button" class="btn btn-s" onClick="{{saveDraft}}" disabled="{{isPublished}}">Salvar rascunho</button>
+        <sc-if value="{{notPublished}}" hint-placeholder-val="{{ true }}">
+          <button type="button" class="btn btn-p" onClick="{{publish}}">Publicar v1</button>
+        </sc-if>
+        <sc-if value="{{isPublished}}" hint-placeholder-val="{{ false }}">
+          <span class="btn btn-sent fade"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg>Publicado como v1</span>
+        </sc-if>
+      </div>
+    </div>
+
+    <div class="rise" style="animation-delay: .06s; display: flex; flex-direction: column; gap: 6px">
+      <label for="t-nome" class="mono" style="font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: #5C6385">Nome do template</label>
+      <input id="t-nome" class="title-inp" type="text" value="{{title}}" onChange="{{setTitle}}">
+      <label for="t-desc" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Instrução para a paciente</label>
+      <input id="t-desc" class="inp" type="text" value="{{intro}}" onChange="{{setIntro}}" style="max-width: 720px">
+    </div>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start">
+
+      <section class="rise" aria-labelledby="t-tipos" style="animation-delay: .1s; flex: 0 1 210px; min-width: 190px; display: flex; flex-direction: column; gap: 4px">
+        <h2 id="t-tipos" class="mono" style="margin: 0 0 8px 10px; font-size: 11px; font-weight: 500; letter-spacing: .14em; text-transform: uppercase; color: #5C6385">Adicionar campo</h2>
+        <sc-for list="{{palette}}" as="p" hint-placeholder-count="10">
+          <button type="button" class="ptype" onClick="{{p.add}}" aria-label="{{p.aria}}">
+            <span class="mono" aria-hidden="true" style="width: 28px; height: 24px; border-radius: 6px; background: #E6EAFD; color: #2B2E9E; font-size: 10px; display: flex; align-items: center; justify-content: center">{{p.abbr}}</span>
+            {{p.name}}
+            <svg class="plus" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>
+          </button>
+        </sc-for>
+      </section>
+
+      <section class="rise" aria-labelledby="t-campos" style="animation-delay: .14s; flex: 2 1 420px; min-width: 0; display: flex; flex-direction: column; gap: 12px">
+        <div style="display: flex; justify-content: space-between; align-items: baseline">
+          <h2 id="t-campos" style="margin: 0; font-size: 18px; font-weight: 600">Campos <span class="mono" style="font-size: 13px; color: #5C6385">{{count}}</span></h2>
+          <span style="font-size: 13px; color: #5C6385">Clique em um tipo à esquerda para adicionar</span>
+        </div>
+        <ol style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px">
+          <sc-for list="{{fields}}" as="f" hint-placeholder-count="4">
+            <li class="fcard fitem">
+              <div style="display: flex; align-items: center; gap: 10px">
+                <span class="mono" style="font-size: 12px; color: #5C6385">{{f.num}}</span>
+                <span class="mono" style="font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: #2B2E9E">{{f.typeName}}</span>
+                <span style="margin-left: auto; display: flex; align-items: center; gap: 2px">
+                  <button type="button" class="icon-btn" aria-label="{{f.upLabel}}" onClick="{{f.up}}" disabled="{{f.isFirst}}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 15l6-6 6 6"></path></svg></button>
+                  <button type="button" class="icon-btn" aria-label="{{f.downLabel}}" onClick="{{f.down}}" disabled="{{f.isLast}}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg></button>
+                  <button type="button" class="icon-btn" aria-label="{{f.removeLabel}}" onClick="{{f.remove}}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"></path></svg></button>
+                </span>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 6px">
+                <label for="{{f.labelId}}" style="font-size: 13px; font-weight: 500; color: #3E4466">Pergunta</label>
+                <input id="{{f.labelId}}" class="inp" type="text" value="{{f.label}}" onChange="{{f.setLabel}}">
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 6px">
+                <label for="{{f.helpId}}" style="font-size: 13px; font-weight: 500; color: #3E4466">Texto de ajuda <span style="font-weight: 400; color: #5C6385">(opcional)</span></label>
+                <input id="{{f.helpId}}" class="inp" type="text" value="{{f.help}}" onChange="{{f.setHelp}}" placeholder="Ex.: pense no momento mais intenso da semana">
+              </div>
+              <sc-if value="{{f.hasOptions}}" hint-placeholder-val="{{ false }}">
+                <p style="margin: 0; font-size: 13px; color: #3E4466">Opções: {{f.optionsText}}</p>
+              </sc-if>
+              <div style="display: flex; align-items: center; gap: 10px">
+                <button type="button" role="switch" class="{{f.reqCls}}" aria-checked="{{f.required}}" aria-labelledby="{{f.reqId}}" onClick="{{f.toggleReq}}"></button>
+                <span id="{{f.reqId}}" style="font-size: 13px; color: #3E4466">Resposta obrigatória</span>
+              </div>
+            </li>
+          </sc-for>
+        </ol>
+        <sc-if value="{{empty}}" hint-placeholder-val="{{ false }}">
+          <p class="fade" style="margin: 0; padding: 32px; border: 1px dashed #CBD2EA; border-radius: 14px; text-align: center; font-size: 14px; color: #5C6385">Nenhum campo ainda. Escolha um tipo à esquerda.</p>
+        </sc-if>
+      </section>
+
+      <div class="rise" style="animation-delay: .18s; flex: 1 1 300px; min-width: 0; display: flex; flex-direction: column; gap: 20px">
+        <section style="padding: 20px; border-radius: 16px; background: #FFFFFF; border: 1px solid #DDE3F3; display: flex; flex-direction: column; gap: 16px" aria-labelledby="t-conf">
+          <h2 id="t-conf" style="margin: 0; font-size: 16px; font-weight: 600">Configurações</h2>
+          <div role="group" aria-label="Quem pode usar" style="display: flex; flex-direction: column; gap: 8px">
+            <span style="font-size: 13px; font-weight: 500; color: #3E4466">Quem pode usar</span>
+            <div style="display: flex; gap: 6px">
+              <sc-for list="{{scopes}}" as="o" hint-placeholder-count="2"><button type="button" class="{{o.cls}}" aria-pressed="{{o.on}}" onClick="{{o.pick}}">{{o.label}}</button></sc-for>
+            </div>
+          </div>
+          <div role="group" aria-label="Recorrência sugerida" style="display: flex; flex-direction: column; gap: 8px">
+            <span style="font-size: 13px; font-weight: 500; color: #3E4466">Recorrência sugerida</span>
+            <div style="display: flex; gap: 6px">
+              <sc-for list="{{recs}}" as="o" hint-placeholder-count="3"><button type="button" class="{{o.cls}}" aria-pressed="{{o.on}}" onClick="{{o.pick}}">{{o.label}}</button></sc-for>
+            </div>
+          </div>
+          <div role="group" aria-label="Pontuação" style="display: flex; flex-direction: column; gap: 8px">
+            <span style="font-size: 13px; font-weight: 500; color: #3E4466">Pontuação</span>
+            <div style="display: flex; gap: 6px">
+              <sc-for list="{{scores}}" as="o" hint-placeholder-count="2"><button type="button" class="{{o.cls}}" aria-pressed="{{o.on}}" onClick="{{o.pick}}">{{o.label}}</button></sc-for>
+            </div>
+            <sc-if value="{{isSum}}" hint-placeholder-val="{{ false }}"><p class="fade" style="margin: 0; font-size: 12px; line-height: 1.5; color: #5C6385">Soma os campos de escala. O total aparece só para você e não gera classificação automática.</p></sc-if>
+          </div>
+          <p style="margin: 0; padding: 12px; border-radius: 10px; background: #EFF2FB; font-size: 12px; line-height: 1.5; color: #3E4466">Depois de publicado, editar este template cria uma nova versão. Atividades já enviadas continuam na versão antiga.</p>
+        </section>
+
+        <section aria-labelledby="t-prev" style="padding: 20px; border-radius: 16px; background: #1C1A5E; color: #E8EBFB; display: flex; flex-direction: column; gap: 14px">
+          <h2 id="t-prev" class="mono" style="margin: 0; font-size: 11px; font-weight: 500; letter-spacing: .14em; text-transform: uppercase; color: #A9B2E8">Como a paciente vê</h2>
+          <div style="background: #FFFFFF; color: #161A3A; border-radius: 14px; padding: 16px; display: flex; flex-direction: column; gap: 16px">
+            <div>
+              <p style="margin: 0; font-size: 16px; font-weight: 600">{{title}}</p>
+              <p style="margin: 4px 0 0; font-size: 13px; color: #5C6385">{{intro}}</p>
+            </div>
+            <sc-for list="{{fields}}" as="f" hint-placeholder-count="4">
+              <div class="fade" style="display: flex; flex-direction: column; gap: 6px">
+                <p style="margin: 0; font-size: 14px; font-weight: 500">{{f.num}}. {{f.label}}<span style="color: #9E3522">{{f.star}}</span></p>
+                <sc-if value="{{f.hasHelp}}" hint-placeholder-val="{{ false }}"><p style="margin: 0; font-size: 12px; color: #5C6385">{{f.help}}</p></sc-if>
+                <sc-if value="{{f.pvBox}}" hint-placeholder-val="{{ true }}"><div class="pv-box" style="{{f.pvBoxStyle}}"></div></sc-if>
+                <sc-if value="{{f.pvScale}}" hint-placeholder-val="{{ false }}">
+                  <div style="display: flex; gap: 4px"><sc-for list="{{f.nums}}" as="n" hint-placeholder-count="5"><span class="pv-num">{{n}}</span></sc-for></div>
+                </sc-if>
+                <sc-if value="{{f.pvChips}}" hint-placeholder-val="{{ false }}">
+                  <div style="display: flex; flex-wrap: wrap; gap: 6px"><sc-for list="{{f.options}}" as="o" hint-placeholder-count="3"><span style="height: 28px; padding: 0 10px; border: 1px solid #DDE3F3; border-radius: 14px; font-size: 12px; display: inline-flex; align-items: center; color: #3E4466">{{o}}</span></sc-for></div>
+                </sc-if>
+              </div>
+            </sc-for>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1000}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = {
+      title: 'Registro de pensamentos',
+      intro: 'Preencha quando sentir uma emoção forte. Leva uns 5 minutos.',
+      nextId: 5,
+      scope: 'pessoal', rec: 'semana', score: 'nenhuma',
+      draft: false, published: false,
+      fields: [
+        { id: 1, type: 'long', label: 'Descreva a situação', help: 'Quando, onde e com quem aconteceu?', required: true },
+        { id: 2, type: 'short', label: 'Qual foi o pensamento automático?', help: '', required: true },
+        { id: 3, type: 'multi', label: 'Qual distorção você reconhece?', help: 'Pode marcar mais de uma.', required: false },
+        { id: 4, type: 'scale10', label: 'Intensidade da emoção agora', help: '1 = muito fraca, 10 = muito forte', required: true }
+      ]
+    };
+  }
+  renderVals() {
+    const s = this.state;
+    const T = {
+      short: { name: 'Texto curto', abbr: 'Aa' }, long: { name: 'Texto longo', abbr: '¶' },
+      scale5: { name: 'Escala 1–5', abbr: '1–5' }, scale10: { name: 'Escala 1–10', abbr: '1–10' },
+      single: { name: 'Escolha única', abbr: '◉' }, multi: { name: 'Múltipla escolha', abbr: '☑' },
+      yesno: { name: 'Sim / Não', abbr: 'S/N' }, date: { name: 'Data', abbr: 'DT' },
+      time: { name: 'Hora', abbr: 'HR' }, file: { name: 'Arquivo', abbr: 'ARQ' }
+    };
+    const order = ['short', 'long', 'scale5', 'scale10', 'single', 'multi', 'yesno', 'date', 'time', 'file'];
+    const defaultOptions = { single: ['Opção 1', 'Opção 2', 'Opção 3'], multi: ['Catastrofização', 'Leitura mental', 'Adivinhação', 'Tudo ou nada'], yesno: ['Sim', 'Não'] };
+    const pvHeights = { short: 'height: 36px', long: 'height: 72px', date: 'height: 36px; max-width: 160px', time: 'height: 36px; max-width: 120px', file: 'height: 56px; border-style: dashed' };
+    const setField = (id, patch) => this.setState({ fields: this.state.fields.map((f) => f.id === id ? Object.assign({}, f, patch) : f) });
+    const move = (i, d) => {
+      const arr = this.state.fields.slice();
+      const j = i + d;
+      if (j < 0 || j >= arr.length) return;
+      const tmp = arr[i]; arr[i] = arr[j]; arr[j] = tmp;
+      this.setState({ fields: arr });
+    };
+    const pick = (key, list) => list.map((o) => ({ label: o[1], on: s[key] === o[0], cls: s[key] === o[0] ? 'opt on' : 'opt', pick: () => this.setState({ [key]: o[0] }) }));
+    const last = s.fields.length - 1;
+    return {
+      title: s.title,
+      intro: s.intro,
+      setTitle: (e) => this.setState({ title: e.target.value }),
+      setIntro: (e) => this.setState({ intro: e.target.value }),
+      palette: order.map((k) => ({
+        name: T[k].name, abbr: T[k].abbr, aria: 'Adicionar campo ' + T[k].name,
+        add: () => this.setState({ nextId: s.nextId + 1, published: false, fields: s.fields.concat([{ id: s.nextId, type: k, label: 'Nova pergunta', help: '', required: false }]) })
+      })),
+      count: s.fields.length,
+      empty: s.fields.length === 0,
+      fields: s.fields.map((f, i) => {
+        const opts = defaultOptions[f.type] || [];
+        const isScale = f.type === 'scale5' || f.type === 'scale10';
+        const max = f.type === 'scale5' ? 5 : 10;
+        return {
+          num: i + 1, label: f.label, help: f.help, required: f.required,
+          typeName: T[f.type].name,
+          labelId: 'lb-' + f.id, helpId: 'hp-' + f.id, reqId: 'rq-' + f.id,
+          setLabel: (e) => setField(f.id, { label: e.target.value }),
+          setHelp: (e) => setField(f.id, { help: e.target.value }),
+          toggleReq: () => setField(f.id, { required: !f.required }),
+          reqCls: f.required ? 'switch on' : 'switch',
+          up: () => move(i, -1), down: () => move(i, 1),
+          isFirst: i === 0, isLast: i === last,
+          upLabel: 'Mover pergunta ' + (i + 1) + ' para cima',
+          downLabel: 'Mover pergunta ' + (i + 1) + ' para baixo',
+          removeLabel: 'Remover pergunta ' + (i + 1),
+          remove: () => this.setState({ fields: this.state.fields.filter((x) => x.id !== f.id) }),
+          hasOptions: opts.length > 0 && f.type !== 'yesno',
+          optionsText: opts.join(', '),
+          star: f.required ? ' *' : '',
+          hasHelp: !!f.help,
+          pvBox: !isScale && opts.length === 0,
+          pvBoxStyle: pvHeights[f.type] || 'height: 36px',
+          pvScale: isScale,
+          nums: Array.from({ length: max }, (_, n) => n + 1),
+          pvChips: opts.length > 0,
+          options: opts
+        };
+      }),
+      scopes: pick('scope', [['pessoal', 'Só eu'], ['clinica', 'Toda a clínica']]),
+      recs: pick('rec', [['nenhuma', 'Nenhuma'], ['diaria', 'Diária'], ['semana', '3× semana']]),
+      scores: pick('score', [['nenhuma', 'Sem pontuação'], ['soma', 'Somar escalas']]),
+      isSum: s.score === 'soma',
+      savedDraft: s.draft && !s.published,
+      saveDraft: () => this.setState({ draft: true }),
+      isPublished: s.published,
+      notPublished: !s.published,
+      publish: () => this.setState({ published: true })
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Acolhe — Início da psicóloga</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&amp;family=Schibsted+Grotesk:wght@400;500;600;700&amp;display=swap">
+<style>
+body{margin:0;background:#F5F7FE}
+*{box-sizing:border-box}
+a{color:#4040D6}a:hover{color:#1C1A5E}
+.mono{font-family:'IBM Plex Mono',ui-monospace,monospace}
+@keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.rise{animation:rise .7s cubic-bezier(.2,.7,.2,1) both}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.fade{animation:fade .36s cubic-bezier(.2,.7,.2,1) both}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(64,64,214,.45)}70%{box-shadow:0 0 0 10px rgba(64,64,214,0)}100%{box-shadow:0 0 0 0 rgba(64,64,214,0)}}
+.now-dot{animation:pulse 2.4s cubic-bezier(.2,.7,.2,1) infinite}
+@keyframes grow{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+.bar{transform-origin:bottom;animation:grow .7s cubic-bezier(.2,.7,.2,1) both}
+.nav{display:flex;align-items:center;gap:12px;height:40px;padding:0 12px;border-radius:10px;color:#3E4466;text-decoration:none;font-size:14px;font-weight:500;transition:background .2s ease,color .2s ease}
+.nav:hover{background:#ECEFFB;color:#161A3A}
+.nav.on{background:#E6EAFD;color:#1C1A5E}
+.btn{height:40px;padding:0 16px;border-radius:10px;font:inherit;font-size:14px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:8px;transition:background .25s ease,box-shadow .25s ease,transform .25s cubic-bezier(.2,.7,.2,1),border-color .25s ease,color .25s ease;white-space:nowrap}
+.btn:active{transform:scale(.985)}
+.btn-p{border:0;background:#4040D6;color:#FFFFFF}.btn-p:hover{background:#3232B5;box-shadow:0 6px 18px rgba(64,64,214,.22)}
+.btn-s{border:1px solid #CBD2EA;background:#FFFFFF;color:#161A3A}.btn-s:hover{border-color:#A7AFCF;background:#F7F8FE}
+.btn-sent{border:1px solid #E6EAFD;background:#E6EAFD;color:#2B2E9E;cursor:default}
+.search{width:100%;height:40px;padding:0 64px 0 40px;border:1px solid #DDE3F3;border-radius:10px;background:#FFFFFF;font:inherit;font-size:14px;color:#161A3A;outline:none;transition:border-color .2s ease,box-shadow .2s ease}
+.search:focus{border-color:#4040D6;box-shadow:0 0 0 4px rgba(64,64,214,.14)}
+.row{display:flex;align-items:center;gap:16px;padding:14px 16px;border-radius:12px;text-decoration:none;color:inherit;transition:background .2s ease}
+.row:hover{background:#F5F7FE}
+.seg{position:relative;z-index:1;height:32px;padding:0 14px;border:0;background:transparent;font:inherit;font-size:13px;font-weight:500;color:#5C6385;cursor:pointer;border-radius:8px;transition:color .3s ease;min-width:72px}
+.seg.on{color:#161A3A}
+.seg-pill{position:absolute;top:3px;bottom:3px;left:3px;width:72px;background:#FFFFFF;border-radius:8px;box-shadow:0 1px 2px rgba(22,26,58,.1);transition:transform .42s cubic-bezier(.2,.7,.2,1)}
+.seg-pill.right{transform:translateX(72px)}
+.card{background:#FFFFFF;border:1px solid #DDE3F3;border-radius:16px}
+:focus-visible{outline:2px solid #4040D6;outline-offset:2px}
+@media (max-width:760px){.side{max-width:none!important}.side nav{flex-direction:row!important;flex-wrap:wrap}.side .sec{display:none!important}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+</style>
+</helmet>
+<div style="min-height: 1000px; display: flex; flex-wrap: wrap; background: #F5F7FE; color: #161A3A; font-family: 'Schibsted Grotesk', ui-sans-serif, system-ui, sans-serif">
+
+  <aside class="side" style="flex: 1 1 248px; max-width: 264px; padding: 24px 16px; border-right: 1px solid #DDE3F3; display: flex; flex-direction: column; gap: 24px; background: #F5F7FE">
+    <a href="Main.dc.html" aria-label="Acolhe, ir para o login" style="display: flex; align-items: center; gap: 10px; padding: 0 12px; color: #161A3A; text-decoration: none">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#4040D6" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M22 17a10 10 0 0 0-20 0"></path><path d="M18 17a6 6 0 0 0-12 0" stroke="#FF7A5C"></path><path d="M14 17a2 2 0 0 0-4 0" stroke="currentColor"></path></svg>
+      <span style="font-size: 18px; font-weight: 600; letter-spacing: -0.02em">Acolhe</span>
+    </a>
+
+    <button type="button" class="sec" style="display: flex; align-items: center; gap: 10px; width: 100%; padding: 10px 12px; border: 1px solid #DDE3F3; border-radius: 12px; background: #FFFFFF; font: inherit; text-align: left; cursor: pointer">
+      <span aria-hidden="true" style="width: 32px; height: 32px; border-radius: 8px; background: #1C1A5E; color: #FF8A70; font-size: 13px; font-weight: 600; display: flex; align-items: center; justify-content: center">CT</span>
+      <span style="display: flex; flex-direction: column; flex: 1; min-width: 0">
+        <span style="font-size: 14px; font-weight: 600">Clínica Travessia</span>
+        <span style="font-size: 12px; color: #5C6385">Trocar clínica</span>
+      </span>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5C6385" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 9l4-4 4 4M8 15l4 4 4-4"></path></svg>
+    </button>
+
+    <nav aria-label="Principal" style="display: flex; flex-direction: column; gap: 2px">
+      <a href="#" class="nav on" aria-current="page"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 11l8-6 8 6v8a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1z"></path></svg>Início</a>
+      <a href="Pacientes.dc.html" class="nav"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"></circle><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.5a3.5 3.5 0 0 1 0 7M18.5 14a6.5 6.5 0 0 1 3 6"></path></svg>Pacientes<span class="mono" style="margin-left: auto; font-size: 12px; color: #5C6385">14</span></a>
+      <a href="Agenda.dc.html" class="nav"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="2"></rect><path d="M3.5 10h17M8 3v4M16 3v4"></path></svg>Agenda</a>
+      <a href="Atividades.dc.html" class="nav"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5h10M9 12h10M9 19h10M4.5 5l.5.5L6.5 4M4.5 12l.5.5 1.5-1.5M4.5 19l.5.5 1.5-1.5"></path></svg>Atividades<span class="mono" style="margin-left: auto; font-size: 12px; color: #4040D6">2</span></a>
+      <a href="Documentos.dc.html" class="nav"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3h7l5 5v12a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"></path><path d="M14 3v5h5M9 13h6M9 17h6"></path></svg>Documentos</a>
+      <a href="Templates.dc.html" class="nav"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h11l3 3v13H5z"></path><path d="M9 4v5h6"></path></svg>Templates</a>
+
+      <p class="mono sec" style="margin: 18px 12px 6px; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: #5C6385">Só você</p>
+      <a href="Registro.dc.html" class="nav"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="2"></rect><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"></path></svg>Registro Documental</a>
+
+      <p class="mono sec" style="margin: 18px 12px 6px; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: #5C6385">Clínica</p>
+      <a href="PainelClinica.dc.html" class="nav"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"></path></svg>Painel</a>
+      <a href="Equipe.dc.html" class="nav"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21h18M5 21V8l7-4 7 4v13M10 21v-5h4v5"></path></svg>Equipe</a>
+      <a href="Assinatura.dc.html" class="nav"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5.5" width="18" height="13" rx="2"></rect><path d="M3 10h18M7 15h3"></path></svg>Assinatura</a>
+    </nav>
+
+    <div class="sec" style="margin-top: auto; display: flex; align-items: center; gap: 10px; padding: 12px; border-top: 1px solid #DDE3F3">
+      <span aria-hidden="true" style="width: 34px; height: 34px; border-radius: 50%; background: #E6EAFD; color: #2B2E9E; font-size: 13px; font-weight: 600; display: flex; align-items: center; justify-content: center">MS</span>
+      <span style="display: flex; flex-direction: column; min-width: 0; flex: 1">
+        <span style="font-size: 14px; font-weight: 600">Mariana Sá</span>
+        <span class="mono" style="font-size: 11px; color: #5C6385">CRP 06/123456</span>
+      </span>
+      <a href="Perfil.dc.html" aria-label="Ajustes" style="width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #5C6385"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"></path></svg></a>
+    </div>
+  </aside>
+
+  <main style="flex: 999 1 560px; min-width: 0; padding: 24px clamp(16px, 4vw, 48px) 56px; display: flex; flex-direction: column; gap: 32px">
+
+    <div class="rise" style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center">
+      <div style="position: relative; flex: 1 1 280px; max-width: 480px">
+        <label for="busca" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Buscar</label>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5C6385" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" style="position: absolute; left: 14px; top: 12px"><circle cx="11" cy="11" r="6.5"></circle><path d="M20 20l-4-4"></path></svg>
+        <input id="busca" class="search" type="search" placeholder="Buscar paciente, sessão ou documento">
+        <span class="mono" aria-hidden="true" style="position: absolute; right: 10px; top: 9px; padding: 2px 6px; border: 1px solid #DDE3F3; border-radius: 6px; font-size: 11px; color: #5C6385">⌘K</span>
+      </div>
+      <div style="display: flex; gap: 10px; margin-left: auto">
+        <button type="button" class="btn btn-s"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>Novo paciente</button>
+        <button type="button" class="btn btn-p"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>Agendar sessão</button>
+      </div>
+    </div>
+
+    <header class="rise" style="animation-delay: .08s; display: flex; flex-direction: column; gap: 10px">
+      <p class="mono" style="margin: 0; font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: #5C6385">Quinta · 9 de outubro</p>
+      <h1 style="margin: 0; font-size: 40px; line-height: 1.1; font-weight: 600; letter-spacing: -0.03em">Bom dia, Mariana.</h1>
+      <p style="margin: 0; font-size: 16px; line-height: 1.55; color: #3E4466">4 sessões hoje, 2 respostas para revisar e 1 paciente sem acessar há 5 dias.</p>
+    </header>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start">
+
+      <section class="card rise" aria-labelledby="t-agenda" style="animation-delay: .16s; flex: 2 1 460px; min-width: 0; padding: 20px 12px 12px">
+        <div style="display: flex; align-items: center; justify-content: space-between; padding: 0 8px 12px">
+          <h2 id="t-agenda" style="margin: 0; font-size: 18px; font-weight: 600; letter-spacing: -0.01em">Agenda</h2>
+          <div role="group" aria-label="Período" style="position: relative; display: flex; padding: 3px; background: #EFF2FB; border-radius: 10px">
+            <div class="{{pillClass}}" aria-hidden="true"></div>
+            <button type="button" class="{{segDia}}" aria-pressed="{{isDia}}" onClick="{{showDia}}">Hoje</button>
+            <button type="button" class="{{segSem}}" aria-pressed="{{isSem}}" onClick="{{showSem}}">Semana</button>
+          </div>
+        </div>
+
+        <sc-if value="{{isDia}}" hint-placeholder-val="{{ true }}">
+          <ol class="fade" style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column">
+            <sc-for list="{{sessions}}" as="s" hint-placeholder-count="5">
+              <li>
+                <a href="Ficha.dc.html" class="row" style="{{s.rowStyle}}">
+                  <span class="mono" style="width: 48px; font-size: 13px; color: #3E4466">{{s.hora}}</span>
+                  <span style="width: 10px; height: 10px; border-radius: 50%; flex: none; {{s.dotStyle}}" class="{{s.dotClass}}" aria-hidden="true"></span>
+                  <span style="display: flex; flex-direction: column; flex: 1; min-width: 0">
+                    <span style="font-size: 15px; font-weight: 600">{{s.nome}}</span>
+                    <span style="font-size: 13px; color: #5C6385">{{s.meta}}</span>
+                  </span>
+                  <span style="font-size: 13px; font-weight: 500; {{s.statusStyle}}">{{s.status}}</span>
+                </a>
+              </li>
+            </sc-for>
+          </ol>
+        </sc-if>
+
+        <sc-if value="{{isSem}}" hint-placeholder-val="{{ false }}">
+          <div class="fade" style="padding: 8px 8px 4px">
+            <div role="img" aria-label="Sessões por dia nesta semana: segunda 5, terça 6, quarta 3, quinta 4, sexta 6, sábado 0, domingo 0" style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 12px; align-items: end; height: 200px">
+              <sc-for list="{{week}}" as="d" hint-placeholder-count="7">
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 8px; height: 100%; justify-content: flex-end">
+                  <span class="mono" style="font-size: 12px; color: #3E4466">{{d.n}}</span>
+                  <div class="bar" style="width: 100%; max-width: 44px; border-radius: 8px; {{d.barStyle}}"></div>
+                  <span class="mono" style="font-size: 11px; letter-spacing: .08em; text-transform: uppercase; {{d.labelStyle}}">{{d.dia}}</span>
+                </div>
+              </sc-for>
+            </div>
+            <p style="margin: 16px 0 0; font-size: 13px; color: #5C6385">24 sessões nesta semana · 2 horários livres na sexta à tarde</p>
+          </div>
+        </sc-if>
+      </section>
+
+      <div style="flex: 1 1 300px; min-width: 0; display: flex; flex-direction: column; gap: 24px">
+        <section class="card rise" aria-labelledby="t-rev" style="animation-delay: .24s; padding: 20px 12px 12px">
+          <div style="display: flex; align-items: baseline; justify-content: space-between; padding: 0 8px 8px">
+            <h2 id="t-rev" style="margin: 0; font-size: 18px; font-weight: 600; letter-spacing: -0.01em">Para revisar</h2>
+            <a href="Revisar.dc.html" style="font-size: 13px; text-underline-offset: 3px">Ver todas</a>
+          </div>
+          <a href="Revisar.dc.html" class="row" style="align-items: flex-start">
+            <span aria-hidden="true" style="width: 36px; height: 36px; border-radius: 50%; background: #E6EAFD; color: #2B2E9E; font-size: 12px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex: none">PT</span>
+            <span style="display: flex; flex-direction: column; gap: 2px; min-width: 0">
+              <span style="font-size: 14px; font-weight: 600">Registro de pensamentos</span>
+              <span style="font-size: 13px; color: #5C6385">Pedro Tavares · ontem, 21h</span>
+            </span>
+          </a>
+          <a href="Revisar.dc.html" class="row" style="align-items: flex-start">
+            <span aria-hidden="true" style="width: 36px; height: 36px; border-radius: 50%; background: #E6EAFD; color: #2B2E9E; font-size: 12px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex: none">JA</span>
+            <span style="display: flex; flex-direction: column; gap: 2px; min-width: 0">
+              <span style="font-size: 14px; font-weight: 600">Higiene do sono</span>
+              <span style="font-size: 13px; color: #5C6385">Júlia Andrade · há 4 horas</span>
+            </span>
+          </a>
+        </section>
+
+        <section class="rise" aria-labelledby="t-aten" style="animation-delay: .32s; padding: 20px; border-radius: 16px; background: #FDEBE7; display: flex; flex-direction: column; gap: 14px">
+          <div style="display: flex; align-items: center; gap: 8px; color: #9E3522">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7.5v5l3 2"></path></svg>
+            <h2 id="t-aten" class="mono" style="margin: 0; font-size: 11px; font-weight: 500; letter-spacing: .14em; text-transform: uppercase">Sem acesso há 5 dias</h2>
+          </div>
+          <p style="margin: 0; font-size: 15px; line-height: 1.5; color: #161A3A"><strong style="font-weight: 600">Rita Lopes</strong> tem 3 atividades pendentes e não entra no Acolhe desde sábado.</p>
+          <div aria-live="polite">
+            <sc-if value="{{notSent}}" hint-placeholder-val="{{ true }}">
+              <button type="button" class="btn btn-s" onClick="{{remind}}">Enviar lembrete</button>
+            </sc-if>
+            <sc-if value="{{sent}}" hint-placeholder-val="{{ false }}">
+              <span class="btn btn-sent fade"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg>Lembrete enviado por e-mail</span>
+            </sc-if>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <section class="rise" aria-label="Resumo do mês" style="animation-delay: .4s; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px">
+      <div class="card" style="padding: 20px; display: flex; flex-direction: column; gap: 8px"><span class="mono" style="font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: #5C6385">Pacientes ativos</span><span style="font-size: 32px; font-weight: 600; letter-spacing: -0.03em">14</span></div>
+      <div class="card" style="padding: 20px; display: flex; flex-direction: column; gap: 8px"><span class="mono" style="font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: #5C6385">Sessões em outubro</span><span style="font-size: 32px; font-weight: 600; letter-spacing: -0.03em">18</span></div>
+      <div class="card" style="padding: 20px; display: flex; flex-direction: column; gap: 8px"><span class="mono" style="font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: #5C6385">Atividades respondidas</span><span style="font-size: 32px; font-weight: 600; letter-spacing: -0.03em">78%</span></div>
+    </section>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1000}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { view: 'dia', sent: false };
+  }
+  renderVals() {
+    const s = this.state;
+    const isDia = s.view === 'dia';
+    const mk = (hora, nome, meta, status, kind) => {
+      const done = kind === 'done', now = kind === 'now', miss = kind === 'miss';
+      return {
+        hora: hora, nome: nome, meta: meta, status: status,
+        rowStyle: now ? 'background: #E6EAFD' : '',
+        dotStyle: now ? 'background: #4040D6' : done ? 'background: #A7AFCF' : miss ? 'background: #FFFFFF; border: 2px solid #D9503C' : 'background: #FFFFFF; border: 2px solid #A7AFCF',
+        dotClass: now ? 'now-dot' : '',
+        statusStyle: now ? 'color: #1C1A5E' : miss ? 'color: #9E3522' : 'color: #5C6385'
+      };
+    };
+    const days = [['seg', 5], ['ter', 6], ['qua', 3], ['qui', 4], ['sex', 6], ['sáb', 0], ['dom', 0]];
+    return {
+      isDia: isDia,
+      isSem: !isDia,
+      pillClass: isDia ? 'seg-pill' : 'seg-pill right',
+      segDia: isDia ? 'seg on' : 'seg',
+      segSem: isDia ? 'seg' : 'seg on',
+      showDia: () => this.setState({ view: 'dia' }),
+      showSem: () => this.setState({ view: 'sem' }),
+      sessions: [
+        mk('09:00', 'Pedro Tavares', 'Online · 50 min', 'Realizada', 'done'),
+        mk('11:00', 'Rita Lopes', 'Presencial · 50 min', 'Falta', 'miss'),
+        mk('14:00', 'Júlia Andrade', 'Online · 50 min', 'Agora', 'now'),
+        mk('16:00', 'Bruno Felix', 'Online · 50 min', 'Em 2 h', 'next'),
+        mk('18:00', 'Sofia Lima', 'Presencial · 50 min', 'Em 4 h', 'next')
+      ],
+      week: days.map((d, i) => ({
+        dia: d[0], n: d[1],
+        barStyle: 'height: ' + Math.max(4, d[1] * 24) + 'px; background: ' + (i === 3 ? '#4040D6' : '#C6D2F7') + '; animation-delay: ' + (i * 0.05) + 's',
+        labelStyle: i === 3 ? 'color: #1C1A5E; font-weight: 500' : 'color: #5C6385'
+      })),
+      notSent: !s.sent,
+      sent: s.sent,
+      remind: () => this.setState({ sent: true })
+    };
+  }
+}
+</script>
+</body>
+</html>

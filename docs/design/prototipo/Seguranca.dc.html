@@ -1,0 +1,336 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Acolhe — Ajustes · Segurança</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&amp;family=Schibsted+Grotesk:wght@400;500;600;700&amp;display=swap">
+<style>
+body{margin:0;background:#F5F7FE}
+*{box-sizing:border-box}
+a{color:#4040D6}a:hover{color:#1C1A5E}
+.mono{font-family:'IBM Plex Mono',ui-monospace,monospace}
+@keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.rise{animation:rise .7s cubic-bezier(.2,.7,.2,1) both}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.fade{animation:fade .36s cubic-bezier(.2,.7,.2,1) both}
+@keyframes ind{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+@keyframes out{from{opacity:1;transform:none;max-height:90px}to{opacity:0;transform:translateX(24px);max-height:0;padding-top:0;padding-bottom:0}}
+.sess{max-height:90px;overflow:hidden}
+.sess.leaving{animation:out .38s cubic-bezier(.2,.7,.2,1) both}
+.nav{display:flex;align-items:center;gap:12px;height:40px;padding:0 12px;border-radius:10px;color:#3E4466;text-decoration:none;font-size:14px;font-weight:500;transition:background .2s ease,color .2s ease}
+.nav:hover{background:#ECEFFB;color:#161A3A}
+.nav.on{background:#E6EAFD;color:#1C1A5E}
+.sub{position:relative;display:flex;align-items:center;height:40px;padding:0 14px;border-radius:10px;color:#3E4466;text-decoration:none;font-size:14px;font-weight:500;transition:background .25s ease,color .25s ease}
+.sub:hover{background:#ECEFFB;color:#161A3A}
+.sub.on{background:#FFFFFF;color:#1C1A5E;box-shadow:0 1px 2px rgba(22,26,58,.08)}
+.sub.on::before{content:"";position:absolute;left:0;top:10px;bottom:10px;width:3px;border-radius:2px;background:#4040D6;animation:ind .45s cubic-bezier(.2,.7,.2,1) .2s both}
+.btn{height:44px;padding:0 18px;border-radius:10px;font:inherit;font-size:14px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;transition:background .25s ease,box-shadow .25s ease,transform .25s cubic-bezier(.2,.7,.2,1),border-color .25s ease,opacity .25s ease;white-space:nowrap}
+.btn:active{transform:scale(.985)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn-p{border:0;background:#4040D6;color:#FFFFFF}.btn-p:hover{background:#3232B5;box-shadow:0 6px 18px rgba(64,64,214,.22)}
+.btn-s{border:1px solid #CBD2EA;background:#FFFFFF;color:#161A3A}.btn-s:hover{border-color:#A7AFCF;background:#F7F8FE}
+.btn-d{border:1px solid #F3C9C0;background:#FFFFFF;color:#A33A3A}.btn-d:hover{background:#FDEBE7}
+.card{background:#FFFFFF;border:1px solid #DDE3F3;border-radius:16px}
+.inp{width:100%;height:44px;padding:0 14px;border:1px solid #CBD2EA;border-radius:10px;background:#FFFFFF;font:inherit;font-size:15px;color:#161A3A;outline:none;transition:border-color .2s ease,box-shadow .2s ease}
+.inp:hover{border-color:#A7AFCF}
+.inp:focus{border-color:#4040D6;box-shadow:0 0 0 4px rgba(64,64,214,.14)}
+.code{letter-spacing:.5em;text-align:center;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:20px}
+.req{display:flex;align-items:center;gap:8px;font-size:13px;transition:color .3s ease}
+.req .dot{width:18px;height:18px;border-radius:50%;border:1.5px solid #CBD2EA;display:flex;align-items:center;justify-content:center;transition:background .3s ease,border-color .3s ease}
+.req.ok{color:#2B2E9E}.req.ok .dot{background:#4040D6;border-color:#4040D6}
+.opt{height:40px;padding:0 14px;border:1px solid #CBD2EA;border-radius:10px;background:#FFFFFF;font:inherit;font-size:14px;color:#3E4466;cursor:pointer;transition:background .25s ease,border-color .25s ease,color .25s ease}
+.opt:hover{border-color:#A7AFCF}
+.opt.on{background:#E6EAFD;border-color:#93A9F0;color:#1C1A5E;font-weight:500}
+.steps span{transition:background .4s ease,color .4s ease}
+:focus-visible{outline:2px solid #4040D6;outline-offset:2px}
+@media (max-width:760px){.side{max-width:none!important}.side nav{flex-direction:row!important;flex-wrap:wrap}.side .sec{display:none!important}.subnav{flex-direction:row!important;flex-wrap:wrap;max-width:none!important}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition-duration:.01ms!important}}
+</style>
+</helmet>
+<div style="min-height: 1000px; display: flex; flex-wrap: wrap; background: #F5F7FE; color: #161A3A; font-family: 'Schibsted Grotesk', ui-sans-serif, system-ui, sans-serif">
+
+  <aside class="side" style="flex: 1 1 248px; max-width: 264px; padding: 24px 16px; border-right: 1px solid #DDE3F3; display: flex; flex-direction: column; gap: 24px">
+    <a href="Main.dc.html" aria-label="Acolhe, ir para o login" style="display: flex; align-items: center; gap: 10px; padding: 0 12px; color: #161A3A; text-decoration: none">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#4040D6" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M22 17a10 10 0 0 0-20 0"></path><path d="M18 17a6 6 0 0 0-12 0" stroke="#FF7A5C"></path><path d="M14 17a2 2 0 0 0-4 0" stroke="currentColor"></path></svg>
+      <span style="font-size: 18px; font-weight: 600; letter-spacing: -0.02em">Acolhe</span>
+    </a>
+    <nav aria-label="Principal" style="display: flex; flex-direction: column; gap: 2px">
+      <a href="Dashboard.dc.html" class="nav">Início</a>
+      <a href="Pacientes.dc.html" class="nav">Pacientes</a>
+      <a href="Agenda.dc.html" class="nav">Agenda</a>
+      <a href="Atividades.dc.html" class="nav">Atividades</a>
+      <a href="Documentos.dc.html" class="nav">Documentos</a>
+      <a href="Templates.dc.html" class="nav">Templates</a>
+      <p class="mono sec" style="margin: 18px 12px 6px; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: #5C6385">Só você</p>
+      <a href="Registro.dc.html" class="nav">Registro Documental</a>
+      <p class="mono sec" style="margin: 18px 12px 6px; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: #5C6385">Conta</p>
+      <a href="Perfil.dc.html" class="nav on" aria-current="page">Ajustes</a>
+      <a href="Assinatura.dc.html" class="nav">Assinatura</a>
+    </nav>
+  </aside>
+
+  <main style="flex: 999 1 560px; min-width: 0; padding: 28px clamp(16px, 4vw, 48px) 64px; display: flex; flex-direction: column; gap: 24px">
+    <header class="rise" style="display: flex; flex-direction: column; gap: 6px">
+      <p class="mono" style="margin: 0; font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: #5C6385">Ajustes</p>
+      <h1 style="margin: 0; font-size: 32px; font-weight: 600; letter-spacing: -0.03em">Segurança</h1>
+    </header>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 32px; align-items: flex-start">
+      <nav class="subnav rise" aria-label="Ajustes" style="animation-delay: .05s; flex: 0 1 220px; max-width: 220px; display: flex; flex-direction: column; gap: 4px">
+        <a href="Perfil.dc.html" class="sub">Perfil</a>
+        <a href="Seguranca.dc.html" class="sub on" aria-current="page">Segurança</a>
+        <a href="PrefNotificacoes.dc.html" class="sub">Notificações</a>
+        <a href="Exportacao.dc.html" class="sub">Privacidade e dados</a>
+        <a href="Assinatura.dc.html" class="sub">Assinatura</a>
+      </nav>
+
+      <div style="flex: 1 1 520px; min-width: 0; max-width: 760px; display: flex; flex-direction: column; gap: 24px">
+
+        <section class="card rise" aria-labelledby="t-senha" style="animation-delay: .1s; padding: 24px; display: flex; flex-direction: column; gap: 18px">
+          <h2 id="t-senha" style="margin: 0; font-size: 18px; font-weight: 600">Trocar senha</h2>
+          <div style="display: flex; flex-direction: column; gap: 8px; max-width: 360px">
+            <label for="atual" style="font-size: 14px; font-weight: 500">Senha atual</label>
+            <input id="atual" class="inp" type="password" autocomplete="current-password" value="{{atual}}" onChange="{{setAtual}}">
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px">
+            <div style="display: flex; flex-direction: column; gap: 8px">
+              <label for="nova" style="font-size: 14px; font-weight: 500">Nova senha</label>
+              <input id="nova" class="inp" type="password" autocomplete="new-password" value="{{nova}}" onChange="{{setNova}}" aria-describedby="reqs">
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 8px">
+              <label for="conf" style="font-size: 14px; font-weight: 500">Confirmar nova senha</label>
+              <input id="conf" class="inp" type="password" autocomplete="new-password" value="{{conf}}" onChange="{{setConf}}">
+            </div>
+          </div>
+          <ul id="reqs" style="list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px">
+            <sc-for list="{{reqs}}" as="r" hint-placeholder-count="4">
+              <li class="{{r.cls}}"><span class="dot" aria-hidden="true"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></span>{{r.label}}<span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">{{r.sr}}</span></li>
+            </sc-for>
+          </ul>
+          <div aria-live="polite" style="display: flex; flex-wrap: wrap; align-items: center; gap: 14px">
+            <button type="button" class="btn btn-p" disabled="{{cantSave}}" onClick="{{savePw}}">Atualizar senha</button>
+            <sc-if value="{{pwSaved}}" hint-placeholder-val="{{ false }}">
+              <span class="fade" style="font-size: 14px; color: #2B2E9E">Senha atualizada. As outras sessões foram encerradas.</span>
+            </sc-if>
+          </div>
+        </section>
+
+        <section class="card rise" aria-labelledby="t-2fa" style="animation-delay: .15s; padding: 24px; display: flex; flex-direction: column; gap: 18px">
+          <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px">
+            <div style="display: flex; flex-direction: column; gap: 4px">
+              <h2 id="t-2fa" style="margin: 0; font-size: 18px; font-weight: 600">Verificação em duas etapas</h2>
+              <p style="margin: 0; font-size: 14px; color: #3E4466">Pede um código do aplicativo autenticador além da senha ao entrar.</p>
+            </div>
+            <span style="height: 28px; padding: 0 12px; border-radius: 14px; font-size: 13px; font-weight: 500; display: inline-flex; align-items: center; {{tfaBadgeStyle}}">{{tfaBadge}}</span>
+          </div>
+
+          <sc-if value="{{tfaOff}}" hint-placeholder-val="{{ true }}">
+            <div class="fade"><button type="button" class="btn btn-p" onClick="{{tfaStart}}">Ativar</button></div>
+          </sc-if>
+
+          <sc-if value="{{tfaSetup}}" hint-placeholder-val="{{ false }}">
+            <div class="fade" style="display: flex; flex-direction: column; gap: 18px">
+              <ol class="steps" aria-label="Etapas" style="list-style: none; margin: 0; padding: 0; display: flex; gap: 8px">
+                <sc-for list="{{steps}}" as="st" hint-placeholder-count="3">
+                  <li style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: #3E4466"><span style="width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; {{st.style}}">{{st.n}}</span>{{st.label}}</li>
+                </sc-for>
+              </ol>
+
+              <sc-if value="{{isStepScan}}" hint-placeholder-val="{{ true }}">
+                <div class="fade" style="display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start">
+                  <div role="img" aria-label="QR code para configurar o aplicativo autenticador" style="width: 168px; height: 168px; padding: 12px; border: 1px solid #DDE3F3; border-radius: 12px; background: #FFFFFF; display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 2px; flex: none">
+                    <sc-for list="{{qr}}" as="q" hint-placeholder-count="144">
+                      <span style="border-radius: 1px; {{q.style}}"></span>
+                    </sc-for>
+                  </div>
+                  <div style="flex: 1 1 260px; display: flex; flex-direction: column; gap: 14px">
+                    <p style="margin: 0; font-size: 14px; line-height: 1.55; color: #3E4466">Abra o aplicativo autenticador (Google Authenticator, 1Password, Authy) e leia o QR code. Se não der, digite a chave:</p>
+                    <span class="mono" style="padding: 10px 12px; border-radius: 10px; background: #EFF2FB; font-size: 14px; letter-spacing: .08em; color: #161A3A">JBSW Y3DP EHPK 3PXP</span>
+                    <div style="display: flex; flex-direction: column; gap: 8px; max-width: 240px">
+                      <label for="otp" style="font-size: 14px; font-weight: 500">Código de 6 dígitos</label>
+                      <input id="otp" class="inp code" type="text" inputmode="numeric" maxlength="6" autocomplete="one-time-code" value="{{otp}}" onChange="{{setOtp}}" placeholder="000000">
+                    </div>
+                    <div style="display: flex; gap: 10px">
+                      <button type="button" class="btn btn-s" onClick="{{tfaCancel}}">Cancelar</button>
+                      <button type="button" class="btn btn-p" disabled="{{otpInvalid}}" onClick="{{tfaVerify}}">Verificar</button>
+                    </div>
+                  </div>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{isStepCodes}}" hint-placeholder-val="{{ false }}">
+                <div class="fade" style="display: flex; flex-direction: column; gap: 14px">
+                  <p style="margin: 0; font-size: 14px; line-height: 1.55; color: #3E4466">Guarde estes códigos de recuperação em um lugar seguro. Cada um funciona uma vez, se você perder o acesso ao aplicativo.</p>
+                  <ul class="mono" style="list-style: none; margin: 0; padding: 16px; border-radius: 12px; background: #EFF2FB; display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; font-size: 14px; letter-spacing: .06em">
+                    <sc-for list="{{codes}}" as="c" hint-placeholder-count="8"><li>{{c}}</li></sc-for>
+                  </ul>
+                  <div style="display: flex; flex-wrap: wrap; gap: 10px">
+                    <button type="button" class="btn btn-s">Baixar .txt</button>
+                    <button type="button" class="btn btn-s">Copiar</button>
+                    <button type="button" class="btn btn-p" onClick="{{tfaDone}}">Já guardei os códigos</button>
+                  </div>
+                </div>
+              </sc-if>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{tfaOn}}" hint-placeholder-val="{{ false }}">
+            <div class="fade" style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px">
+              <span style="flex: 1 1 240px; font-size: 14px; color: #3E4466">Ativada hoje. Restam 8 códigos de recuperação.</span>
+              <button type="button" class="btn btn-s">Gerar novos códigos</button>
+              <button type="button" class="btn btn-d" onClick="{{tfaDisable}}">Desativar</button>
+            </div>
+          </sc-if>
+        </section>
+
+        <section class="card rise" aria-labelledby="t-sess" style="animation-delay: .2s; padding: 24px; display: flex; flex-direction: column; gap: 8px">
+          <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding-bottom: 8px">
+            <h2 id="t-sess" style="margin: 0; font-size: 18px; font-weight: 600">Sessões ativas</h2>
+            <sc-if value="{{hasOthers}}" hint-placeholder-val="{{ true }}">
+              <button type="button" class="btn btn-s fade" style="height: 36px" onClick="{{endAll}}">Encerrar todas as outras</button>
+            </sc-if>
+          </div>
+          <ul style="list-style: none; margin: 0; padding: 0">
+            <sc-for list="{{sessions}}" as="se" hint-placeholder-count="3">
+              <li class="{{se.cls}}" style="display: flex; flex-wrap: wrap; align-items: center; gap: 16px; padding: 14px 0; border-top: 1px solid #EFF2FB">
+                <span aria-hidden="true" style="width: 40px; height: 40px; border-radius: 10px; background: #EFF2FB; color: #3E4466; display: flex; align-items: center; justify-content: center; flex: none">
+                  <sc-if value="{{se.isPhone}}" hint-placeholder-val="{{ false }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="3" width="10" height="18" rx="2"></rect><path d="M11 18h2"></path></svg></sc-if>
+                  <sc-if value="{{se.isDesk}}" hint-placeholder-val="{{ true }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="2"></rect><path d="M8 20h8M12 16v4"></path></svg></sc-if>
+                </span>
+                <span style="display: flex; flex-direction: column; gap: 2px; flex: 1 1 220px; min-width: 0">
+                  <span style="font-size: 15px; font-weight: 600">{{se.device}}</span>
+                  <span style="font-size: 13px; color: #5C6385">{{se.meta}}</span>
+                </span>
+                <sc-if value="{{se.current}}" hint-placeholder-val="{{ false }}">
+                  <span style="height: 26px; padding: 0 10px; border-radius: 13px; background: #E6EAFD; color: #2B2E9E; font-size: 12px; font-weight: 500; display: inline-flex; align-items: center">Este dispositivo</span>
+                </sc-if>
+                <sc-if value="{{se.other}}" hint-placeholder-val="{{ true }}">
+                  <button type="button" class="btn btn-s" style="height: 36px" aria-label="{{se.endLabel}}" onClick="{{se.end}}">Encerrar</button>
+                </sc-if>
+              </li>
+            </sc-for>
+          </ul>
+        </section>
+
+        <section class="card rise" aria-labelledby="t-inat" style="animation-delay: .25s; padding: 24px; display: flex; flex-direction: column; gap: 14px">
+          <div style="display: flex; flex-direction: column; gap: 4px">
+            <h2 id="t-inat" style="margin: 0; font-size: 18px; font-weight: 600">Sair por inatividade</h2>
+            <p style="margin: 0; font-size: 14px; color: #3E4466">Encerra a sessão depois de um tempo sem uso. Recomendado em computadores compartilhados.</p>
+          </div>
+          <div role="radiogroup" aria-labelledby="t-inat" style="display: flex; flex-wrap: wrap; gap: 8px">
+            <sc-for list="{{timeouts}}" as="t" hint-placeholder-count="4">
+              <button type="button" role="radio" class="{{t.cls}}" aria-checked="{{t.on}}" onClick="{{t.pick}}">{{t.label}}</button>
+            </sc-for>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1000}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = {
+      atual: '', nova: '', conf: '', pwSaved: false,
+      tfa: 'off', otp: '',
+      sessions: [
+        { id: 1, device: 'Chrome no macOS', meta: 'São Paulo, SP · agora', kind: 'desk', current: true },
+        { id: 2, device: 'Safari no iPhone', meta: 'São Paulo, SP · há 2 horas', kind: 'phone' },
+        { id: 3, device: 'Edge no Windows', meta: 'Campinas, SP · há 3 dias', kind: 'desk' }
+      ],
+      leaving: [],
+      timeout: 30
+    };
+  }
+  componentWillUnmount() { (this.timers || []).forEach(clearTimeout); }
+  later(fn, ms) { this.timers = this.timers || []; this.timers.push(setTimeout(fn, ms)); }
+  endSessions(ids) {
+    this.setState({ leaving: this.state.leaving.concat(ids) });
+    this.later(() => this.setState({
+      sessions: this.state.sessions.filter((x) => ids.indexOf(x.id) < 0),
+      leaving: this.state.leaving.filter((x) => ids.indexOf(x) < 0)
+    }), 380);
+  }
+  renderVals() {
+    const s = this.state;
+    const val = (e) => (e && e.target ? e.target.value : '');
+    const n = s.nova;
+    const reqList = [
+      ['Pelo menos 10 caracteres', n.length >= 10],
+      ['Uma letra maiúscula', /[A-Z]/.test(n)],
+      ['Um número', /[0-9]/.test(n)],
+      ['As duas senhas iguais', n.length > 0 && n === s.conf]
+    ];
+    const allOk = reqList.every((r) => r[1]) && s.atual.length > 0;
+    const stepIdx = s.tfa === 'scan' ? 0 : s.tfa === 'codes' ? 1 : 2;
+    const stepLabels = ['Ler QR code', 'Guardar códigos', 'Pronto'];
+    let seed = 7;
+    const rnd = () => { seed = (seed * 9301 + 49297) % 233280; return seed / 233280; };
+    const qr = [];
+    for (let i = 0; i < 144; i++) {
+      const r = Math.floor(i / 12), c = i % 12;
+      const finder = (r < 3 && c < 3) || (r < 3 && c > 8) || (r > 8 && c < 3);
+      qr.push({ style: 'background: ' + ((finder || rnd() > 0.52) ? '#161A3A' : 'transparent') });
+    }
+    const others = s.sessions.filter((x) => !x.current).map((x) => x.id);
+    const tfaLabel = s.tfa === 'on' ? 'Ativada' : s.tfa === 'off' ? 'Desativada' : 'Configurando';
+    return {
+      atual: s.atual, nova: s.nova, conf: s.conf,
+      setAtual: (e) => this.setState({ atual: val(e), pwSaved: false }),
+      setNova: (e) => this.setState({ nova: val(e), pwSaved: false }),
+      setConf: (e) => this.setState({ conf: val(e), pwSaved: false }),
+      reqs: reqList.map((r) => ({ label: r[0], cls: r[1] ? 'req ok' : 'req', sr: r[1] ? ' (atendido)' : ' (pendente)' })),
+      cantSave: !allOk,
+      pwSaved: s.pwSaved,
+      savePw: () => this.setState({ atual: '', nova: '', conf: '', pwSaved: true }),
+      tfaBadge: tfaLabel,
+      tfaBadgeStyle: s.tfa === 'on' ? 'background: #E6EAFD; color: #2B2E9E' : 'background: #EFF2FB; color: #3E4466',
+      tfaOff: s.tfa === 'off',
+      tfaSetup: s.tfa === 'scan' || s.tfa === 'codes',
+      tfaOn: s.tfa === 'on',
+      isStepScan: s.tfa === 'scan',
+      isStepCodes: s.tfa === 'codes',
+      steps: stepLabels.map((l, i) => ({
+        n: i < stepIdx ? '✓' : String(i + 1), label: l,
+        style: i <= stepIdx ? 'background: #4040D6; color: #FFFFFF' : 'background: #EFF2FB; color: #5C6385'
+      })),
+      qr: qr,
+      otp: s.otp,
+      setOtp: (e) => this.setState({ otp: val(e).replace(/\D/g, '').slice(0, 6) }),
+      otpInvalid: s.otp.length !== 6,
+      tfaStart: () => this.setState({ tfa: 'scan', otp: '' }),
+      tfaCancel: () => this.setState({ tfa: 'off', otp: '' }),
+      tfaVerify: () => this.setState({ tfa: 'codes' }),
+      tfaDone: () => this.setState({ tfa: 'on' }),
+      tfaDisable: () => this.setState({ tfa: 'off', otp: '' }),
+      codes: ['4KQ7-82MD', 'P9XT-3LWA', 'H2RC-91VE', 'Z6NB-07QK', 'T3FJ-58YU', 'M8WD-24PL', 'C5GA-66HS', 'R1EY-43ZN'],
+      sessions: s.sessions.map((x) => ({
+        device: x.device, meta: x.meta,
+        isPhone: x.kind === 'phone', isDesk: x.kind !== 'phone',
+        current: !!x.current, other: !x.current,
+        cls: s.leaving.indexOf(x.id) >= 0 ? 'sess leaving' : 'sess',
+        endLabel: 'Encerrar sessão de ' + x.device,
+        end: () => this.endSessions([x.id])
+      })),
+      hasOthers: others.length > 0,
+      endAll: () => this.endSessions(others),
+      timeouts: [15, 30, 60, 240].map((m) => ({
+        label: m < 60 ? m + ' min' : (m / 60) + (m === 60 ? ' hora' : ' horas'),
+        on: s.timeout === m,
+        cls: s.timeout === m ? 'opt on' : 'opt',
+        pick: () => this.setState({ timeout: m })
+      }))
+    };
+  }
+}
+</script>
+</body>
+</html>

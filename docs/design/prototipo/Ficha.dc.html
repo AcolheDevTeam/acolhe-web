@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Acolhe — Ficha da paciente</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&amp;family=Schibsted+Grotesk:wght@400;500;600;700&amp;display=swap">
+<style>
+body{margin:0;background:#F5F7FE}
+*{box-sizing:border-box}
+a{color:#4040D6}a:hover{color:#1C1A5E}
+.mono{font-family:'IBM Plex Mono',ui-monospace,monospace}
+@keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.rise{animation:rise .7s cubic-bezier(.2,.7,.2,1) both}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.fade{animation:fade .4s cubic-bezier(.2,.7,.2,1) both}
+@keyframes draw{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+.spark{stroke-dasharray:1;animation:draw 1.4s cubic-bezier(.45,0,.55,1) .2s both}
+@keyframes fill{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.meter{transform-origin:left;animation:fill 1s cubic-bezier(.2,.7,.2,1) .3s both}
+@keyframes pop{from{opacity:0;transform:scale(.6)}to{opacity:1;transform:none}}
+.cell{animation:pop .4s cubic-bezier(.2,.7,.2,1) both}
+.nav{display:flex;align-items:center;gap:12px;height:40px;padding:0 12px;border-radius:10px;color:#3E4466;text-decoration:none;font-size:14px;font-weight:500;transition:background .2s ease,color .2s ease}
+.nav:hover{background:#ECEFFB;color:#161A3A}
+.nav.on{background:#E6EAFD;color:#1C1A5E}
+.btn{height:40px;padding:0 16px;border-radius:10px;font:inherit;font-size:14px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:8px;transition:background .25s ease,box-shadow .25s ease,transform .25s cubic-bezier(.2,.7,.2,1),border-color .25s ease;white-space:nowrap}
+.btn:active{transform:scale(.985)}
+.btn-p{border:0;background:#4040D6;color:#FFFFFF}.btn-p:hover{background:#3232B5;box-shadow:0 6px 18px rgba(64,64,214,.22)}
+.btn-s{border:1px solid #CBD2EA;background:#FFFFFF;color:#161A3A}.btn-s:hover{border-color:#A7AFCF;background:#F7F8FE}
+.tab{position:relative;height:48px;padding:0 4px;margin-right:24px;border:0;background:transparent;font:inherit;font-size:15px;font-weight:500;color:#5C6385;cursor:pointer;transition:color .25s ease;white-space:nowrap}
+.tab:hover{color:#161A3A}
+.tab::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;border-radius:2px;background:#4040D6;transform:scaleX(0);transition:transform .42s cubic-bezier(.2,.7,.2,1)}
+.tab.on{color:#161A3A}
+.tab.on::after{transform:scaleX(1)}
+.card{background:#FFFFFF;border:1px solid #DDE3F3;border-radius:16px}
+.area{width:100%;min-height:72px;padding:12px 14px;border:1px solid transparent;border-radius:10px;background:#F7F8FE;font:inherit;font-size:15px;line-height:1.6;color:#161A3A;resize:vertical;outline:none;transition:border-color .2s ease,box-shadow .2s ease,background .2s ease}
+.area:hover{border-color:#DDE3F3}
+.area:focus{background:#FFFFFF;border-color:#4040D6;box-shadow:0 0 0 4px rgba(64,64,214,.14)}
+:focus-visible{outline:2px solid #4040D6;outline-offset:2px}
+@media (max-width:760px){.side{max-width:none!important}.side nav{flex-direction:row!important;flex-wrap:wrap}.side .sec{display:none!important}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+</style>
+</helmet>
+<div style="min-height: 1040px; display: flex; flex-wrap: wrap; background: #F5F7FE; color: #161A3A; font-family: 'Schibsted Grotesk', ui-sans-serif, system-ui, sans-serif">
+
+  <aside class="side" style="flex: 1 1 248px; max-width: 264px; padding: 24px 16px; border-right: 1px solid #DDE3F3; display: flex; flex-direction: column; gap: 24px">
+    <a href="Main.dc.html" aria-label="Acolhe, ir para o login" style="display: flex; align-items: center; gap: 10px; padding: 0 12px; color: #161A3A; text-decoration: none">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#4040D6" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M22 17a10 10 0 0 0-20 0"></path><path d="M18 17a6 6 0 0 0-12 0" stroke="#FF7A5C"></path><path d="M14 17a2 2 0 0 0-4 0" stroke="currentColor"></path></svg>
+      <span style="font-size: 18px; font-weight: 600; letter-spacing: -0.02em">Acolhe</span>
+    </a>
+    <nav aria-label="Principal" style="display: flex; flex-direction: column; gap: 2px">
+      <a href="Dashboard.dc.html" class="nav">Início</a>
+      <a href="#" class="nav on" aria-current="page">Pacientes<span class="mono" style="margin-left: auto; font-size: 12px; color: #5C6385">14</span></a>
+      <a href="Agenda.dc.html" class="nav">Agenda</a>
+      <a href="Atividades.dc.html" class="nav">Atividades</a>
+      <a href="Documentos.dc.html" class="nav">Documentos</a>
+      <a href="Templates.dc.html" class="nav">Templates</a>
+      <p class="mono sec" style="margin: 18px 12px 6px; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: #5C6385">Só você</p>
+      <a href="Registro.dc.html" class="nav">Registro Documental</a>
+      <p class="mono sec" style="margin: 18px 12px 6px; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: #5C6385">Clínica</p>
+      <a href="PainelClinica.dc.html" class="nav">Painel</a>
+      <a href="Equipe.dc.html" class="nav">Equipe</a>
+      <a href="Assinatura.dc.html" class="nav">Assinatura</a>
+    </nav>
+  </aside>
+
+  <main style="flex: 999 1 560px; min-width: 0; padding: 28px clamp(16px, 4vw, 48px) 56px; display: flex; flex-direction: column; gap: 28px">
+
+    <nav aria-label="Caminho" class="rise mono" style="font-size: 12px; letter-spacing: .06em; color: #5C6385; display: flex; gap: 8px">
+      <a href="Dashboard.dc.html" style="color: #5C6385; text-underline-offset: 3px">Pacientes</a><span aria-hidden="true">/</span><span style="color: #161A3A">Júlia Andrade</span>
+    </nav>
+
+    <header class="rise" style="animation-delay: .06s; display: flex; flex-wrap: wrap; gap: 20px; align-items: center">
+      <span aria-hidden="true" style="width: 64px; height: 64px; border-radius: 50%; background: #1C1A5E; color: #FF8A70; font-size: 22px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex: none">JA</span>
+      <div style="display: flex; flex-direction: column; gap: 6px; flex: 1 1 260px; min-width: 0">
+        <h1 style="margin: 0; font-size: 32px; line-height: 1.1; font-weight: 600; letter-spacing: -0.03em">Júlia Andrade</h1>
+        <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center; font-size: 14px; color: #3E4466">
+          <span>28 anos</span><span aria-hidden="true" style="color: #A7AFCF">·</span><span>TCC</span><span aria-hidden="true" style="color: #A7AFCF">·</span><span>Particular</span>
+          <span style="height: 24px; padding: 0 10px; border-radius: 12px; background: #E6EAFD; color: #2B2E9E; font-size: 12px; font-weight: 500; display: inline-flex; align-items: center">Vínculo ativo · 7 meses</span>
+        </div>
+      </div>
+      <div style="display: flex; gap: 10px; flex-wrap: wrap">
+        <button type="button" class="btn btn-s">Atribuir atividade</button>
+        <button type="button" class="btn btn-p"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l10-6.5z"></path></svg>Iniciar sessão das 14h</button>
+      </div>
+    </header>
+
+    <div class="rise" role="tablist" aria-label="Seções da ficha" style="animation-delay: .12s; display: flex; border-bottom: 1px solid #DDE3F3; overflow-x: auto">
+      <sc-for list="{{tabs}}" as="t" hint-placeholder-count="4">
+        <button type="button" role="tab" class="{{t.cls}}" aria-selected="{{t.on}}" onClick="{{t.pick}}">{{t.label}}</button>
+      </sc-for>
+    </div>
+
+    <sc-if value="{{isGeral}}" hint-placeholder-val="{{ true }}">
+      <div class="fade" role="tabpanel" aria-label="Visão geral" style="display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start">
+        <div style="flex: 2 1 460px; min-width: 0; display: flex; flex-direction: column; gap: 24px">
+          <section class="card" aria-labelledby="t-humor" style="padding: 24px; display: flex; flex-direction: column; gap: 16px">
+            <div style="display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 8px">
+              <h2 id="t-humor" class="mono" style="margin: 0; font-size: 11px; font-weight: 500; letter-spacing: .14em; text-transform: uppercase; color: #5C6385">Humor · últimos 30 dias</h2>
+              <span style="font-size: 14px; color: #3E4466"><strong style="font-size: 22px; font-weight: 600; color: #161A3A">3,8</strong> de 5 em média</span>
+            </div>
+            <svg viewBox="0 0 600 120" width="100%" height="120" role="img" aria-label="Humor diário dos últimos 30 dias, oscilando entre 2 e 5, com tendência de subida na última semana" preserveAspectRatio="none">
+              <path d="M0 30H600M0 60H600M0 90H600" stroke="#EFF2FB" stroke-width="1"></path>
+              <polyline class="spark" pathLength="1" fill="none" stroke="#4040D6" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke" points="0,70 20,64 40,78 60,72 80,60 100,66 120,84 140,90 160,76 180,70 200,62 220,68 240,58 260,64 280,72 300,66 320,54 340,60 360,50 380,56 400,62 420,48 440,52 460,44 480,40 500,46 520,36 540,32 560,38 580,28 600,24"></polyline>
+            </svg>
+            <p style="margin: 0; font-size: 12px; color: #5C6385">Média dos check-ins diários feitos pela paciente.</p>
+          </section>
+
+          <section class="card" aria-labelledby="t-tl" style="padding: 24px; display: flex; flex-direction: column; gap: 4px">
+            <h2 id="t-tl" class="mono" style="margin: 0 0 12px; font-size: 11px; font-weight: 500; letter-spacing: .14em; text-transform: uppercase; color: #5C6385">Linha do tempo</h2>
+            <ol style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column">
+              <sc-for list="{{timeline}}" as="e" hint-placeholder-count="4">
+                <li class="fade" style="{{e.anim}}; display: grid; grid-template-columns: 20px 1fr auto; gap: 14px; padding: 10px 0">
+                  <span aria-hidden="true" style="width: 10px; height: 10px; margin: 5px 0 0 4px; border-radius: 50%; {{e.dot}}"></span>
+                  <span style="display: flex; flex-direction: column; gap: 2px">
+                    <span style="font-size: 15px; font-weight: 500">{{e.title}}</span>
+                    <span style="font-size: 13px; color: #5C6385">{{e.meta}}</span>
+                  </span>
+                  <span class="mono" style="font-size: 12px; color: #5C6385">{{e.when}}</span>
+                </li>
+              </sc-for>
+            </ol>
+          </section>
+        </div>
+
+        <div style="flex: 1 1 280px; min-width: 0; display: flex; flex-direction: column; gap: 24px">
+          <section aria-labelledby="t-next" style="padding: 24px; border-radius: 16px; background: #1C1A5E; color: #E8EBFB; display: flex; flex-direction: column; gap: 10px">
+            <h2 id="t-next" class="mono" style="margin: 0; font-size: 11px; font-weight: 500; letter-spacing: .14em; text-transform: uppercase; color: #A9B2E8">Próxima sessão</h2>
+            <p style="margin: 0; font-size: 24px; font-weight: 600; letter-spacing: -0.02em; color: #FFFFFF">Hoje, 14h00</p>
+            <p style="margin: 0; font-size: 14px; color: #C3CAF0">Online · 50 min · presença confirmada</p>
+          </section>
+
+          <section class="card" aria-labelledby="t-ades" style="padding: 24px; display: flex; flex-direction: column; gap: 12px">
+            <h2 id="t-ades" class="mono" style="margin: 0; font-size: 11px; font-weight: 500; letter-spacing: .14em; text-transform: uppercase; color: #5C6385">Atividades respondidas</h2>
+            <span style="font-size: 28px; font-weight: 600; letter-spacing: -0.03em">86%</span>
+            <div aria-hidden="true" style="height: 8px; border-radius: 4px; background: #EFF2FB; overflow: hidden"><div class="meter" style="width: 86%; height: 100%; border-radius: 4px; background: #4040D6"></div></div>
+            <span style="font-size: 13px; color: #5C6385">12 de 14 nas últimas 8 semanas</span>
+          </section>
+
+          <section class="card" aria-labelledby="t-id" style="padding: 24px; display: flex; flex-direction: column; gap: 12px; font-size: 14px">
+            <h2 id="t-id" class="mono" style="margin: 0; font-size: 11px; font-weight: 500; letter-spacing: .14em; text-transform: uppercase; color: #5C6385">Identificação</h2>
+            <div style="display: flex; justify-content: space-between; gap: 12px"><span style="color: #5C6385">E-mail</span><span>julia@exemplo.com</span></div>
+            <div style="display: flex; justify-content: space-between; gap: 12px"><span style="color: #5C6385">Telefone</span><span>(11) 9••••-••42</span></div>
+            <div style="display: flex; justify-content: space-between; gap: 12px"><span style="color: #5C6385">Consentimento</span><span>v0.3 · 12/10/2025</span></div>
+          </section>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{isPront}}" hint-placeholder-val="{{ false }}">
+      <div class="fade" role="tabpanel" aria-label="Prontuário" style="display: flex; flex-direction: column; gap: 20px; max-width: 860px">
+        <div style="display: flex; gap: 12px; padding: 14px 16px; border-radius: 12px; background: #E6EAFD; color: #2B2E9E; font-size: 14px; line-height: 1.5">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M2.5 12S6 5 12 5s9.5 7 9.5 7-3.5 7-9.5 7-9.5-7-9.5-7z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+          <p style="margin: 0">A paciente tem acesso a este prontuário (Res. CFP 01/2009, art. 5º, II). Para anotações que só você vê, use o <a href="#" style="font-weight: 500">Registro Documental</a>.</p>
+        </div>
+
+        <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px">
+          <div>
+            <h2 style="margin: 0; font-size: 22px; font-weight: 600; letter-spacing: -0.02em">Sessão 28 · 9 de outubro</h2>
+            <p style="margin: 4px 0 0; font-size: 14px; color: #5C6385">Online · 50 min · Mariana Sá, CRP 06/123456</p>
+          </div>
+          <span class="mono" aria-live="polite" style="display: inline-flex; align-items: center; gap: 8px; font-size: 12px; color: #5C6385"><span aria-hidden="true" style="width: 8px; height: 8px; border-radius: 50%; background: #4040D6"></span>Salvo · versão 3 · <a href="#" style="color: #4040D6">histórico</a></span>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 6px">
+          <label for="p-dem" style="font-size: 14px; font-weight: 600">Demanda e objetivos</label>
+          <textarea id="p-dem" class="area" rows="2">Ansiedade generalizada e ruminação noturna. Objetivo: reduzir episódios noturnos e reestruturar crenças ligadas ao trabalho.</textarea>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px">
+          <label for="p-evo" style="font-size: 14px; font-weight: 600">Evolução desta sessão</label>
+          <textarea id="p-evo" class="area" rows="4">Relata melhora na semana, com um episódio de ansiedade noturna. Trouxe 5 dos 7 registros de pensamentos pedidos, identificando catastrofização e leitura mental com consistência.</textarea>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px">
+          <label for="p-con" style="font-size: 14px; font-weight: 600">Conduta</label>
+          <textarea id="p-con" class="area" rows="2">Reforçada a técnica de adiamento da ruminação. Combinada a continuidade dos registros, 3 por semana.</textarea>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px">
+          <label for="p-enc" style="font-size: 14px; font-weight: 600">Encaminhamento ou encerramento</label>
+          <textarea id="p-enc" class="area" rows="1" placeholder="Preencha só em caso de encaminhamento ou alta."></textarea>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{isAtiv}}" hint-placeholder-val="{{ false }}">
+      <section class="card fade" role="tabpanel" aria-label="Atividades" style="padding: 8px">
+        <sc-for list="{{atividades}}" as="a" hint-placeholder-count="3">
+          <div class="fade" style="{{a.anim}}; display: flex; flex-wrap: wrap; align-items: center; gap: 16px; padding: 16px; border-bottom: 1px solid #EFF2FB">
+            <span style="display: flex; flex-direction: column; gap: 2px; flex: 1 1 240px">
+              <span style="font-size: 15px; font-weight: 600">{{a.nome}}</span>
+              <span style="font-size: 13px; color: #5C6385">{{a.meta}}</span>
+            </span>
+            <span style="height: 26px; padding: 0 10px; border-radius: 13px; font-size: 12px; font-weight: 500; display: inline-flex; align-items: center; {{a.chip}}">{{a.status}}</span>
+          </div>
+        </sc-for>
+      </section>
+    </sc-if>
+
+    <sc-if value="{{isCheck}}" hint-placeholder-val="{{ false }}">
+      <section class="card fade" role="tabpanel" aria-label="Check-ins" style="padding: 24px; display: flex; flex-direction: column; gap: 18px">
+        <h2 class="mono" style="margin: 0; font-size: 11px; font-weight: 500; letter-spacing: .14em; text-transform: uppercase; color: #5C6385">Check-ins dos últimos 35 dias</h2>
+        <div role="img" aria-label="Check-ins diários dos últimos 35 dias, com humor mais alto na última semana" style="display: grid; grid-template-columns: repeat(7, 36px); gap: 8px">
+          <sc-for list="{{days}}" as="d" hint-placeholder-count="35">
+            <span class="cell" style="width: 36px; height: 36px; border-radius: 8px; {{d.style}}"></span>
+          </sc-for>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px; font-size: 12px; color: #5C6385">
+          <span>Difícil</span>
+          <span aria-hidden="true" style="width: 16px; height: 16px; border-radius: 4px; background: #E9EDFB"></span>
+          <span aria-hidden="true" style="width: 16px; height: 16px; border-radius: 4px; background: #C6D2F7"></span>
+          <span aria-hidden="true" style="width: 16px; height: 16px; border-radius: 4px; background: #93A9F0"></span>
+          <span aria-hidden="true" style="width: 16px; height: 16px; border-radius: 4px; background: #6470E6"></span>
+          <span aria-hidden="true" style="width: 16px; height: 16px; border-radius: 4px; background: #4040D6"></span>
+          <span>Bem</span>
+          <span style="margin-left: 16px; display: inline-flex; align-items: center; gap: 6px"><span aria-hidden="true" style="width: 16px; height: 16px; border-radius: 4px; border: 1px dashed #A7AFCF"></span>sem registro</span>
+        </div>
+      </section>
+    </sc-if>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1040}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { tab: 'geral' };
+  }
+  renderVals() {
+    const tab = this.state.tab;
+    const defs = [['geral', 'Visão geral'], ['pront', 'Prontuário'], ['ativ', 'Atividades'], ['check', 'Check-ins']];
+    const moods = [3,2,3,4,3,0,2,2,3,3,4,3,0,3,4,3,2,3,4,4,0,3,4,4,3,4,5,4,4,5,4,5,5,0,5];
+    const shades = ['', '#E9EDFB', '#C6D2F7', '#93A9F0', '#6470E6', '#4040D6'];
+    const stagger = (i) => 'animation-delay: ' + (i * 0.06) + 's';
+    return {
+      tabs: defs.map((d) => ({
+        label: d[1],
+        on: tab === d[0],
+        cls: tab === d[0] ? 'tab on' : 'tab',
+        pick: () => this.setState({ tab: d[0] })
+      })),
+      isGeral: tab === 'geral',
+      isPront: tab === 'pront',
+      isAtiv: tab === 'ativ',
+      isCheck: tab === 'check',
+      timeline: [
+        { title: 'Sessão agendada', meta: 'Online · confirmada pela paciente', when: 'hoje 14h', dot: 'background: #4040D6' },
+        { title: 'Respondeu "Higiene do sono"', meta: '7 de 7 itens', when: 'hoje 10h', dot: 'background: #93A9F0' },
+        { title: 'Check-in de humor', meta: 'Leve · "acordei melhor"', when: 'hoje 9h', dot: 'background: #93A9F0' },
+        { title: 'Sessão 27 registrada', meta: 'Prontuário · versão 2', when: '2 out', dot: 'background: #A7AFCF' }
+      ].map((e, i) => Object.assign(e, { anim: stagger(i) })),
+      atividades: [
+        { nome: 'Registro de pensamentos', meta: '3 vezes por semana · até a próxima sessão', status: 'Em andamento', chip: 'background: #E6EAFD; color: #2B2E9E' },
+        { nome: 'Higiene do sono', meta: 'Checklist · 7 itens', status: 'Para revisar', chip: 'background: #FDEBE7; color: #9E3522' },
+        { nome: 'Diário de gratidão', meta: 'Texto livre · semanal', status: 'Concluída', chip: 'background: #EFF2FB; color: #3E4466' }
+      ].map((a, i) => Object.assign(a, { anim: stagger(i) })),
+      days: moods.map((m, i) => ({
+        style: (m === 0 ? 'border: 1px dashed #A7AFCF; background: transparent' : 'background: ' + shades[m]) + '; animation-delay: ' + (i * 0.015) + 's'
+      }))
+    };
+  }
+}
+</script>
+</body>
+</html>

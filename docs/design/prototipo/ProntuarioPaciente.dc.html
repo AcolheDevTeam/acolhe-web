@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Acolhe — Meu prontuário</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&amp;family=Schibsted+Grotesk:wght@400;500;600;700&amp;display=swap">
+<style>
+body{margin:0}
+*{box-sizing:border-box}
+a{color:#4040D6}a:hover{color:#1C1A5E}
+.mono{font-family:'IBM Plex Mono',ui-monospace,monospace}
+@keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.rise{animation:rise .6s cubic-bezier(.2,.7,.2,1) both}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.fade{animation:fade .4s cubic-bezier(.2,.7,.2,1) both}
+@keyframes enter{from{opacity:0;transform:translateX(28px)}to{opacity:1;transform:none}}
+.enter{animation:enter .45s cubic-bezier(.2,.7,.2,1) both}
+.scroll{scrollbar-width:none}.scroll::-webkit-scrollbar{display:none}
+.item{display:flex;align-items:center;gap:14px;width:100%;padding:16px;border:1px solid #DDE3F3;border-radius:14px;background:#FFFFFF;font:inherit;text-align:left;color:inherit;cursor:pointer;transition:border-color .2s ease,transform .3s cubic-bezier(.2,.7,.2,1)}
+.item:hover{border-color:#A7AFCF;transform:translateX(2px)}
+.btn{height:48px;width:100%;border-radius:12px;font:inherit;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:background .25s ease,transform .25s cubic-bezier(.2,.7,.2,1)}
+.btn:active{transform:scale(.985)}
+.btn-s{background:#FFFFFF;color:#161A3A;border:1px solid #CBD2EA}.btn-s:hover{border-color:#A7AFCF}
+.tabbar a{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:56px;font-size:11px;font-weight:500;color:#5C6385;text-decoration:none}
+.tabbar a.on{color:#1C1A5E}
+:focus-visible{outline:2px solid #4040D6;outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition-duration:.01ms!important}}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; display: flex; flex-direction: column; background: #F5F7FE; color: #161A3A; font-family: 'Schibsted Grotesk', ui-sans-serif, system-ui, sans-serif; overflow: hidden">
+
+  <div class="scroll" style="flex: 1; overflow-y: auto; overflow-x: hidden; padding: 28px 20px 24px">
+    <sc-if value="{{isList}}" hint-placeholder-val="{{ true }}">
+      <div style="display: flex; flex-direction: column; gap: 20px">
+        <header class="rise" style="display: flex; flex-direction: column; gap: 6px">
+          <p class="mono" style="margin: 0; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: #5C6385">Histórico</p>
+          <h1 style="margin: 0; font-size: 28px; font-weight: 600; letter-spacing: -0.03em">Meu prontuário</h1>
+        </header>
+        <p class="rise" style="animation-delay: .05s; margin: 0; padding: 14px 16px; border-radius: 12px; background: #E6EAFD; color: #2B2E9E; font-size: 14px; line-height: 1.5">Este é o registro das suas sessões feito pela sua psicóloga. Você pode pedir uma cópia a qualquer momento.</p>
+        <div style="display: flex; flex-direction: column; gap: 10px">
+          <sc-for list="{{sessoes}}" as="s" hint-placeholder-count="5">
+            <button type="button" class="item rise" style="{{s.anim}}" onClick="{{s.open}}">
+              <span class="mono" aria-hidden="true" style="width: 44px; height: 44px; border-radius: 12px; background: #E6EAFD; color: #4040D6; font-size: 13px; font-weight: 500; display: flex; align-items: center; justify-content: center; flex: none">{{s.n}}</span>
+              <span style="display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0">
+                <span style="font-size: 15px; font-weight: 600">{{s.data}}</span>
+                <span style="font-size: 13px; color: #5C6385">{{s.meta}}</span>
+              </span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5C6385" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg>
+            </button>
+          </sc-for>
+        </div>
+        <button type="button" class="btn btn-s rise" style="animation-delay: .3s"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"></path></svg>Baixar cópia (PDF)</button>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{isDetail}}" hint-placeholder-val="{{ false }}">
+      <article class="enter" style="display: flex; flex-direction: column; gap: 20px">
+        <button type="button" onClick="{{back}}" style="align-self: flex-start; display: flex; align-items: center; gap: 6px; height: 44px; padding: 0 8px 0 0; border: 0; background: none; font: inherit; font-size: 14px; color: #4040D6; cursor: pointer">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg>Todas as sessões
+        </button>
+        <header style="display: flex; flex-direction: column; gap: 4px">
+          <h1 style="margin: 0; font-size: 26px; font-weight: 600; letter-spacing: -0.03em">{{atual.titulo}}</h1>
+          <p style="margin: 0; font-size: 14px; color: #5C6385">{{atual.meta}} · Mariana Sá, CRP 06/123456</p>
+        </header>
+        <section style="display: flex; flex-direction: column; gap: 6px">
+          <h2 class="mono" style="margin: 0; font-size: 11px; font-weight: 500; letter-spacing: .14em; text-transform: uppercase; color: #5C6385">Demanda e objetivos</h2>
+          <p style="margin: 0; font-size: 15px; line-height: 1.6">Ansiedade generalizada e ruminação noturna. Objetivo: reduzir os episódios à noite e trabalhar pensamentos ligados ao trabalho.</p>
+        </section>
+        <section style="display: flex; flex-direction: column; gap: 6px">
+          <h2 class="mono" style="margin: 0; font-size: 11px; font-weight: 500; letter-spacing: .14em; text-transform: uppercase; color: #5C6385">Evolução</h2>
+          <p style="margin: 0; font-size: 15px; line-height: 1.6">{{atual.evolucao}}</p>
+        </section>
+        <section style="display: flex; flex-direction: column; gap: 6px">
+          <h2 class="mono" style="margin: 0; font-size: 11px; font-weight: 500; letter-spacing: .14em; text-transform: uppercase; color: #5C6385">Conduta</h2>
+          <p style="margin: 0; font-size: 15px; line-height: 1.6">{{atual.conduta}}</p>
+        </section>
+        <p class="mono" style="margin: 0; font-size: 11px; color: #5C6385">Última atualização: {{atual.versao}}</p>
+      </article>
+    </sc-if>
+  </div>
+
+  <nav class="tabbar" aria-label="Navegação" style="display: flex; padding: 4px 8px 12px; background: #FFFFFF; border-top: 1px solid #DDE3F3">
+    <a href="Paciente.dc.html"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 11l8-6 8 6v8a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1z"></path></svg>Início</a>
+    <a href="AtividadesPaciente.dc.html"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5h10M9 12h10M9 19h10M4.5 5l.5.5L6.5 4M4.5 12l.5.5 1.5-1.5M4.5 19l.5.5 1.5-1.5"></path></svg>Atividades</a>
+    <a href="CheckinPaciente.dc.html"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><circle cx="12" cy="12" r="3.5"></circle></svg>Check-in</a>
+    <a href="ProntuarioPaciente.dc.html" class="on" aria-current="page"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"></path><path d="M3 3v5h5M12 7v5l3 2"></path></svg>Histórico</a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { open: -1 };
+  }
+  renderVals() {
+    const s = this.state;
+    const data = [
+      { n: '28', data: '9 de outubro', meta: 'Online · 50 min', evolucao: 'Relatou melhora na semana, com um episódio de ansiedade à noite. Trouxe 5 dos 7 registros de pensamentos combinados.', conduta: 'Manter a técnica de adiar a ruminação. Continuar os registros, 3 por semana.', versao: '9 out, 15h12 · versão 3' },
+      { n: '27', data: '2 de outubro', meta: 'Online · 50 min', evolucao: 'Conversamos sobre a reunião de equipe e os pensamentos que surgiram antes dela.', conduta: 'Começar o registro de pensamentos, 3 vezes por semana.', versao: '2 out, 15h05 · versão 2' },
+      { n: '26', data: '25 de setembro', meta: 'Presencial · 50 min', evolucao: 'Revisamos a rotina de sono e os horários de uso do celular à noite.', conduta: 'Checklist de higiene do sono por uma semana.', versao: '25 set, 15h20 · versão 1' },
+      { n: '25', data: '18 de setembro', meta: 'Online · 50 min', evolucao: 'Relatou semana difícil no trabalho, com dificuldade para dormir em três noites.', conduta: 'Introduzida a técnica de adiar a ruminação.', versao: '18 set, 14h58 · versão 1' },
+      { n: '24', data: '11 de setembro', meta: 'Online · 50 min', evolucao: 'Retomada após duas semanas de pausa. Ansiedade estável.', conduta: 'Manter a frequência semanal.', versao: '11 set, 15h01 · versão 1' }
+    ];
+    const atual = s.open >= 0 ? data[s.open] : data[0];
+    return {
+      isList: s.open < 0,
+      isDetail: s.open >= 0,
+      sessoes: data.map((d, i) => ({ n: d.n, data: d.data, meta: 'Sessão ' + d.n + ' · ' + d.meta, anim: 'animation-delay: ' + (0.08 + i * 0.05) + 's', open: () => this.setState({ open: i }) })),
+      atual: { titulo: 'Sessão ' + atual.n + ' · ' + atual.data, meta: atual.meta, evolucao: atual.evolucao, conduta: atual.conduta, versao: atual.versao },
+      back: () => this.setState({ open: -1 })
+    };
+  }
+}
+</script>
+</body>
+</html>

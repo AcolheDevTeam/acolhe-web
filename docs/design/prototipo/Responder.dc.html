@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Acolhe — Respondendo atividade</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&amp;family=Schibsted+Grotesk:wght@400;500;600;700&amp;display=swap">
+<style>
+body{margin:0}
+*{box-sizing:border-box}
+a{color:#4040D6}a:hover{color:#1C1A5E}
+.mono{font-family:'IBM Plex Mono',ui-monospace,monospace}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.fade{animation:fade .4s cubic-bezier(.2,.7,.2,1) both}
+@keyframes fwd{from{opacity:0;transform:translateX(32px)}to{opacity:1;transform:none}}
+@keyframes back{from{opacity:0;transform:translateX(-32px)}to{opacity:1;transform:none}}
+.q-fwd{animation:fwd .45s cubic-bezier(.2,.7,.2,1) both}
+.q-back{animation:back .45s cubic-bezier(.2,.7,.2,1) both}
+.scroll{scrollbar-width:none}.scroll::-webkit-scrollbar{display:none}
+.bar{height:6px;border-radius:3px;background:#E6EAFD;overflow:hidden}
+.bar-fill{height:100%;border-radius:3px;background:#4040D6;transition:width .5s cubic-bezier(.2,.7,.2,1)}
+.area{width:100%;padding:14px;border:1px solid #CBD2EA;border-radius:12px;background:#FFFFFF;font:inherit;font-size:16px;line-height:1.55;color:#161A3A;resize:none;outline:none;transition:border-color .2s ease,box-shadow .2s ease}
+.area:focus{border-color:#4040D6;box-shadow:0 0 0 4px rgba(64,64,214,.14)}
+.opt{display:flex;gap:12px;align-items:flex-start;width:100%;padding:14px;border:1px solid #DDE3F3;border-radius:14px;background:#FFFFFF;font:inherit;text-align:left;cursor:pointer;transition:border-color .25s ease,background .25s ease}
+.opt.on{border-color:#4040D6;background:#F7F8FE}
+.box{width:22px;height:22px;border-radius:6px;border:1.5px solid #A7AFCF;display:flex;align-items:center;justify-content:center;flex:none;margin-top:1px;transition:background .2s ease,border-color .2s ease}
+.box.on{background:#4040D6;border-color:#4040D6}
+.num{height:48px;border:1px solid #DDE3F3;border-radius:10px;background:#FFFFFF;font:inherit;font-size:15px;font-weight:600;color:#3E4466;cursor:pointer;transition:background .25s ease,color .25s ease,border-color .25s ease,transform .3s cubic-bezier(.2,.7,.2,1)}
+.num.on{background:#4040D6;border-color:#4040D6;color:#FFFFFF;transform:translateY(-3px)}
+.btn{height:48px;border:0;border-radius:12px;font:inherit;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:background .25s ease,transform .25s cubic-bezier(.2,.7,.2,1)}
+.btn:active{transform:scale(.985)}
+.btn-p{background:#4040D6;color:#FFFFFF}.btn-p:hover{background:#3232B5}
+.btn-s{background:#FFFFFF;color:#161A3A;border:1px solid #CBD2EA}.btn-s:hover{border-color:#A7AFCF}
+@keyframes drawc{from{stroke-dashoffset:24}to{stroke-dashoffset:0}}
+.check path{stroke-dasharray:24;animation:drawc .5s cubic-bezier(.2,.7,.2,1) .15s both}
+:focus-visible{outline:2px solid #4040D6;outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition-duration:.01ms!important}}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; display: flex; flex-direction: column; background: #F5F7FE; color: #161A3A; font-family: 'Schibsted Grotesk', ui-sans-serif, system-ui, sans-serif; overflow: hidden">
+
+  <header style="padding: 20px 16px 16px; display: flex; flex-direction: column; gap: 14px; background: #F5F7FE; border-bottom: 1px solid #DDE3F3">
+    <div style="display: flex; align-items: center; gap: 8px">
+      <a href="Paciente.dc.html" aria-label="Voltar para o início" style="width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #161A3A"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg></a>
+      <div style="display: flex; flex-direction: column; flex: 1; min-width: 0">
+        <span class="mono" style="font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: #5C6385">Atividade</span>
+        <span style="font-size: 16px; font-weight: 600">Registro de pensamentos</span>
+      </div>
+    </div>
+    <sc-if value="{{notSent}}" hint-placeholder-val="{{ true }}">
+      <div style="display: flex; flex-direction: column; gap: 8px">
+        <div style="display: flex; justify-content: space-between; font-size: 13px; color: #3E4466"><span aria-live="polite">Pergunta {{num}} de 4</span><span class="mono" style="font-size: 12px; color: #5C6385">{{pctLabel}}</span></div>
+        <div class="bar" role="progressbar" aria-valuemin="1" aria-valuemax="4" aria-valuenow="{{num}}" aria-label="Progresso"><div class="bar-fill" style="width: {{pctLabel}}"></div></div>
+      </div>
+    </sc-if>
+  </header>
+
+  <div class="scroll" style="flex: 1; overflow-y: auto; overflow-x: hidden; padding: 24px 20px">
+    <sc-if value="{{q1}}" hint-placeholder-val="{{ true }}">
+      <div class="{{qCls}}" style="display: flex; flex-direction: column; gap: 14px">
+        <p class="mono" style="margin: 0; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: #5C6385">01 · Texto longo</p>
+        <label for="r1" style="font-size: 22px; font-weight: 600; line-height: 1.25; letter-spacing: -0.02em">Descreva a situação</label>
+        <p style="margin: 0; font-size: 14px; color: #3E4466">Quando, onde e com quem aconteceu?</p>
+        <textarea id="r1" class="area" rows="7" placeholder="Escreva com suas palavras"></textarea>
+      </div>
+    </sc-if>
+    <sc-if value="{{q2}}" hint-placeholder-val="{{ false }}">
+      <div class="{{qCls}}" style="display: flex; flex-direction: column; gap: 14px">
+        <p class="mono" style="margin: 0; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: #5C6385">02 · Texto curto</p>
+        <label for="r2" style="font-size: 22px; font-weight: 600; line-height: 1.25; letter-spacing: -0.02em">Qual foi o pensamento que veio na hora?</label>
+        <textarea id="r2" class="area" rows="3" placeholder="Ex.: vou ser demitido"></textarea>
+      </div>
+    </sc-if>
+    <sc-if value="{{q3}}" hint-placeholder-val="{{ false }}">
+      <div class="{{qCls}}" style="display: flex; flex-direction: column; gap: 14px">
+        <p class="mono" style="margin: 0; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: #5C6385">03 · Múltipla escolha</p>
+        <h2 id="q3t" style="margin: 0; font-size: 22px; font-weight: 600; line-height: 1.25; letter-spacing: -0.02em">Você reconhece alguma destas distorções no pensamento?</h2>
+        <p style="margin: 0; font-size: 14px; color: #3E4466">Pode marcar mais de uma.</p>
+        <div role="group" aria-labelledby="q3t" style="display: flex; flex-direction: column; gap: 10px">
+          <sc-for list="{{opcoes}}" as="o" hint-placeholder-count="5">
+            <button type="button" role="checkbox" class="{{o.cls}}" aria-checked="{{o.on}}" onClick="{{o.pick}}">
+              <span class="{{o.boxCls}}" aria-hidden="true"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></span>
+              <span style="display: flex; flex-direction: column; gap: 2px">
+                <span style="font-size: 15px; font-weight: 600; color: #161A3A">{{o.nome}}</span>
+                <span style="font-size: 13px; line-height: 1.45; color: #5C6385">{{o.desc}}</span>
+              </span>
+            </button>
+          </sc-for>
+        </div>
+      </div>
+    </sc-if>
+    <sc-if value="{{q4}}" hint-placeholder-val="{{ false }}">
+      <div class="{{qCls}}" style="display: flex; flex-direction: column; gap: 14px">
+        <p class="mono" style="margin: 0; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: #5C6385">04 · Escala 1 a 10</p>
+        <h2 id="q4t" style="margin: 0; font-size: 22px; font-weight: 600; line-height: 1.25; letter-spacing: -0.02em">Qual a intensidade da emoção agora?</h2>
+        <div role="radiogroup" aria-labelledby="q4t" style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px">
+          <sc-for list="{{escala}}" as="n" hint-placeholder-count="10">
+            <button type="button" role="radio" class="{{n.cls}}" aria-checked="{{n.on}}" onClick="{{n.pick}}">{{n.v}}</button>
+          </sc-for>
+        </div>
+        <div style="display: flex; justify-content: space-between; font-size: 12px; color: #5C6385"><span>1 · fraca</span><span>10 · muito forte</span></div>
+      </div>
+    </sc-if>
+    <sc-if value="{{sent}}" hint-placeholder-val="{{ false }}">
+      <div class="fade" style="display: flex; flex-direction: column; align-items: center; text-align: center; gap: 16px; padding-top: 80px">
+        <span aria-hidden="true" style="width: 72px; height: 72px; border-radius: 50%; background: #E6EAFD; display: flex; align-items: center; justify-content: center">
+          <svg class="check" width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#4040D6" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg>
+        </span>
+        <h2 style="margin: 0; font-size: 22px; font-weight: 600; letter-spacing: -0.02em">Resposta enviada</h2>
+        <p style="margin: 0; max-width: 280px; font-size: 15px; line-height: 1.5; color: #3E4466">A Mariana vai ver antes da próxima sessão. Você pode reler suas respostas no Histórico.</p>
+        <a href="Paciente.dc.html" class="btn btn-p" style="width: 100%; margin-top: 16px; text-decoration: none">Voltar para o início</a>
+      </div>
+    </sc-if>
+  </div>
+
+  <sc-if value="{{notSent}}" hint-placeholder-val="{{ true }}">
+    <footer style="padding: 12px 16px 20px; display: flex; flex-direction: column; gap: 8px; background: #FFFFFF; border-top: 1px solid #DDE3F3">
+      <div style="display: flex; gap: 10px">
+        <sc-if value="{{canBack}}" hint-placeholder-val="{{ true }}">
+          <button type="button" class="btn btn-s" style="flex: 0 0 96px" onClick="{{voltar}}">Voltar</button>
+        </sc-if>
+        <button type="button" class="btn btn-p" style="flex: 1" onClick="{{avancar}}">{{nextLabel}}</button>
+      </div>
+      <button type="button" onClick="{{salvar}}" style="height: 36px; border: 0; background: none; font: inherit; font-size: 14px; color: #4040D6; cursor: pointer">{{draftLabel}}</button>
+    </footer>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { step: 1, dir: 'fwd', marks: [true, false, true, false, false], nivel: 6, sent: false, saved: false };
+  }
+  renderVals() {
+    const s = this.state;
+    const ops = [
+      ['Catastrofização', 'Imaginar o pior cenário como se fosse o mais provável.'],
+      ['Leitura mental', 'Supor o que o outro está pensando sem ter como saber.'],
+      ['Adivinhação', 'Tratar uma previsão sobre o futuro como certeza.'],
+      ['Tudo ou nada', 'Ver a situação só em extremos, sem meio-termo.'],
+      ['Outra', 'Nenhuma das anteriores.']
+    ];
+    return {
+      num: s.step,
+      pctLabel: (s.step * 25) + '%',
+      q1: !s.sent && s.step === 1, q2: !s.sent && s.step === 2, q3: !s.sent && s.step === 3, q4: !s.sent && s.step === 4,
+      qCls: s.dir === 'fwd' ? 'q-fwd' : 'q-back',
+      opcoes: ops.map((o, i) => ({
+        nome: o[0], desc: o[1], on: s.marks[i],
+        cls: s.marks[i] ? 'opt on' : 'opt', boxCls: s.marks[i] ? 'box on' : 'box',
+        pick: () => { const m = s.marks.slice(); m[i] = !m[i]; this.setState({ marks: m }); }
+      })),
+      escala: [1,2,3,4,5,6,7,8,9,10].map((v) => ({ v: v, on: s.nivel === v, cls: s.nivel === v ? 'num on' : 'num', pick: () => this.setState({ nivel: v }) })),
+      sent: s.sent, notSent: !s.sent,
+      canBack: s.step > 1,
+      nextLabel: s.step === 4 ? 'Enviar resposta' : 'Continuar',
+      avancar: () => s.step === 4 ? this.setState({ sent: true }) : this.setState({ step: s.step + 1, dir: 'fwd', saved: false }),
+      voltar: () => this.setState({ step: s.step - 1, dir: 'back', saved: false }),
+      draftLabel: s.saved ? 'Rascunho salvo' : 'Salvar rascunho',
+      salvar: () => this.setState({ saved: true })
+    };
+  }
+}
+</script>
+</body>
+</html>

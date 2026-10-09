@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Acolhe — Assinatura vencida</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&amp;family=Schibsted+Grotesk:wght@400;500;600;700&amp;display=swap">
+<style>
+body{margin:0;background:#F5F7FE}
+*{box-sizing:border-box}
+a{color:#4040D6}a:hover{color:#1C1A5E}
+.mono{font-family:'IBM Plex Mono',ui-monospace,monospace}
+@keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.rise{animation:rise .7s cubic-bezier(.2,.7,.2,1) both}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.fade{animation:fade .4s cubic-bezier(.2,.7,.2,1) both}
+@keyframes slideDown{from{opacity:0;transform:translateY(-100%)}to{opacity:1;transform:none}}
+.banner{animation:slideDown .6s cubic-bezier(.2,.7,.2,1) .2s both}
+.nav{display:flex;align-items:center;gap:12px;height:40px;padding:0 12px;border-radius:10px;color:#3E4466;text-decoration:none;font-size:14px;font-weight:500;transition:background .2s ease,color .2s ease}
+.nav:hover{background:#ECEFFB;color:#161A3A}
+.nav.on{background:#E6EAFD;color:#1C1A5E}
+.btn{height:40px;padding:0 16px;border-radius:10px;font:inherit;font-size:14px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:8px;text-decoration:none;transition:background .25s ease,box-shadow .25s ease,transform .25s cubic-bezier(.2,.7,.2,1),border-color .25s ease,color .25s ease;white-space:nowrap}
+.btn:active{transform:scale(.985)}
+.btn-p{border:0;background:#4040D6;color:#FFFFFF}.btn-p:hover{background:#3232B5;color:#FFFFFF;box-shadow:0 6px 18px rgba(64,64,214,.22)}
+.btn-s{border:1px solid #CBD2EA;background:#FFFFFF;color:#161A3A}.btn-s:hover{border-color:#A7AFCF;background:#F7F8FE;color:#161A3A}
+.btn-w{border:0;background:#FFFFFF;color:#9E3522}.btn-w:hover{background:#FFF6F4;color:#9E3522}
+.btn-locked{border:1px dashed #CBD2EA;background:#F7F8FE;color:#868DAD;cursor:not-allowed}
+.btn-locked:hover{border-color:#A7AFCF}
+.row{display:flex;align-items:center;gap:16px;padding:14px 16px;border-radius:12px;text-decoration:none;color:inherit;transition:background .2s ease}
+.row:hover{background:#F5F7FE}
+.card{background:#FFFFFF;border:1px solid #DDE3F3;border-radius:16px}
+:focus-visible{outline:2px solid #4040D6;outline-offset:2px}
+@media (max-width:760px){.side{max-width:none!important}.side nav{flex-direction:row!important;flex-wrap:wrap}.side .sec{display:none!important}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition-duration:.01ms!important}}
+</style>
+</helmet>
+<div style="min-height: 1000px; display: flex; flex-wrap: wrap; background: #F5F7FE; color: #161A3A; font-family: 'Schibsted Grotesk', ui-sans-serif, system-ui, sans-serif">
+
+  <aside class="side" style="flex: 1 1 248px; max-width: 264px; padding: 24px 16px; border-right: 1px solid #DDE3F3; display: flex; flex-direction: column; gap: 24px; background: #F5F7FE">
+    <a href="Main.dc.html" aria-label="Acolhe, ir para o login" style="display: flex; align-items: center; gap: 10px; padding: 0 12px; color: #161A3A; text-decoration: none">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#4040D6" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M22 17a10 10 0 0 0-20 0"></path><path d="M18 17a6 6 0 0 0-12 0" stroke="#FF7A5C"></path><path d="M14 17a2 2 0 0 0-4 0" stroke="currentColor"></path></svg>
+      <span style="font-size: 18px; font-weight: 600; letter-spacing: -0.02em">Acolhe</span>
+    </a>
+
+    <nav aria-label="Principal" style="display: flex; flex-direction: column; gap: 2px">
+      <a href="#" class="nav on" aria-current="page"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 11l8-6 8 6v8a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1z"></path></svg>Início</a>
+      <a href="Pacientes.dc.html" class="nav"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"></circle><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.5a3.5 3.5 0 0 1 0 7M18.5 14a6.5 6.5 0 0 1 3 6"></path></svg>Pacientes<span class="mono" style="margin-left: auto; font-size: 12px; color: #5C6385">14</span></a>
+      <a href="Agenda.dc.html" class="nav"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="2"></rect><path d="M3.5 10h17M8 3v4M16 3v4"></path></svg>Agenda</a>
+      <a href="Atividades.dc.html" class="nav"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5h10M9 12h10M9 19h10M4.5 5l.5.5L6.5 4M4.5 12l.5.5 1.5-1.5M4.5 19l.5.5 1.5-1.5"></path></svg>Atividades</a>
+      <a href="Documentos.dc.html" class="nav"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3h7l5 5v12a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"></path><path d="M14 3v5h5M9 13h6M9 17h6"></path></svg>Documentos</a>
+      <a href="Templates.dc.html" class="nav"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h11l3 3v13H5z"></path><path d="M9 4v5h6"></path></svg>Templates</a>
+      <p class="mono sec" style="margin: 18px 12px 6px; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: #5C6385">Só você</p>
+      <a href="Registro.dc.html" class="nav"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="2"></rect><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"></path></svg>Registro Documental</a>
+      <p class="mono sec" style="margin: 18px 12px 6px; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: #5C6385">Conta</p>
+      <a href="Assinatura.dc.html" class="nav"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5.5" width="18" height="13" rx="2"></rect><path d="M3 10h18M7 15h3"></path></svg>Assinatura<span aria-label="pendente" style="margin-left: auto; width: 8px; height: 8px; border-radius: 50%; background: #D9503C"></span></a>
+    </nav>
+
+    <div class="sec" style="margin-top: auto; display: flex; align-items: center; gap: 10px; padding: 12px; border-top: 1px solid #DDE3F3">
+      <span aria-hidden="true" style="width: 34px; height: 34px; border-radius: 50%; background: #E6EAFD; color: #2B2E9E; font-size: 13px; font-weight: 600; display: flex; align-items: center; justify-content: center">MS</span>
+      <span style="display: flex; flex-direction: column; min-width: 0; flex: 1">
+        <span style="font-size: 14px; font-weight: 600">Mariana Sá</span>
+        <span class="mono" style="font-size: 11px; color: #5C6385">CRP 06/123456</span>
+      </span>
+    </div>
+  </aside>
+
+  <div style="flex: 999 1 560px; min-width: 0; display: flex; flex-direction: column">
+    <div class="banner" role="status" style="position: sticky; top: 0; z-index: 5; display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: center; padding: 14px clamp(16px, 4vw, 48px); background: #D9503C; color: #FFFFFF">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none"><path d="M12 3l9.5 17h-19z"></path><path d="M12 10v4M12 17.5v.5"></path></svg>
+      <p style="margin: 0; flex: 1 1 360px; font-size: 14px; line-height: 1.5">Sua assinatura venceu em 2 de outubro. Você ainda pode ver e exportar seus dados, mas não pode criar registros novos.</p>
+      <a href="Assinatura.dc.html" class="btn btn-w">Regularizar pagamento</a>
+    </div>
+
+    <main style="padding: 28px clamp(16px, 4vw, 48px) 56px; display: flex; flex-direction: column; gap: 28px">
+      <div class="rise" style="display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-end; justify-content: space-between">
+        <header style="display: flex; flex-direction: column; gap: 8px">
+          <p class="mono" style="margin: 0; font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: #5C6385">Quinta · 9 de outubro</p>
+          <h1 style="margin: 0; font-size: 36px; line-height: 1.1; font-weight: 600; letter-spacing: -0.03em">Bom dia, Mariana.</h1>
+        </header>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap">
+          <button type="button" class="btn btn-locked" aria-disabled="true" aria-describedby="aviso-bloqueio" onClick="{{tryCreate}}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="2"></rect><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"></path></svg>Novo paciente</button>
+          <button type="button" class="btn btn-locked" aria-disabled="true" aria-describedby="aviso-bloqueio" onClick="{{tryCreate}}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="2"></rect><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"></path></svg>Agendar sessão</button>
+        </div>
+      </div>
+
+      <div id="aviso-bloqueio" aria-live="polite">
+        <sc-if value="{{showNotice}}" hint-placeholder-val="{{ false }}">
+          <div class="fade" style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center; padding: 14px 16px; border-radius: 12px; background: #FDEBE7; color: #9E3522; font-size: 14px">
+            <span style="flex: 1 1 320px">Para cadastrar pacientes, agendar sessões ou registrar evoluções, regularize o pagamento.</span>
+            <a href="Assinatura.dc.html" style="color: #9E3522; font-weight: 600; text-underline-offset: 3px">Ver assinatura</a>
+            <button type="button" onClick="{{closeNotice}}" aria-label="Fechar aviso" style="width: 32px; height: 32px; border: 0; border-radius: 8px; background: transparent; color: #9E3522; cursor: pointer; display: flex; align-items: center; justify-content: center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+          </div>
+        </sc-if>
+      </div>
+
+      <div style="display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start">
+        <section class="card rise" aria-labelledby="t-hoje" style="animation-delay: .1s; flex: 2 1 440px; min-width: 0; padding: 20px 12px 12px">
+          <div style="display: flex; justify-content: space-between; align-items: baseline; padding: 0 8px 8px">
+            <h2 id="t-hoje" style="margin: 0; font-size: 18px; font-weight: 600">Agenda de hoje</h2>
+            <span class="mono" style="font-size: 12px; color: #5C6385">somente leitura</span>
+          </div>
+          <sc-for list="{{sessions}}" as="s" hint-placeholder-count="4">
+            <a href="Ficha.dc.html" class="row">
+              <span class="mono" style="width: 48px; font-size: 13px; color: #3E4466">{{s.hora}}</span>
+              <span style="display: flex; flex-direction: column; flex: 1; min-width: 0">
+                <span style="font-size: 15px; font-weight: 600">{{s.nome}}</span>
+                <span style="font-size: 13px; color: #5C6385">{{s.meta}}</span>
+              </span>
+              <span style="font-size: 13px; color: #5C6385">{{s.status}}</span>
+            </a>
+          </sc-for>
+          <p style="margin: 8px 8px 0; font-size: 13px; color: #5C6385">Sessões já agendadas continuam aparecendo. Não é possível registrar a evolução até regularizar.</p>
+        </section>
+
+        <div style="flex: 1 1 280px; min-width: 0; display: flex; flex-direction: column; gap: 24px">
+          <section class="card rise" aria-labelledby="t-dados" style="animation-delay: .18s; padding: 24px; display: flex; flex-direction: column; gap: 14px">
+            <h2 id="t-dados" style="margin: 0; font-size: 18px; font-weight: 600">Seus dados</h2>
+            <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; font-size: 14px; color: #3E4466">
+              <li style="display: flex; gap: 8px; align-items: center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4040D6" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg>Prontuários e fichas: leitura liberada</li>
+              <li style="display: flex; gap: 8px; align-items: center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4040D6" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg>Exportação LGPD: liberada</li>
+              <li style="display: flex; gap: 8px; align-items: center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4040D6" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg>Pacientes continuam acessando o app</li>
+              <li style="display: flex; gap: 8px; align-items: center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9E3522" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg>Novos registros e atribuições: pausados</li>
+            </ul>
+            <a href="Exportacao.dc.html" class="btn btn-s" style="align-self: flex-start">Exportar dados</a>
+          </section>
+
+          <section class="card rise" aria-labelledby="t-cob" style="animation-delay: .26s; padding: 24px; display: flex; flex-direction: column; gap: 10px">
+            <h2 id="t-cob" style="margin: 0; font-size: 18px; font-weight: 600">Última cobrança</h2>
+            <p style="margin: 0; font-size: 14px; line-height: 1.5; color: #3E4466">Cartão final 4242 recusado em 2 de outubro. Tentamos de novo em 5 e 8 de outubro.</p>
+            <p class="mono" style="margin: 0; font-size: 12px; color: #5C6385">Plano Clínica · 3 psicólogas · [PREÇO]</p>
+          </section>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1000}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { notice: false };
+  }
+  renderVals() {
+    return {
+      showNotice: this.state.notice,
+      tryCreate: () => this.setState({ notice: true }),
+      closeNotice: () => this.setState({ notice: false }),
+      sessions: [
+        { hora: '09:00', nome: 'Pedro Tavares', meta: 'Online · 50 min', status: 'Realizada' },
+        { hora: '14:00', nome: 'Júlia Andrade', meta: 'Online · 50 min', status: 'Em 2 h' },
+        { hora: '16:00', nome: 'Bruno Felix', meta: 'Online · 50 min', status: 'Em 4 h' },
+        { hora: '18:00', nome: 'Sofia Lima', meta: 'Presencial · 50 min', status: 'Em 6 h' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>
