@@ -82,8 +82,11 @@ async function submitCheckin() {
   } catch (error) {
     checkinError.value = apiErrorMessage(error, {
       400: 'Escolha uma nota de 1 a 5 e, se quiser, uma observação curta.',
-      403: 'Seu vínculo ainda não está ativo para registrar check-ins.',
-      409: 'Já existe um check-in hoje ou o dia do registro mudou. Atualize a página para conferir.',
+      403: 'Seu vínculo com a psicóloga não está ativo no momento, então não é possível registrar check-ins.',
+      404: 'Este check-in não está mais disponível. Atualize a página.',
+      409: editingCheckin.value
+        ? 'O dia virou e este check-in não pode mais ser editado. Ele continua no seu histórico.'
+        : 'Você já registrou o check-in de hoje. Atualize a página para editá-lo.',
       default: 'Não foi possível salvar o check-in agora. Tente novamente.',
     })
     await checkins.refresh()
@@ -215,7 +218,7 @@ function formatTime(value: string) {
               <Button variant="outline" class="self-start" @click="editTodayCheckin">Editar check-in de hoje</Button>
             </template>
             <template v-else>
-              <p class="text-xs text-muted-foreground">Um registro por dia. Você pode editar até o fim do dia, no horário de Fortaleza.</p>
+              <p class="text-xs text-muted-foreground">Um registro por dia. Você pode editar até o fim do dia, no horário de Brasília.</p>
               <div class="flex gap-2" role="radiogroup" aria-label="Humor de hoje">
                 <Button v-for="value in 5" :key="value" type="button" :variant="mood === value ? 'default' : 'outline'" class="size-10 rounded-full p-0" :aria-checked="mood === value" role="radio" :disabled="checkinSubmitting" @click="mood = value">{{ value }}</Button>
               </div>
