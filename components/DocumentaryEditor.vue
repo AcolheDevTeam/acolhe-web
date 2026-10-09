@@ -481,7 +481,7 @@ watch(
               >
                 <span class="font-medium">Versão {{ version.revision }}</span
                 ><span class="text-xs text-muted-foreground">{{
-                  new Date(version.createdAt).toLocaleString('pt-BR')
+                  new Date(version.createdAt).toLocaleString('pt-BR', { timeZone: APP_TIMEZONE })
                 }}</span
                 ><span
                   v-if="version.restoredFrom"

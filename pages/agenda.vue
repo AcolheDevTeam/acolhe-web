@@ -8,35 +8,30 @@ definePageMeta({ middleware: ['auth', 'psychologist-only'] })
 const route = useRoute()
 const { data: appointments, error, status, refresh } = useAppointments()
 const queryDate = z.string().date().safeParse(route.query.date)
-const selectedDate = ref(queryDate.success ? queryDate.data : new Date().toLocaleDateString('sv-SE'))
-const monday = computed(() => {
-  const date = new Date(`${selectedDate.value || new Date().toLocaleDateString('sv-SE')}T12:00:00`)
-  date.setDate(date.getDate() - (date.getDay() + 6) % 7)
-  date.setHours(0, 0, 0, 0)
-  return date
+const selectedDate = ref(queryDate.success ? queryDate.data : zonedDay())
+// Dias e horas no fuso do app: o SSR roda em UTC e a hidratação não corrige o
+// `style` dos blocos (ACO-83).
+const days = computed(() => {
+  const monday = weekStart(selectedDate.value || zonedDay())
+  return Array.from({ length: 7 }, (_, index) => {
+    const iso = addCalendarDays(monday, index)
+    return { iso, label: calendarDayLabel(iso), appointments: (appointments.value ?? []).filter(a => zonedDay(a.scheduledFor) === iso) }
+  })
 })
-const days = computed(() => Array.from({ length: 7 }, (_, index) => {
-  const date = new Date(monday.value)
-  date.setDate(date.getDate() + index)
-  return { date, iso: date.toLocaleDateString('sv-SE'), label: date.toLocaleDateString('pt-BR', { weekday: 'short', day: 'numeric', month: 'numeric' }),
-    appointments: (appointments.value ?? []).filter(a => new Date(a.scheduledFor).toLocaleDateString('sv-SE') === date.toLocaleDateString('sv-SE')) }
-}))
 const visibleAppointments = computed(() => days.value.flatMap(day => day.appointments).filter(a => a.status !== 'canceled'))
-const firstHour = computed(() => Math.min(8, ...visibleAppointments.value.map(a => new Date(a.scheduledFor).getHours())))
+const firstHour = computed(() => Math.min(8, ...visibleAppointments.value.map(a => zonedParts(a.scheduledFor).hour)))
 const lastHour = computed(() => Math.min(24, Math.max(20, ...visibleAppointments.value.map((a) => {
-  const start = new Date(a.scheduledFor)
-  return Math.ceil(start.getHours() + (start.getMinutes() + a.durationMinutes) / 60)
+  const start = zonedParts(a.scheduledFor)
+  return Math.ceil(start.hour + (start.minute + a.durationMinutes) / 60)
 }))))
 const hours = computed(() => Array.from({ length: lastHour.value - firstHour.value }, (_, index) => index + firstHour.value))
 const canceled = computed(() => days.value.flatMap(day => day.appointments).filter(a => a.status === 'canceled'))
 function moveWeek(offset: number) {
-  const date = new Date(monday.value)
-  date.setDate(date.getDate() + offset * 7)
-  selectedDate.value = date.toLocaleDateString('sv-SE')
+  selectedDate.value = addCalendarDays(days.value[0]!.iso, offset * 7)
 }
 function position(iso: string, minutes: number) {
-  const date = new Date(iso)
-  return { top: `${(date.getHours() - firstHour.value + date.getMinutes() / 60) * 60}px`, height: `${Math.min(minutes, 1440 - date.getHours() * 60 - date.getMinutes())}px` }
+  const { hour, minute } = zonedParts(iso)
+  return { top: `${(hour - firstHour.value + minute / 60) * 60}px`, height: `${Math.min(minutes, 1440 - hour * 60 - minute)}px` }
 }
 </script>
 
@@ -51,8 +46,8 @@ function position(iso: string, minutes: number) {
       <Button variant="outline" size="icon" aria-label="Semana anterior" @click="moveWeek(-1)"><ChevronLeft /></Button>
       <div class="w-44"><DatePicker v-model="selectedDate" aria-label="Escolher semana" /></div>
       <Button variant="outline" size="icon" aria-label="Próxima semana" @click="moveWeek(1)"><ChevronRight /></Button>
-      <Button variant="ghost" size="sm" @click="selectedDate = new Date().toLocaleDateString('sv-SE')">Hoje</Button>
-      <p class="label-mono">{{ formatDate(days[0]!.date.toISOString()) }} – {{ formatDate(days[6]!.date.toISOString()) }}</p>
+      <Button variant="ghost" size="sm" @click="selectedDate = zonedDay()">Hoje</Button>
+      <p class="label-mono">{{ formatDate(days[0]!.iso) }} – {{ formatDate(days[6]!.iso) }}</p>
     </div>
     <div v-if="error" class="rounded-lg border border-dashed p-6 text-sm">
       <p>{{ apiErrorMessage(error, { default: 'Não foi possível carregar a agenda agora.' }) }}</p>

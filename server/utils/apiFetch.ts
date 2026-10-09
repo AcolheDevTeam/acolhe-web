@@ -11,11 +11,31 @@ export async function apiFetch<T>(
   const config = useRuntimeConfig()
   const token = getCookie(event, 'acolhe_session')
 
-  return await $fetch<T>(`${config.apiUrl}${path}`, {
-    ...opts,
-    headers: {
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...opts.headers,
-    },
-  }) as T
+  try {
+    return await $fetch<T>(`${config.apiUrl}${path}`, {
+      ...opts,
+      headers: {
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...opts.headers,
+      },
+    }) as T
+  }
+  catch (error) {
+    throw relayApiError(error)
+  }
+}
+
+// Em produção o Nitro troca por "Server Error" a mensagem de qualquer erro que
+// não seja H3Error, e o cliente perdia o motivo do 4xx (ex.: qual 409 da agenda,
+// ACO-83). Aqui o status segue e, só em 4xx, a mensagem curta da API vai em
+// `data.message`, para o front reconhecer o caso (nunca para exibi-la). 5xx e
+// falhas de rede não levam detalhe nenhum.
+export function relayApiError(error: unknown): unknown {
+  const status = (error as { response?: { status?: number } })?.response?.status
+  if (!status) return error
+  const apiMessage = (error as { data?: { message?: unknown } }).data?.message
+  return createError({
+    statusCode: status,
+    data: status < 500 && typeof apiMessage === 'string' ? { message: apiMessage } : undefined,
+  })
 }

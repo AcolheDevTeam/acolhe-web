@@ -17,7 +17,7 @@ const { data: patients } = await useFetch<Patient[]>('/api/patients', {
 
 const firstName = computed(() => me.value?.name?.split(' ')[0] ?? '')
 const greeting = computed(() => {
-  const h = new Date().getHours()
+  const h = zonedParts(new Date()).hour
   return h < 12 ? 'Bom dia' : h < 18 ? 'Boa tarde' : 'Boa noite'
 })
 const today = computed(() => {
@@ -25,18 +25,15 @@ const today = computed(() => {
     weekday: 'long',
     day: 'numeric',
     month: 'long',
+    timeZone: APP_TIMEZONE,
   }).format(new Date())
   return s.charAt(0).toUpperCase() + s.slice(1)
 })
 
 const sessionsToday = computed(() => {
-  const now = new Date()
-  return (allAppointments.value ?? []).filter((session) => {
-    const occurredAt = new Date(session.scheduledFor)
-    return ['scheduled', 'confirmed', 'completed'].includes(session.status) && occurredAt.getFullYear() === now.getFullYear()
-      && occurredAt.getMonth() === now.getMonth()
-      && occurredAt.getDate() === now.getDate()
-  })
+  const today = zonedDay()
+  return (allAppointments.value ?? []).filter(session =>
+    ['scheduled', 'confirmed', 'completed'].includes(session.status) && zonedDay(session.scheduledFor) === today)
 })
 const reviews = computed(() => (allActivities.value ?? []).filter(activity => activity.status === 'submitted'))
 const activePatients = computed(() => (patients.value ?? []).filter((p) => p.status === 'active'))
