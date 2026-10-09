@@ -24,7 +24,9 @@ const viewOptions: { value: AgendaView, label: string }[] = [
 
 // Altura de uma hora na grade (protótipo: 56px).
 const HOUR = 56
-const today = zonedDay()
+// Relógio da página: vira o "hoje" e a linha do agora à meia-noite de Brasília.
+const now = useNow({ interval: 60000 })
+const today = computed(() => zonedDay(now.value))
 const all = computed(() => appointments.value ?? [])
 // Dias e horas no fuso do app: o SSR roda em UTC e a hidratação não corrige o
 // `style` dos blocos (ACO-83).
@@ -42,7 +44,7 @@ const days = computed(() => {
   const list = view.value === 'dia' ? [selectedDate.value] : weekDays(selectedDate.value, !!byDay.value.get(sunday)?.length)
   return list.map((iso) => {
     const appointments = byDay.value.get(iso) ?? []
-    return { iso, abbr: weekdayAbbr(iso), num: Number(iso.slice(8)), isToday: iso === today, appointments, visible: appointments.filter(a => a.status !== 'canceled') }
+    return { iso, abbr: weekdayAbbr(iso), num: Number(iso.slice(8)), isToday: iso === today.value, appointments, visible: appointments.filter(a => a.status !== 'canceled') }
   })
 })
 const visibleAppointments = computed(() => days.value.flatMap(day => day.visible))
@@ -64,7 +66,6 @@ function position(appointment: Appointment) {
 // Linha do "agora" só no cliente: o SSR não sabe a hora de quem vê.
 const mounted = ref(false)
 onMounted(() => { mounted.value = true })
-const now = useNow({ interval: 60000 })
 const nowTop = computed(() => {
   if (!mounted.value) return null
   const { hour, minute } = zonedParts(now.value)
@@ -218,7 +219,7 @@ function select(appointment: Appointment) {
       </section>
     </template>
 
-    <AppointmentPanel v-if="selected" :key="selected.id" :appointment="selected" @close="selectedId = null" />
+    <AppointmentPanel v-if="selected" :appointment="selected" @close="selectedId = null" />
   </div>
 </template>
 

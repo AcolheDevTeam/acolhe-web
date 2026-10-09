@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useEventListener } from '@vueuse/core'
 import { X } from 'lucide-vue-next'
 import type { Appointment } from '~/types'
 import { Button } from '@/components/ui/button'
@@ -17,16 +18,37 @@ const when = computed(() => {
 })
 const canReschedule = computed(() => active.value && !appointment.value.sessionId)
 
+// Foco entra no painel ao abrir (e ao trocar de evento) e volta para quem o
+// abriu ao fechar.
+const panel = ref<HTMLElement | null>(null)
 const closeButton = ref<{ $el: HTMLElement } | null>(null)
-onMounted(() => closeButton.value?.$el.focus())
+let opener: HTMLElement | null = null
+onMounted(() => {
+  opener = document.activeElement instanceof HTMLElement ? document.activeElement : null
+  closeButton.value?.$el.focus()
+})
+onBeforeUnmount(() => { if (opener?.isConnected) opener.focus() })
+watch(() => appointment.value.id, () => {
+  pendingStatus.value = null
+  nextTick(() => closeButton.value?.$el.focus())
+})
+
+// Esc fecha mesmo com o foco fora do painel; dentro de outro diálogo
+// (confirmação, reagendar) o Esc é dele.
+useEventListener(document, 'keydown', (event: KeyboardEvent) => {
+  if (event.key !== 'Escape' || pendingStatus.value) return
+  const target = event.target instanceof Element ? event.target : null
+  if (target?.closest('[role="dialog"], [role="alertdialog"]') && !panel.value?.contains(target)) return
+  emit('close')
+})
 </script>
 
 <template>
   <section
+    ref="panel"
     role="dialog"
     aria-labelledby="agenda-evento-titulo"
     class="fixed inset-x-4 bottom-4 z-40 flex max-h-[calc(100dvh-2rem)] flex-col gap-[18px] overflow-y-auto rounded-2xl border bg-card p-6 shadow-[0_24px_60px_rgba(22,26,58,.18)] sm:inset-x-auto sm:bottom-auto sm:right-6 sm:top-6 sm:w-[380px] lg:right-10 animate-[agenda-panel_.45s_var(--ease-out)_both]"
-    @keydown.esc="emit('close')"
   >
     <div class="flex items-start justify-between gap-3">
       <div class="flex min-w-0 flex-col gap-1">
@@ -44,8 +66,8 @@ onMounted(() => closeButton.value?.$el.focus())
 
     <div v-if="active" class="grid grid-cols-2 gap-2">
       <Button v-if="appointment.status === 'scheduled'" variant="outline" :disabled="busy" @click="changeStatus('confirmed')">Confirmar</Button>
-      <Button v-if="active && hasStarted" variant="outline" :disabled="busy" @click="askStatus('completed')">Realizada</Button>
-      <Button v-if="active && hasStarted && !appointment.sessionId" variant="destructive-soft" :disabled="busy" @click="askStatus('no_show')">Falta</Button>
+      <Button v-if="hasStarted" variant="outline" :disabled="busy" @click="askStatus('completed')">Realizada</Button>
+      <Button v-if="hasStarted && !appointment.sessionId" variant="destructive-soft" :disabled="busy" @click="askStatus('no_show')">Falta</Button>
       <Button v-if="canReschedule" variant="destructive-soft" :disabled="busy" @click="askStatus('canceled')">Cancelar</Button>
     </div>
 
