@@ -11,15 +11,16 @@ import { apiErrorInfo, apiErrorMessage } from './api-error'
 
 // Vocabulário da biblioteca de templates em português (telas 11 e 12 do design).
 
-export const FIELD_TYPE_META: Record<FieldType, { label: string, description: string }> = {
-  short_text: { label: 'Texto curto', description: 'Uma linha, até 500 caracteres' },
-  long_text: { label: 'Texto longo', description: 'Parágrafos livres' },
-  scale: { label: 'Escala', description: 'Um número entre mínimo e máximo, ex.: 1 a 10' },
-  single_choice: { label: 'Escolha única', description: 'Só uma opção' },
-  multiple_choice: { label: 'Múltipla escolha', description: 'Pode marcar mais de uma' },
-  boolean: { label: 'Sim / não', description: 'Uma pergunta fechada' },
-  date: { label: 'Data', description: 'Só o dia' },
-  datetime: { label: 'Data e hora', description: 'Dia e horário' },
+// `abbr` é a etiqueta mono da paleta "Adicionar campo" do builder (protótipo).
+export const FIELD_TYPE_META: Record<FieldType, { label: string, description: string, abbr: string }> = {
+  short_text: { label: 'Texto curto', description: 'Uma linha, até 500 caracteres', abbr: 'Aa' },
+  long_text: { label: 'Texto longo', description: 'Parágrafos livres', abbr: '¶' },
+  scale: { label: 'Escala', description: 'Um número entre mínimo e máximo, ex.: 1 a 10', abbr: '1–10' },
+  single_choice: { label: 'Escolha única', description: 'Só uma opção', abbr: '◉' },
+  multiple_choice: { label: 'Múltipla escolha', description: 'Pode marcar mais de uma', abbr: '☑' },
+  boolean: { label: 'Sim / não', description: 'Uma pergunta fechada', abbr: 'S/N' },
+  date: { label: 'Data', description: 'Só o dia', abbr: 'DT' },
+  datetime: { label: 'Data e hora', description: 'Dia e horário', abbr: 'DH' },
 }
 
 export const FIELD_TYPE_OPTIONS: CustomDropdownOption[] = (Object.keys(FIELD_TYPE_META) as FieldType[])
@@ -43,9 +44,10 @@ export function templateTypeLabel(code: string): string {
   return TEMPLATE_TYPE_META[code as TemplateTypeCode] ?? code
 }
 
-// Opções do filtro por tipo em /templates (ACO-74). "Todos" é o valor vazio.
-export const TEMPLATE_TYPE_FILTER_OPTIONS: CustomDropdownOption[] = [
-  { value: '', label: 'Todos os tipos' },
+// Opções do filtro por tipo em /templates (ACO-74), mostradas como chips.
+// "Todos" é o valor vazio.
+export const TEMPLATE_TYPE_FILTER_OPTIONS: { value: string, label: string }[] = [
+  { value: '', label: 'Todos' },
   ...(Object.keys(TEMPLATE_TYPE_META) as TemplateTypeCode[])
     .map((value) => ({ value, label: TEMPLATE_TYPE_META[value] })),
 ]
@@ -65,9 +67,18 @@ export function filterTemplates<T extends { title: string, description?: string 
   })
 }
 
+// Escopo de um template, como nas abas da biblioteca: meus, de outras pessoas
+// da clínica (mesma organização) ou da biblioteca global da Acolhe.
+export type TemplateScope = 'mine' | 'clinic' | 'acolhe'
+
+export function templateScope(template: { isGlobal: boolean, ownedByMe: boolean }): TemplateScope {
+  if (template.isGlobal) return 'acolhe'
+  return template.ownedByMe ? 'mine' : 'clinic'
+}
+
+// Rótulos do protótipo: "Pessoal", "Da clínica", "Biblioteca Acolhe".
 export function templateOriginLabel(template: { isGlobal: boolean, ownedByMe: boolean }): string {
-  if (template.isGlobal) return 'Acolhe'
-  return template.ownedByMe ? 'Meu' : 'Da organização'
+  return { mine: 'Pessoal', clinic: 'Da clínica', acolhe: 'Biblioteca Acolhe' }[templateScope(template)]
 }
 
 // "4 campos · situação, pensamento, emoção…" como no card da tela 11.

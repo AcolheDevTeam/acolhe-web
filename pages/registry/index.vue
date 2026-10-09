@@ -6,8 +6,8 @@ const page = ref(1)
 const { data, error, status, refresh } = useDocumentaryPatients(page)
 </script>
 <template>
-  <PageHeader title="Registro Documental" />
-  <div class="mx-auto flex max-w-5xl flex-col gap-6 px-4 py-6 md:px-8 md:py-8">
+  <PageHeader eyebrow="Só você" title="Registro Documental" />
+  <div class="mx-auto flex max-w-5xl flex-col gap-6 px-4 py-6 md:px-8 md:py-8 lg:px-12">
     <div class="rounded-lg border bg-muted/40 p-5 text-sm">
       <p class="font-medium">Espaço restrito · sigilo profissional</p>
       <p class="mt-2 text-muted-foreground">
@@ -19,12 +19,8 @@ const { data, error, status, refresh } = useDocumentaryPatients(page)
       Para começar um caderno, abra Registro Documental na ficha da paciente.
     </p>
     <div v-if="error" role="alert" class="space-y-3">
-      <p>
-        {{
-          apiErrorMessage(error, {
-            503: 'Registro Documental indisponível. A configuração de criptografia precisa ser verificada.',
-          })
-        }}
+      <p class="text-sm text-destructive">
+        {{ documentaryErrorText(error) }}
       </p>
       <Button variant="outline" @click="refresh()">Tentar novamente</Button>
     </div>
@@ -32,12 +28,9 @@ const { data, error, status, refresh } = useDocumentaryPatients(page)
       Carregando cadernos…
     </p>
     <template v-else-if="data">
-      <div
-        v-if="!data.items.length"
-        class="rounded-lg border border-dashed p-8 text-center text-muted-foreground"
-      >
+      <EmptyState v-if="!data.items.length" compact>
         Nenhum caderno salvo nesta página.
-      </div>
+      </EmptyState>
       <div v-else class="divide-y rounded-lg border bg-card">
         <NuxtLink
           v-for="patient in data.items"

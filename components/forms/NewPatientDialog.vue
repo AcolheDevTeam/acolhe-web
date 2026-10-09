@@ -68,7 +68,7 @@ watch(open, (isOpen) => {
     </DialogTrigger>
     <DialogContent class="sm:max-w-md">
       <DialogHeader v-if="!createdPatient">
-        <DialogTitle class="font-serif text-2xl font-normal">Novo paciente</DialogTitle>
+        <DialogTitle class="text-[22px] font-semibold tracking-[-0.02em]">Novo paciente</DialogTitle>
         <DialogDescription>
           Cadastre os dados básicos para iniciar o acompanhamento.
         </DialogDescription>
@@ -132,7 +132,7 @@ watch(open, (isOpen) => {
             <MailCheck v-else-if="!delivery.showLink" class="size-5" />
             <Link2 v-else class="size-5" />
           </div>
-          <DialogTitle class="font-serif text-2xl font-normal">{{ delivery.title }}</DialogTitle>
+          <DialogTitle class="text-[22px] font-semibold tracking-[-0.02em]">{{ delivery.title }}</DialogTitle>
           <DialogDescription :class="delivery.tone === 'warning' ? 'text-warning' : ''">
             {{ delivery.description(createdPatient.fullName, createdPatient.invitation?.email) }}
           </DialogDescription>

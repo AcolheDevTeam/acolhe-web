@@ -1,6 +1,14 @@
 import { describe, expect, it } from 'vitest'
 import type { Activity } from '~/types'
-import { activityQueueGroup, activitySummary, groupActivityQueue, isActivityOverdue } from '~/utils/activity-queue'
+import {
+  activityQueueBadge,
+  activityQueueGroup,
+  activityQueueTab,
+  activitySummary,
+  groupActivityQueue,
+  isActivityOverdue,
+  isActivityQueueTab,
+} from '~/utils/activity-queue'
 import { formatDate, formatDateTime } from '~/utils/format'
 
 const now = new Date('2026-09-09T12:00:00Z')
@@ -80,5 +88,31 @@ describe('activitySummary', () => {
     expect(activitySummary(make({ status: 'submitted', respondedAt: past }), now)).toBe(`Respondida em ${formatDateTime(past)}`)
     expect(activitySummary(make({ status: 'expired' }), now)).toBe('Prazo encerrado sem resposta')
     expect(activitySummary(make({ status: 'canceled' }), now)).toBe('Cancelada')
+  })
+})
+
+describe('abas da fila', () => {
+  it('distribui os status nas quatro abas do protótipo', () => {
+    expect(activityQueueTab({ status: 'submitted' }, now)).toBe('review')
+    expect(activityQueueTab({ status: 'pending', dueAt: future }, now)).toBe('open')
+    expect(activityQueueTab({ status: 'in_progress', dueAt: past }, now)).toBe('late')
+    expect(activityQueueTab({ status: 'reviewed' }, now)).toBe('done')
+    expect(activityQueueTab({ status: 'expired' }, now)).toBe('done')
+    expect(activityQueueTab({ status: 'algo_novo' }, now)).toBe('open')
+  })
+
+  it('pílula com o rótulo e o tom de cada situação', () => {
+    expect(activityQueueBadge({ status: 'submitted' }, now)).toEqual({ label: 'Para revisar', variant: 'warning' })
+    expect(activityQueueBadge({ status: 'pending', dueAt: past }, now)).toEqual({ label: 'Atrasada', variant: 'danger' })
+    expect(activityQueueBadge({ status: 'pending', dueAt: future }, now)).toEqual({ label: 'Em andamento', variant: 'positive' })
+    expect(activityQueueBadge({ status: 'reviewed' }, now)).toEqual({ label: 'Concluída', variant: 'neutral' })
+    expect(activityQueueBadge({ status: 'canceled' }, now).label).toBe('Cancelada')
+    expect(activityQueueBadge({ status: 'expired' }, now).label).toBe('Sem resposta')
+  })
+
+  it('valida a aba vinda da URL', () => {
+    expect(isActivityQueueTab('late')).toBe(true)
+    expect(isActivityQueueTab('qualquer')).toBe(false)
+    expect(isActivityQueueTab(undefined)).toBe(false)
   })
 })

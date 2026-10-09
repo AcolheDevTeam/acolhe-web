@@ -12,6 +12,29 @@ export interface User {
   name?: string
   crp?: string
   patient?: PatientContext
+  /** Workspace ativo do token, para quem atua numa organização (ADR 0002 da API). */
+  workspace?: WorkspaceContext
+}
+
+export type WorkspaceRole = 'clinic_owner' | 'clinic_admin' | 'clinical_supervisor' | 'psychologist'
+
+export interface WorkspaceContext {
+  organizationId: string
+  type: 'individual' | 'clinic' | string
+  roles: WorkspaceRole[]
+  /** false: vínculo suspenso/encerrado ou organização inativa. */
+  active: boolean
+}
+
+/** Um vínculo da pessoa, para a troca de workspace. */
+export interface Workspace {
+  organizationId: string
+  name: string
+  type: 'individual' | 'clinic' | string
+  roles: WorkspaceRole[]
+  membershipStatus: 'invited' | 'active' | 'suspended' | 'ended' | string
+  organizationStatus: string
+  current: boolean
 }
 
 export interface PatientContext {
@@ -123,6 +146,7 @@ export type ActivityStatus = 'pending' | 'in_progress' | 'submitted' | 'reviewed
 
 export interface Activity {
   id: string
+  templateId?: string
   patientId: string
   patientName?: string
   title: string

@@ -6,7 +6,8 @@ export { default as AvatarFallback } from "./AvatarFallback.vue"
 export { default as AvatarImage } from "./AvatarImage.vue"
 
 export const avatarVariant = cva(
-  "inline-flex items-center justify-center font-normal text-foreground select-none shrink-0 bg-secondary overflow-hidden",
+  // Iniciais sem foto: índigo claro com texto índigo (protótipo).
+  "inline-flex items-center justify-center font-semibold select-none shrink-0 overflow-hidden",
   {
     variants: {
       size: {
@@ -14,10 +15,19 @@ export const avatarVariant = cva(
         base: "h-16 w-16 text-2xl",
         lg: "h-32 w-32 text-5xl",
       },
+      // soft: pessoas na lista; brand: paciente/workspace; pending: convite.
+      tone: {
+        soft: "bg-positive-soft text-positive",
+        brand: "bg-brand text-brand-foreground",
+        pending: "border border-dashed border-input-hover bg-card text-muted-foreground",
+      },
       shape: {
         circle: "rounded-full",
-        square: "rounded-md",
+        square: "rounded-lg",
       },
+    },
+    defaultVariants: {
+      tone: "soft",
     },
   },
 )

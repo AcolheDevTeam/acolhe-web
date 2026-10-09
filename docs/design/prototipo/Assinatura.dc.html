@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Acolhe — Assinatura e faturas</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&amp;family=Schibsted+Grotesk:wght@400;500;600;700&amp;display=swap">
+<style>
+body{margin:0;background:#F5F7FE}
+*{box-sizing:border-box}
+a{color:#4040D6}a:hover{color:#1C1A5E}
+.mono{font-family:'IBM Plex Mono',ui-monospace,monospace}
+@keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.rise{animation:rise .7s cubic-bezier(.2,.7,.2,1) both}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.fade{animation:fade .36s cubic-bezier(.2,.7,.2,1) both}
+@keyframes pop{from{opacity:0;transform:translateY(10px) scale(.98)}to{opacity:1;transform:none}}
+.pop{animation:pop .4s cubic-bezier(.2,.7,.2,1) both}
+@keyframes dim{from{opacity:0}to{opacity:1}}
+.dim{animation:dim .3s ease both}
+.nav{display:flex;align-items:center;gap:12px;height:40px;padding:0 12px;border-radius:10px;color:#3E4466;text-decoration:none;font-size:14px;font-weight:500;transition:background .2s ease,color .2s ease}
+.nav:hover{background:#ECEFFB;color:#161A3A}
+.nav.on{background:#E6EAFD;color:#1C1A5E}
+.btn{height:40px;padding:0 16px;border-radius:10px;font:inherit;font-size:14px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;transition:background .25s ease,box-shadow .25s ease,transform .25s cubic-bezier(.2,.7,.2,1),border-color .25s ease,color .25s ease;white-space:nowrap}
+.btn:active{transform:scale(.985)}
+.btn-p{border:0;background:#4040D6;color:#FFFFFF}.btn-p:hover{background:#3232B5;box-shadow:0 6px 18px rgba(64,64,214,.22)}
+.btn-s{border:1px solid #CBD2EA;background:#FFFFFF;color:#161A3A}.btn-s:hover{border-color:#A7AFCF;background:#F7F8FE}
+.btn-q{border:0;background:transparent;color:#3E4466}.btn-q:hover{background:#ECEFFB}
+.btn-danger{border:0;background:#A33A3A;color:#FFFFFF}.btn-danger:hover{background:#8A2F2F}
+.step{width:36px;height:36px;border:1px solid #CBD2EA;border-radius:10px;background:#FFFFFF;font:inherit;font-size:18px;color:#161A3A;cursor:pointer;transition:background .2s ease}
+.step:hover{background:#EFF2FB}
+.card{background:#FFFFFF;border:1px solid #DDE3F3;border-radius:16px}
+.inv td,.inv th{padding:14px 16px;text-align:left;border-bottom:1px solid #EFF2FB;white-space:nowrap}
+.inv tbody tr{transition:background .2s ease}
+.inv tbody tr:hover{background:#F7F8FE}
+:focus-visible{outline:2px solid #4040D6;outline-offset:2px}
+@media (max-width:760px){.side{max-width:none!important}.side nav{flex-direction:row!important;flex-wrap:wrap}.side .sec{display:none!important}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition-duration:.01ms!important}}
+</style>
+</helmet>
+<div style="position: relative; min-height: 1000px; display: flex; flex-wrap: wrap; background: #F5F7FE; color: #161A3A; font-family: 'Schibsted Grotesk', ui-sans-serif, system-ui, sans-serif">
+
+  <aside class="side" style="flex: 1 1 248px; max-width: 264px; padding: 24px 16px; border-right: 1px solid #DDE3F3; display: flex; flex-direction: column; gap: 24px; background: #F5F7FE">
+    <a href="Main.dc.html" aria-label="Acolhe, ir para o login" style="display: flex; align-items: center; gap: 10px; padding: 0 12px; color: #161A3A; text-decoration: none">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#4040D6" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M22 17a10 10 0 0 0-20 0"></path><path d="M18 17a6 6 0 0 0-12 0" stroke="#FF7A5C"></path><path d="M14 17a2 2 0 0 0-4 0" stroke="currentColor"></path></svg>
+      <span style="font-size: 18px; font-weight: 600; letter-spacing: -0.02em">Acolhe</span>
+    </a>
+
+    <button type="button" class="sec" style="display: flex; align-items: center; gap: 10px; width: 100%; padding: 10px 12px; border: 1px solid #DDE3F3; border-radius: 12px; background: #FFFFFF; font: inherit; text-align: left; cursor: pointer">
+      <span aria-hidden="true" style="width: 32px; height: 32px; border-radius: 8px; background: #1C1A5E; color: #FF8A70; font-size: 13px; font-weight: 600; display: flex; align-items: center; justify-content: center">CT</span>
+      <span style="display: flex; flex-direction: column; flex: 1; min-width: 0">
+        <span style="font-size: 14px; font-weight: 600">Clínica Travessia</span>
+        <span style="font-size: 12px; color: #5C6385">Trocar clínica</span>
+      </span>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5C6385" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 9l4-4 4 4M8 15l4 4 4-4"></path></svg>
+    </button>
+
+    <nav aria-label="Principal" style="display: flex; flex-direction: column; gap: 2px">
+      <a href="Dashboard.dc.html" class="nav"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 11l8-6 8 6v8a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1z"></path></svg>Início</a>
+      <a href="Pacientes.dc.html" class="nav"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"></circle><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.5a3.5 3.5 0 0 1 0 7M18.5 14a6.5 6.5 0 0 1 3 6"></path></svg>Pacientes<span class="mono" style="margin-left: auto; font-size: 12px; color: #5C6385">14</span></a>
+      <a href="Agenda.dc.html" class="nav"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="2"></rect><path d="M3.5 10h17M8 3v4M16 3v4"></path></svg>Agenda</a>
+      <a href="Atividades.dc.html" class="nav"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5h10M9 12h10M9 19h10M4.5 5l.5.5L6.5 4M4.5 12l.5.5 1.5-1.5M4.5 19l.5.5 1.5-1.5"></path></svg>Atividades<span class="mono" style="margin-left: auto; font-size: 12px; color: #4040D6">2</span></a>
+      <a href="Documentos.dc.html" class="nav"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3h7l5 5v12a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"></path><path d="M14 3v5h5M9 13h6M9 17h6"></path></svg>Documentos</a>
+      <a href="Templates.dc.html" class="nav"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h11l3 3v13H5z"></path><path d="M9 4v5h6"></path></svg>Templates</a>
+
+      <p class="mono sec" style="margin: 18px 12px 6px; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: #5C6385">Só você</p>
+      <a href="Registro.dc.html" class="nav"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="2"></rect><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"></path></svg>Registro Documental</a>
+
+      <p class="mono sec" style="margin: 18px 12px 6px; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: #5C6385">Clínica</p>
+      <a href="PainelClinica.dc.html" class="nav"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"></path></svg>Painel</a>
+      <a href="Equipe.dc.html" class="nav"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21h18M5 21V8l7-4 7 4v13M10 21v-5h4v5"></path></svg>Equipe</a>
+      <a href="Assinatura.dc.html" class="nav on" aria-current="page"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5.5" width="18" height="13" rx="2"></rect><path d="M3 10h18M7 15h3"></path></svg>Assinatura</a>
+    </nav>
+
+    <div class="sec" style="margin-top: auto; display: flex; align-items: center; gap: 10px; padding: 12px; border-top: 1px solid #DDE3F3">
+      <span aria-hidden="true" style="width: 34px; height: 34px; border-radius: 50%; background: #E6EAFD; color: #2B2E9E; font-size: 13px; font-weight: 600; display: flex; align-items: center; justify-content: center">MS</span>
+      <span style="display: flex; flex-direction: column; min-width: 0; flex: 1">
+        <span style="font-size: 14px; font-weight: 600">Mariana Sá</span>
+        <span class="mono" style="font-size: 11px; color: #5C6385">CRP 06/123456</span>
+      </span>
+      <a href="Perfil.dc.html" aria-label="Ajustes" style="width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #5C6385"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"></path></svg></a>
+    </div>
+  </aside>
+
+  <main style="flex: 999 1 560px; min-width: 0; padding: 32px clamp(16px, 4vw, 48px) 56px; display: flex; flex-direction: column; gap: 24px; max-width: 1100px">
+
+    <header class="rise" style="display: flex; flex-direction: column; gap: 8px">
+      <p class="mono" style="margin: 0; font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: #5C6385">Clínica Travessia</p>
+      <h1 style="margin: 0; font-size: 34px; font-weight: 600; letter-spacing: -0.03em">Assinatura</h1>
+    </header>
+
+    <div aria-live="polite">
+      <sc-if value="{{showFailed}}" hint-placeholder-val="{{ false }}">
+        <section class="fade" role="alert" style="display: flex; flex-wrap: wrap; gap: 16px; align-items: center; padding: 18px 20px; border-radius: 14px; background: #FDEBE7">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#9E3522" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l9.5 17h-19z"></path><path d="M12 10v4M12 17.5v.01"></path></svg>
+          <div style="flex: 1 1 320px; display: flex; flex-direction: column; gap: 4px">
+            <p style="margin: 0; font-size: 15px; font-weight: 600; color: #9E3522">Não conseguimos cobrar o cartão final 4242</p>
+            <p style="margin: 0; font-size: 14px; line-height: 1.5; color: #3E4466">Vamos tentar de novo em 3 dias. Se o pagamento não for feito até 16 de outubro, a criação de registros novos fica pausada. Ver e exportar dados continua liberado.</p>
+          </div>
+          <button type="button" class="btn btn-p" onClick="{{fixCard}}">Atualizar cartão</button>
+        </section>
+      </sc-if>
+      <sc-if value="{{showFixed}}" hint-placeholder-val="{{ false }}">
+        <p class="fade" style="margin: 0; padding: 14px 18px; border-radius: 12px; background: #E6EAFD; color: #2B2E9E; font-size: 14px">Cartão atualizado. A fatura de outubro foi paga.</p>
+      </sc-if>
+      <sc-if value="{{showCanceled}}" hint-placeholder-val="{{ false }}">
+        <section class="fade" style="display: flex; flex-wrap: wrap; gap: 16px; align-items: center; padding: 18px 20px; border-radius: 14px; background: #EFF2FB">
+          <p style="margin: 0; flex: 1 1 320px; font-size: 14px; line-height: 1.5; color: #3E4466"><strong style="color: #161A3A">Assinatura cancelada.</strong> O acesso completo continua até 9 de novembro. Depois disso, você e suas pacientes ainda podem ver e exportar os dados.</p>
+          <button type="button" class="btn btn-s" onClick="{{reactivate}}">Reativar assinatura</button>
+        </section>
+      </sc-if>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px">
+      <section class="rise" aria-labelledby="t-plano" style="animation-delay: .06s; padding: 24px; border-radius: 16px; background: #1C1A5E; color: #E8EBFB; display: flex; flex-direction: column; gap: 14px">
+        <h2 id="t-plano" class="mono" style="margin: 0; font-size: 11px; font-weight: 500; letter-spacing: .14em; text-transform: uppercase; color: #A9B2E8">Plano atual</h2>
+        <p style="margin: 0; font-size: 26px; font-weight: 600; letter-spacing: -0.02em; color: #FFFFFF">Clínica · mensal</p>
+        <p style="margin: 0; font-size: 14px; color: #C3CAF0">[PREÇO] por psicóloga por mês</p>
+        <p style="margin: 0; font-size: 14px; color: #C3CAF0">{{nextCharge}}</p>
+        <a href="Planos.dc.html" style="margin-top: auto; font-size: 14px; font-weight: 500; color: #FF8A70; text-underline-offset: 3px">Mudar de plano</a>
+      </section>
+
+      <section class="card rise" aria-labelledby="t-seats" style="animation-delay: .12s; padding: 24px; display: flex; flex-direction: column; gap: 14px">
+        <h2 id="t-seats" class="mono" style="margin: 0; font-size: 11px; font-weight: 500; letter-spacing: .14em; text-transform: uppercase; color: #5C6385">Psicólogas</h2>
+        <p style="margin: 0; font-size: 26px; font-weight: 600; letter-spacing: -0.02em">{{used}} de {{seats}} <span style="font-size: 15px; font-weight: 400; color: #5C6385">vagas usadas</span></p>
+        <div aria-hidden="true" style="display: flex">
+          <span style="width: 34px; height: 34px; border-radius: 50%; border: 2px solid #FFFFFF; background: #E6EAFD; color: #2B2E9E; font-size: 12px; font-weight: 600; display: flex; align-items: center; justify-content: center">MS</span>
+          <span style="width: 34px; height: 34px; margin-left: -8px; border-radius: 50%; border: 2px solid #FFFFFF; background: #FDEBE7; color: #9E3522; font-size: 12px; font-weight: 600; display: flex; align-items: center; justify-content: center">LC</span>
+          <span style="width: 34px; height: 34px; margin-left: -8px; border-radius: 50%; border: 2px solid #FFFFFF; background: #1C1A5E; color: #FF8A70; font-size: 12px; font-weight: 600; display: flex; align-items: center; justify-content: center">RN</span>
+        </div>
+        <sc-if value="{{notAdjusting}}" hint-placeholder-val="{{ true }}">
+          <button type="button" class="btn btn-s" style="align-self: flex-start" onClick="{{startAdjust}}">Ajustar vagas</button>
+        </sc-if>
+        <sc-if value="{{adjusting}}" hint-placeholder-val="{{ false }}">
+          <div class="fade" style="display: flex; flex-direction: column; gap: 10px">
+            <div role="group" aria-label="Número de vagas" style="display: flex; align-items: center; gap: 10px">
+              <button type="button" class="step" aria-label="Menos uma vaga" onClick="{{dec}}">−</button>
+              <span class="mono" style="width: 28px; text-align: center; font-size: 16px">{{draft}}</span>
+              <button type="button" class="step" aria-label="Mais uma vaga" onClick="{{inc}}">+</button>
+            </div>
+            <p style="margin: 0; font-size: 13px; color: #5C6385">{{draftHint}}</p>
+            <div style="display: flex; gap: 8px"><button type="button" class="btn btn-p" onClick="{{saveSeats}}">Salvar</button><button type="button" class="btn btn-q" onClick="{{cancelAdjust}}">Cancelar</button></div>
+          </div>
+        </sc-if>
+      </section>
+
+      <section class="card rise" aria-labelledby="t-pag" style="animation-delay: .18s; padding: 24px; display: flex; flex-direction: column; gap: 14px">
+        <h2 id="t-pag" class="mono" style="margin: 0; font-size: 11px; font-weight: 500; letter-spacing: .14em; text-transform: uppercase; color: #5C6385">Forma de pagamento</h2>
+        <div style="display: flex; align-items: center; gap: 12px">
+          <span aria-hidden="true" style="width: 48px; height: 32px; border-radius: 6px; background: #EFF2FB; border: 1px solid #DDE3F3; display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3E4466" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="5.5" width="18" height="13" rx="2"></rect><path d="M3 10h18"></path></svg></span>
+          <span style="display: flex; flex-direction: column"><span class="mono" style="font-size: 15px">•••• {{cardEnd}}</span><span style="font-size: 13px; color: #5C6385">vence 08/28</span></span>
+        </div>
+        <p style="margin: 0; font-size: 13px; color: #5C6385">Cobrança no CNPJ 00.000.000/0001-00</p>
+        <button type="button" class="btn btn-s" style="margin-top: auto; align-self: flex-start" onClick="{{fixCard}}">Trocar cartão</button>
+      </section>
+    </div>
+
+    <section class="card rise" aria-labelledby="t-fat" style="animation-delay: .24s; padding: 8px 0 0">
+      <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px 20px 8px">
+        <h2 id="t-fat" style="margin: 0; font-size: 18px; font-weight: 600">Faturas</h2>
+        <span style="font-size: 13px; color: #5C6385">A NFS-e é emitida a cada cobrança</span>
+      </div>
+      <div style="overflow-x: auto">
+        <table class="inv" style="width: 100%; border-collapse: collapse; font-size: 14px">
+          <thead>
+            <tr style="color: #5C6385; font-size: 12px">
+              <th scope="col" class="mono" style="font-weight: 500; letter-spacing: .08em; text-transform: uppercase">Período</th>
+              <th scope="col" class="mono" style="font-weight: 500; letter-spacing: .08em; text-transform: uppercase">Valor</th>
+              <th scope="col" class="mono" style="font-weight: 500; letter-spacing: .08em; text-transform: uppercase">Situação</th>
+              <th scope="col" class="mono" style="font-weight: 500; letter-spacing: .08em; text-transform: uppercase">Nota fiscal</th>
+              <th scope="col"><span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Ações</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            <sc-for list="{{invoices}}" as="f" hint-placeholder-count="4">
+              <tr>
+                <td style="font-weight: 500">{{f.period}}</td>
+                <td>[PREÇO] × 3</td>
+                <td><span style="height: 24px; padding: 0 10px; border-radius: 12px; font-size: 12px; font-weight: 500; display: inline-flex; align-items: center; {{f.chip}}">{{f.status}}</span></td>
+                <td class="mono" style="font-size: 13px; color: #3E4466">{{f.nf}}</td>
+                <td style="text-align: right"><a href="#" style="font-size: 14px; font-weight: 500; text-underline-offset: 3px" aria-label="{{f.aria}}">Baixar PDF</a></td>
+              </tr>
+            </sc-for>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="rise" aria-labelledby="t-cancel" style="animation-delay: .3s; display: flex; flex-wrap: wrap; gap: 12px; justify-content: space-between; align-items: center; padding: 20px 0; border-top: 1px solid #DDE3F3">
+      <div>
+        <h2 id="t-cancel" style="margin: 0; font-size: 15px; font-weight: 600">Cancelar assinatura</h2>
+        <p style="margin: 4px 0 0; font-size: 14px; color: #3E4466">O acesso continua até o fim do período já pago.</p>
+      </div>
+      <button type="button" class="btn btn-s" style="color: #A33A3A" disabled="{{canceled}}" onClick="{{openCancel}}">Cancelar assinatura</button>
+    </section>
+  </main>
+
+  <sc-if value="{{dialog}}" hint-placeholder-val="{{ false }}">
+    <div class="dim" style="position: absolute; inset: 0; z-index: 20; background: rgba(22,26,58,.45); display: flex; align-items: center; justify-content: center; padding: 24px">
+      <div class="pop" role="dialog" aria-modal="true" aria-labelledby="d-title" aria-describedby="d-desc" style="width: 100%; max-width: 480px; padding: 28px; border-radius: 18px; background: #FFFFFF; box-shadow: 0 30px 80px rgba(22,26,58,.3); display: flex; flex-direction: column; gap: 16px">
+        <h2 id="d-title" style="margin: 0; font-size: 22px; font-weight: 600; letter-spacing: -0.02em">Cancelar a assinatura da clínica?</h2>
+        <div id="d-desc" style="display: flex; flex-direction: column; gap: 10px; font-size: 15px; line-height: 1.55; color: #3E4466">
+          <p style="margin: 0">O plano continua ativo até 9 de novembro. Depois disso:</p>
+          <ul style="margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px">
+            <li>as 3 psicólogas e as pacientes continuam podendo ver e exportar todos os dados;</li>
+            <li>não é possível criar sessões, registros ou atividades novas;</li>
+            <li>nenhum dado é apagado sem um pedido de exclusão.</li>
+          </ul>
+        </div>
+        <div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: flex-end; margin-top: 8px">
+          <button type="button" class="btn btn-s" onClick="{{closeCancel}}">Manter assinatura</button>
+          <button type="button" class="btn btn-danger" onClick="{{confirmCancel}}">Cancelar no fim do período</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"pagamentoRecusado":{"editor":"boolean","default":true},"$preview":{"width":1440,"height":1000}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { fixed: false, canceled: false, dialog: false, seats: 3, adjusting: false, draft: 3 };
+  }
+  renderVals() {
+    const s = this.state;
+    const failedProp = this.props.pagamentoRecusado ?? true;
+    const failed = failedProp && !s.fixed && !s.canceled;
+    const used = 3;
+    const inv = [
+      ['Outubro 2026', failed ? 'Recusada' : 'Paga', failed ? '—' : 'NFS-e 0042'],
+      ['Setembro 2026', 'Paga', 'NFS-e 0031'],
+      ['Agosto 2026', 'Paga', 'NFS-e 0019'],
+      ['Julho 2026', 'Paga', 'NFS-e 0008']
+    ];
+    return {
+      showFailed: failed,
+      showFixed: s.fixed && !s.canceled,
+      showCanceled: s.canceled,
+      fixCard: () => this.setState({ fixed: true }),
+      nextCharge: s.canceled ? 'Sem cobranças futuras' : 'Próxima cobrança em 9 de novembro',
+      used: used, seats: s.seats,
+      adjusting: s.adjusting, notAdjusting: !s.adjusting,
+      startAdjust: () => this.setState({ adjusting: true, draft: s.seats }),
+      cancelAdjust: () => this.setState({ adjusting: false }),
+      draft: s.draft,
+      draftHint: s.draft < used ? 'Remova uma psicóloga da equipe antes de reduzir vagas.' : s.draft > s.seats ? 'A diferença é cobrada proporcionalmente nesta fatura.' : s.draft < s.seats ? 'O valor menor vale a partir da próxima cobrança.' : 'Sem mudança no valor.',
+      dec: () => this.setState({ draft: Math.max(used, s.draft - 1) }),
+      inc: () => this.setState({ draft: Math.min(10, s.draft + 1) }),
+      saveSeats: () => this.setState({ seats: s.draft, adjusting: false }),
+      cardEnd: s.fixed ? '1881' : '4242',
+      invoices: inv.map((f) => ({
+        period: f[0], status: f[1], nf: f[2], aria: 'Baixar PDF da fatura de ' + f[0],
+        chip: f[1] === 'Paga' ? 'background: #E6EAFD; color: #2B2E9E' : 'background: #FDEBE7; color: #9E3522'
+      })),
+      canceled: s.canceled,
+      dialog: s.dialog,
+      openCancel: () => this.setState({ dialog: true }),
+      closeCancel: () => this.setState({ dialog: false }),
+      confirmCancel: () => this.setState({ dialog: false, canceled: true }),
+      reactivate: () => this.setState({ canceled: false })
+    };
+  }
+}
+</script>
+</body>
+</html>

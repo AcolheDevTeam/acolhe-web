@@ -4,68 +4,118 @@
 
 @layer base {
   :root {
-    /* Paleta editorial "creme + tinta" — ver PDF Acolhe (v0.3). */
-    --background: 45 29% 97%; /* creme quente #FAF9F5 */
-    --foreground: 24 10% 10%; /* tinta quase-preta #1B1917 */
+    /* Identidade "Acolhe — novo design" (2026-10-09): docs/design/novo-design.md, seção 1. */
+    --background: 226.7 81.8% 97.8%; /* névoa #F5F7FE */
+    --foreground: 233.3 45% 15.7%; /* tinta #161A3A */
 
     --card: 0 0% 100%;
-    --card-foreground: 24 10% 10%;
+    --card-foreground: 233.3 45% 15.7%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 24 10% 10%;
+    --popover-foreground: 233.3 45% 15.7%;
 
-    --primary: 24 10% 12%; /* botões pretos #211E1B */
-    --primary-foreground: 45 29% 98%;
+    --primary: 240 64.7% 54.5%; /* índigo #4040D6: botões e links */
+    --primary-foreground: 0 0% 100%;
+    --primary-hover: 240 56.4% 45.3%; /* #3232B5 */
 
-    --secondary: 43 20% 94%;
-    --secondary-foreground: 24 10% 12%;
+    --secondary: 225 60% 96.1%; /* #EFF2FB */
+    --secondary-foreground: 231 24.4% 32.2%; /* #3E4466 */
 
-    --muted: 43 18% 95%;
-    --muted-foreground: 30 5% 42%; /* cinza quente para rótulos */
+    --muted: 225 60% 96.1%; /* #EFF2FB */
+    --muted-foreground: 229.8 18.2% 44.1%; /* apoio #5C6385 */
 
-    --accent: 43 22% 93%;
-    --accent-foreground: 24 10% 12%;
+    --accent: 229.6 85.2% 94.7%; /* índigo claro #E6EAFD: item ativo, hover */
+    --accent-foreground: 241.8 56.7% 23.5%; /* noite #1C1A5E */
 
-    --destructive: 6 55% 45%; /* "Falta" — vermelho contido */
-    --destructive-foreground: 45 29% 98%;
+    --destructive: 0 47.5% 43.3%; /* alerta #A33A3A */
+    --destructive-foreground: 0 0% 100%;
+    --destructive-soft: 0 57.9% 92.5%; /* #F7E1E1 */
+    --destructive-hover: 0 49.1% 36.3%; /* #8A2F2F */
 
-    --success: 152 30% 32%; /* "Salvo"/"Realizada" — verde discreto */
-    --success-foreground: 45 29% 98%;
+    /* O protótipo não usa verde: positivo é o par índigo claro. */
+    --success: 238.4 57.2% 39.4%; /* #2B2E9E */
+    --success-foreground: 229.6 85.2% 94.7%; /* #E6EAFD */
+    --positive: 238.4 57.2% 39.4%;
+    --positive-soft: 229.6 85.2% 94.7%;
 
-    --warning: 32 60% 42%;
-    --warning-foreground: 45 29% 98%;
+    --warning: 9.2 64.6% 37.6%; /* #9E3522 */
+    --warning-foreground: 10.9 84.6% 94.9%; /* #FDEBE7 */
+    --warning-soft: 10.9 84.6% 94.9%;
 
-    --border: 40 14% 88%;
-    --input: 40 14% 85%;
-    --ring: 24 10% 12%;
+    --brand: 241.8 56.7% 23.5%; /* noite #1C1A5E */
+    --brand-foreground: 230.5 70.4% 94.7%; /* #E8EBFB */
+    --brand-muted: 231.6 58.8% 78.6%; /* #A9B2E8 */
+    --highlight: 11.4 100% 72%; /* salmão #FF8A70 */
+    --alert: 7.6 68.6% 54.3%; /* coral #D9503C */
 
-    --radius: 0.5rem;
+    --surface-subtle: 231.4 77.8% 98.2%; /* #F7F8FE */
+    --surface-hover: 228 65.2% 95.5%; /* #ECEFFB */
+    --input-hover: 228.8 30.2% 73.3%; /* #A7AFCF */
+    --placeholder: 229.2 19.2% 60.2%; /* #868DAD */
+    --selected-border: 225.6 74.6% 75.9%; /* #93A9F0 */
+
+    --mood-1: 226.7 69.2% 94.9%; /* #E9EDFB */
+    --mood-2: 225 74.3% 87.3%; /* #C6D2F7 */
+    --mood-3: 225.6 74.6% 75.9%; /* #93A9F0 */
+    --mood-4: 235.4 72.2% 64.7%; /* #6470E6 */
+    --mood-5: 240 64.7% 54.5%; /* #4040D6 */
+
+    --border: 223.6 47.8% 91%; /* linha #DDE3F3 */
+    --input: 226.5 42.5% 85.7%; /* #CBD2EA */
+    --ring: 240 64.7% 54.5%;
+
+    --radius: 0.625rem; /* 10px */
+
+    --ease-out: cubic-bezier(.2, .7, .2, 1);
   }
 
+  /* Escuro: o protótipo não o desenha. Paleta derivada dele (decisão provisória
+     de 2026-10-09): fundo a partir da Noite, ação em índigo mais claro. */
   .dark {
-    --background: 24 10% 8%;
-    --foreground: 45 20% 94%;
-    --card: 24 9% 11%;
-    --card-foreground: 45 20% 94%;
-    --popover: 24 9% 11%;
-    --popover-foreground: 45 20% 94%;
-    --primary: 45 20% 94%;
-    --primary-foreground: 24 10% 12%;
-    --secondary: 24 8% 16%;
-    --secondary-foreground: 45 20% 94%;
-    --muted: 24 8% 16%;
-    --muted-foreground: 40 8% 60%;
-    --accent: 24 8% 18%;
-    --accent-foreground: 45 20% 94%;
-    --destructive: 6 55% 52%;
-    --destructive-foreground: 45 20% 94%;
-    --success: 152 25% 55%;
-    --success-foreground: 24 10% 8%;
-    --warning: 32 55% 60%;
-    --warning-foreground: 24 10% 8%;
-    --border: 24 8% 20%;
-    --input: 24 8% 22%;
-    --ring: 45 20% 80%;
+    --background: 238 45% 9%;
+    --foreground: 230 60% 95%;
+    --card: 238 42% 13%;
+    --card-foreground: 230 60% 95%;
+    --popover: 238 42% 13%;
+    --popover-foreground: 230 60% 95%;
+    --primary: 236 85% 72%;
+    --primary-foreground: 238 45% 9%;
+    --primary-hover: 236 85% 78%;
+    --secondary: 238 35% 18%;
+    --secondary-foreground: 230 40% 85%;
+    --muted: 238 35% 18%;
+    --muted-foreground: 230 20% 68%;
+    --accent: 238 40% 22%;
+    --accent-foreground: 230 60% 95%;
+    --destructive: 0 65% 62%;
+    --destructive-foreground: 238 45% 9%;
+    --destructive-soft: 0 40% 20%;
+    --destructive-hover: 0 65% 68%;
+    --success: 230 80% 82%;
+    --success-foreground: 238 40% 22%;
+    --positive: 230 80% 82%;
+    --positive-soft: 238 40% 22%;
+    --warning: 11 90% 75%;
+    --warning-foreground: 11 40% 18%;
+    --warning-soft: 11 40% 18%;
+    --brand: 238 50% 6%;
+    --brand-foreground: 230 72% 94%;
+    --brand-muted: 231 50% 70%;
+    --highlight: 11 100% 72%;
+    --alert: 8 75% 62%;
+    --surface-subtle: 238 38% 15%;
+    --surface-hover: 238 35% 19%;
+    --input-hover: 230 25% 45%;
+    --placeholder: 230 15% 55%;
+    --selected-border: 226 60% 55%;
+    --mood-1: 238 35% 22%;
+    --mood-2: 232 45% 32%;
+    --mood-3: 228 55% 45%;
+    --mood-4: 235 65% 60%;
+    --mood-5: 236 85% 72%;
+    --border: 238 30% 22%;
+    --input: 238 28% 28%;
+    --ring: 236 85% 72%;
   }
 }
 
@@ -76,7 +126,21 @@
 
   body {
     @apply bg-background text-foreground font-sans antialiased;
-    font-feature-settings: 'cv11', 'ss01';
+  }
+
+  :focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 2px;
+  }
+
+  /* Movimento só para quem não pediu menos movimento ao sistema. */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: .01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: .01ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 }
 
@@ -87,8 +151,31 @@
     @apply font-mono text-[0.6875rem] uppercase tracking-[0.14em] text-muted-foreground;
   }
 
-  /* Título de display em serif — "Bom dia, Mariana.", "Onboarding." */
-  .display-serif {
-    @apply font-serif font-normal tracking-tight text-foreground;
+  /* Título de display: Schibsted 600 com tracking negativo ("Bom dia, Mariana.").
+     O nome antigo fica até as telas migrarem; o novo é .display. */
+  .display-serif,
+  .display {
+    @apply font-sans font-semibold tracking-[-0.03em] text-foreground;
   }
+
+  /* Entradas do protótipo: sobe 12px e aparece; escalonar com animation-delay. */
+  .animate-rise {
+    animation: rise .7s var(--ease-out) both;
+  }
+  .animate-fade {
+    animation: fade .36s var(--ease-out) both;
+  }
+}
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes fade {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes arcdraw {
+  from { stroke-dashoffset: 1; }
+  to { stroke-dashoffset: 0; }
 }

@@ -29,14 +29,13 @@ const ordered = computed(() =>
 <template>
   <PatientShell :patient="patient ?? null" :patient-id="patientId" active="sessions">
     <div class="flex flex-col gap-4">
-      <div class="flex items-start gap-3 rounded-lg border bg-muted/40 px-4 py-3 text-sm">
-        <Eye class="mt-0.5 size-4 shrink-0 text-muted-foreground" />
-        <p class="text-muted-foreground">
-          <span class="font-medium text-foreground">A paciente tem direito de acesso às informações deste prontuário.</span>
-          Registre apenas o necessário ao cumprimento dos objetivos do trabalho (Art. 5º, II —
-          Res. CFP 01/2009). Para hipóteses e impressões, use o Registro Documental.
+      <InlineNotice tone="positive" class="flex items-start gap-3">
+        <Eye class="mt-0.5 size-[18px] shrink-0" aria-hidden="true" />
+        <p>
+          A paciente tem acesso a este prontuário (Res. CFP 01/2009, art. 5º, II). Para anotações que só
+          você vê, use o <NuxtLink :to="`/patients/${patientId}/registry`" class="font-medium underline underline-offset-[3px]">Registro Documental</NuxtLink>.
         </p>
-      </div>
+      </InlineNotice>
 
       <div v-if="sessionsError || appointmentsError" role="alert" class="text-sm">
         <p>{{ apiErrorMessage(sessionsError || appointmentsError, { default: 'Não foi possível carregar todos os atendimentos desta paciente.' }) }}</p>
@@ -83,9 +82,9 @@ const ordered = computed(() =>
           <ChevronRight class="size-4 text-muted-foreground" />
         </NuxtLink>
       </div>
-      <p v-else-if="!loading && !sessionsError" class="rounded-lg border border-dashed px-4 py-10 text-center text-sm text-muted-foreground">
+      <EmptyState v-else-if="!loading && !sessionsError" compact>
         Nenhuma sessão registrada ainda.
-      </p>
+      </EmptyState>
     </div>
   </PatientShell>
 </template>

@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Acolhe — Registro Documental</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&amp;family=Schibsted+Grotesk:wght@400;500;600;700&amp;display=swap">
+<style>
+body{margin:0;background:#F5F7FE}
+*{box-sizing:border-box}
+a{color:#4040D6}a:hover{color:#1C1A5E}
+.mono{font-family:'IBM Plex Mono',ui-monospace,monospace}
+@keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.rise{animation:rise .7s cubic-bezier(.2,.7,.2,1) both}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.fade{animation:fade .36s cubic-bezier(.2,.7,.2,1) both}
+.nav{display:flex;align-items:center;gap:12px;height:40px;padding:0 12px;border-radius:10px;color:#3E4466;text-decoration:none;font-size:14px;font-weight:500;transition:background .2s ease,color .2s ease}
+.nav:hover{background:#ECEFFB;color:#161A3A}
+.nav.on{background:#E6EAFD;color:#1C1A5E}
+.btn{height:40px;padding:0 16px;border-radius:10px;font:inherit;font-size:14px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;transition:background .25s ease,box-shadow .25s ease,transform .25s cubic-bezier(.2,.7,.2,1),border-color .25s ease,color .25s ease;white-space:nowrap}
+.btn:active{transform:scale(.985)}
+.btn-p{border:0;background:#4040D6;color:#FFFFFF}.btn-p:hover{background:#3232B5;box-shadow:0 6px 18px rgba(64,64,214,.22)}
+.btn-s{border:1px solid #CBD2EA;background:#FFFFFF;color:#161A3A}.btn-s:hover{border-color:#A7AFCF;background:#F7F8FE}
+.btn-q{border:0;background:transparent;color:#4040D6}.btn-q:hover{background:#E6EAFD}
+.flt{height:36px;padding:0 14px;border:1px solid #DDE3F3;border-radius:18px;background:#FFFFFF;font:inherit;font-size:14px;font-weight:500;color:#3E4466;cursor:pointer;display:inline-flex;align-items:center;gap:8px;transition:background .25s ease,color .25s ease,border-color .25s ease}
+.flt:hover{border-color:#A7AFCF}
+.flt.on{background:#1C1A5E;border-color:#1C1A5E;color:#FFFFFF}
+.flt.on .cnt{color:#C3CAF0}
+.cnt{font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:12px;color:#5C6385}
+.entry{width:100%;padding:16px 18px;border:1px solid #DDE3F3;border-radius:14px;background:#FFFFFF;font:inherit;text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:8px;color:#161A3A;transition:border-color .2s ease,box-shadow .25s ease,transform .25s cubic-bezier(.2,.7,.2,1)}
+.entry:hover{border-color:#A7AFCF;transform:translateY(-1px)}
+.entry.on{border-color:#4040D6;box-shadow:0 0 0 3px rgba(64,64,214,.12)}
+.typ{height:32px;padding:0 12px;border:1px solid #DDE3F3;border-radius:16px;background:#FFFFFF;font:inherit;font-size:13px;font-weight:500;color:#3E4466;cursor:pointer;transition:background .25s ease,color .25s ease,border-color .25s ease}
+.typ.on{background:#E6EAFD;border-color:#93A9F0;color:#2B2E9E}
+.dd-btn{width:100%;height:44px;padding:0 12px 0 14px;border:1px solid #CBD2EA;border-radius:10px;background:#FFFFFF;font:inherit;font-size:14px;color:#161A3A;cursor:pointer;display:flex;align-items:center;justify-content:space-between;transition:border-color .2s ease}
+.dd-btn:hover{border-color:#A7AFCF}
+.dd-menu{position:absolute;top:50px;left:0;right:0;z-index:5;padding:6px;background:#FFFFFF;border:1px solid #DDE3F3;border-radius:12px;box-shadow:0 18px 40px rgba(22,26,58,.12);animation:fade .25s cubic-bezier(.2,.7,.2,1) both}
+.opt{width:100%;height:38px;padding:0 10px;border:0;border-radius:8px;background:transparent;font:inherit;font-size:14px;color:#161A3A;text-align:left;cursor:pointer}
+.opt:hover{background:#F5F7FE}
+.inp{width:100%;height:36px;padding:0 12px;border:1px solid #DDE3F3;border-radius:8px;font:inherit;font-size:14px;outline:none}
+.area{width:100%;min-height:140px;padding:12px 14px;border:1px solid #CBD2EA;border-radius:10px;background:#FFFFFF;font:inherit;font-size:15px;line-height:1.6;color:#161A3A;resize:vertical;outline:none;transition:border-color .2s ease,box-shadow .2s ease}
+.area:focus,.inp:focus{border-color:#4040D6;box-shadow:0 0 0 4px rgba(64,64,214,.14)}
+.card{background:#FFFFFF;border:1px solid #DDE3F3;border-radius:16px}
+:focus-visible{outline:2px solid #4040D6;outline-offset:2px}
+@media (max-width:760px){.side{max-width:none!important}.side nav{flex-direction:row!important;flex-wrap:wrap}.side .sec{display:none!important}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition-duration:.01ms!important}}
+</style>
+</helmet>
+<div style="min-height: 1000px; display: flex; flex-wrap: wrap; background: #F5F7FE; color: #161A3A; font-family: 'Schibsted Grotesk', ui-sans-serif, system-ui, sans-serif">
+
+  <aside class="side" style="flex: 1 1 248px; max-width: 264px; padding: 24px 16px; border-right: 1px solid #DDE3F3; display: flex; flex-direction: column; gap: 24px; background: #F5F7FE">
+    <a href="Dashboard.dc.html" aria-label="Acolhe, ir para o início" style="display: flex; align-items: center; gap: 10px; padding: 0 12px; color: #161A3A; text-decoration: none">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#4040D6" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M22 17a10 10 0 0 0-20 0"></path><path d="M18 17a6 6 0 0 0-12 0" stroke="#FF7A5C"></path><path d="M14 17a2 2 0 0 0-4 0" stroke="currentColor"></path></svg>
+      <span style="font-size: 18px; font-weight: 600; letter-spacing: -0.02em">Acolhe</span>
+    </a>
+    <nav aria-label="Principal" style="display: flex; flex-direction: column; gap: 2px">
+      <a href="Dashboard.dc.html" class="nav"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 11l8-6 8 6v8a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1z"></path></svg>Início</a>
+      <a href="Pacientes.dc.html" class="nav"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"></circle><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.5a3.5 3.5 0 0 1 0 7M18.5 14a6.5 6.5 0 0 1 3 6"></path></svg>Pacientes<span class="mono" style="margin-left: auto; font-size: 12px; color: #5C6385">14</span></a>
+      <a href="Agenda.dc.html" class="nav"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="2"></rect><path d="M3.5 10h17M8 3v4M16 3v4"></path></svg>Agenda</a>
+      <a href="Atividades.dc.html" class="nav"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5h10M9 12h10M9 19h10M4.5 5l.5.5L6.5 4M4.5 12l.5.5 1.5-1.5M4.5 19l.5.5 1.5-1.5"></path></svg>Atividades</a>
+      <a href="Documentos.dc.html" class="nav"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3h7l5 5v12a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"></path><path d="M14 3v5h5M9 13h6M9 17h6"></path></svg>Documentos</a>
+      <p class="mono sec" style="margin: 18px 12px 6px; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: #5C6385">Só você</p>
+      <a href="Registro.dc.html" class="nav on" aria-current="page"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="2"></rect><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"></path></svg>Registro Documental</a>
+      <p class="mono sec" style="margin: 18px 12px 6px; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: #5C6385">Clínica</p>
+      <a href="PainelClinica.dc.html" class="nav"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"></path></svg>Painel</a>
+      <a href="Equipe.dc.html" class="nav"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21h18M5 21V8l7-4 7 4v13M10 21v-5h4v5"></path></svg>Equipe</a>
+      <a href="Assinatura.dc.html" class="nav"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5.5" width="18" height="13" rx="2"></rect><path d="M3 10h18M7 15h3"></path></svg>Assinatura</a>
+    </nav>
+  </aside>
+
+  <main style="flex: 999 1 560px; min-width: 0; padding: 28px clamp(16px, 3vw, 40px) 56px; display: flex; flex-direction: column; gap: 22px">
+    <header class="rise" style="display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-end; justify-content: space-between">
+      <div style="display: flex; flex-direction: column; gap: 8px">
+        <p class="mono" style="margin: 0; font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: #5C6385">Só você</p>
+        <h1 style="margin: 0; font-size: 32px; font-weight: 600; letter-spacing: -0.03em">Registro Documental</h1>
+      </div>
+      <button type="button" class="btn btn-p" onClick="{{newEntry}}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>Nova entrada</button>
+    </header>
+
+    <div class="rise" style="animation-delay: .05s; display: flex; gap: 12px; align-items: flex-start; padding: 14px 16px; border-radius: 12px; background: #1C1A5E; color: #E8EBFB; font-size: 14px; line-height: 1.55">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FF8A70" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><rect x="5" y="10.5" width="14" height="10" rx="2"></rect><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"></path></svg>
+      <p style="margin: 0">Só você vê estas anotações. Elas não são compartilhadas com pacientes e não entram na exportação de dados (LGPD). Podem ser requisitadas por ordem judicial.</p>
+    </div>
+
+    <div class="rise" style="animation-delay: .1s; display: flex; flex-wrap: wrap; gap: 8px; align-items: center">
+      <sc-for list="{{filters}}" as="f" hint-placeholder-count="4">
+        <button type="button" class="{{f.cls}}" aria-pressed="{{f.on}}" onClick="{{f.pick}}">{{f.label}} <span class="cnt">{{f.count}}</span></button>
+      </sc-for>
+      <div style="position: relative; margin-left: auto; width: 240px">
+        <button type="button" class="dd-btn" aria-haspopup="listbox" aria-expanded="{{pfOpen}}" onClick="{{togglePf}}" style="height: 36px">
+          <span><span style="color: #5C6385">Paciente:</span> {{pfLabel}}</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5C6385" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg>
+        </button>
+        <sc-if value="{{pfOpen}}" hint-placeholder-val="{{ false }}">
+          <div class="dd-menu" role="listbox" aria-label="Filtrar por paciente" style="top: 42px">
+            <label for="pf-busca" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Buscar paciente</label>
+            <input id="pf-busca" class="inp" type="text" placeholder="Buscar paciente" style="margin-bottom: 6px">
+            <sc-for list="{{pfOptions}}" as="o" hint-placeholder-count="5">
+              <button type="button" role="option" class="opt" aria-selected="{{o.on}}" onClick="{{o.pick}}">{{o.label}}</button>
+            </sc-for>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start">
+      <section aria-label="Entradas" style="flex: 3 1 420px; min-width: 0; display: flex; flex-direction: column; gap: 10px">
+        <sc-for list="{{entries}}" as="e" hint-placeholder-count="5">
+          <button type="button" class="{{e.cls}}" style="{{e.anim}}" aria-pressed="{{e.on}}" onClick="{{e.pick}}">
+            <span style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap">
+              <span style="height: 24px; padding: 0 10px; border-radius: 12px; font-size: 12px; font-weight: 500; display: inline-flex; align-items: center; {{e.chip}}">{{e.tipo}}</span>
+              <span style="font-size: 14px; font-weight: 600">{{e.paciente}}</span>
+              <span class="mono" style="margin-left: auto; font-size: 12px; color: #5C6385">{{e.data}}</span>
+            </span>
+            <span style="font-size: 15px; font-weight: 600">{{e.titulo}}</span>
+            <span style="font-size: 14px; line-height: 1.5; color: #3E4466">{{e.trecho}}</span>
+          </button>
+        </sc-for>
+        <sc-if value="{{noEntries}}" hint-placeholder-val="{{ false }}">
+          <p class="fade" style="margin: 0; padding: 32px; text-align: center; font-size: 14px; color: #5C6385">Nenhuma entrada com esses filtros.</p>
+        </sc-if>
+      </section>
+
+      <section class="card rise" aria-live="polite" style="animation-delay: .15s; flex: 2 1 340px; min-width: 0; padding: 24px; display: flex; flex-direction: column; gap: 16px">
+        <sc-if value="{{showEditor}}" hint-placeholder-val="{{ true }}">
+          <form class="fade" style="display: flex; flex-direction: column; gap: 16px" onSubmit="{{saveEntry}}">
+            <h2 style="margin: 0; font-size: 18px; font-weight: 600">Nova entrada</h2>
+            <div style="display: flex; flex-direction: column; gap: 8px">
+              <span id="lbl-tipo" style="font-size: 14px; font-weight: 500">Tipo</span>
+              <div role="radiogroup" aria-labelledby="lbl-tipo" style="display: flex; gap: 8px; flex-wrap: wrap">
+                <sc-for list="{{types}}" as="t" hint-placeholder-count="3">
+                  <button type="button" role="radio" class="{{t.cls}}" aria-checked="{{t.on}}" onClick="{{t.pick}}">{{t.label}}</button>
+                </sc-for>
+              </div>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 8px; position: relative">
+              <span id="lbl-pac" style="font-size: 14px; font-weight: 500">Paciente</span>
+              <button type="button" class="dd-btn" aria-labelledby="lbl-pac" aria-haspopup="listbox" aria-expanded="{{epOpen}}" onClick="{{toggleEp}}">
+                <span>{{epLabel}}</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5C6385" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg>
+              </button>
+              <sc-if value="{{epOpen}}" hint-placeholder-val="{{ false }}">
+                <div class="dd-menu" role="listbox" aria-label="Escolher paciente" style="top: 78px">
+                  <label for="ep-busca" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Buscar paciente</label>
+                  <input id="ep-busca" class="inp" type="text" placeholder="Buscar paciente" style="margin-bottom: 6px">
+                  <sc-for list="{{epOptions}}" as="o" hint-placeholder-count="5">
+                    <button type="button" role="option" class="opt" aria-selected="{{o.on}}" onClick="{{o.pick}}">{{o.label}}</button>
+                  </sc-for>
+                </div>
+              </sc-if>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 8px">
+              <label for="rd-txt" style="font-size: 14px; font-weight: 500">Anotação</label>
+              <textarea id="rd-txt" class="area" rows="6" placeholder="Escreva a anotação"></textarea>
+            </div>
+            <div style="display: flex; gap: 10px; align-items: center">
+              <button type="submit" class="btn btn-p">Salvar entrada</button>
+              <sc-if value="{{justSaved}}" hint-placeholder-val="{{ false }}"><span class="fade" style="font-size: 13px; color: #2B2E9E">Entrada salva.</span></sc-if>
+            </div>
+          </form>
+        </sc-if>
+
+        <sc-if value="{{showDetail}}" hint-placeholder-val="{{ false }}">
+          <div class="fade" style="display: flex; flex-direction: column; gap: 16px">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px">
+              <div>
+                <p class="mono" style="margin: 0; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: #5C6385">{{cur.tipo}} · {{cur.paciente}}</p>
+                <h2 style="margin: 6px 0 0; font-size: 20px; font-weight: 600; letter-spacing: -0.02em">{{cur.titulo}}</h2>
+              </div>
+              <button type="button" class="btn btn-q" aria-label="Fechar entrada" onClick="{{closeDetail}}" style="width: 40px; padding: 0"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+            </div>
+            <p style="margin: 0; font-size: 15px; line-height: 1.6; color: #161A3A">{{cur.texto}}</p>
+            <div style="border-top: 1px solid #DDE3F3; padding-top: 14px; display: flex; flex-direction: column; gap: 10px">
+              <h3 class="mono" style="margin: 0; font-size: 11px; font-weight: 500; letter-spacing: .14em; text-transform: uppercase; color: #5C6385">Histórico · 3 versões</h3>
+              <ol style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px">
+                <li style="display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 14px"><span><strong style="font-weight: 600">Versão 3</strong> · atual</span><span class="mono" style="font-size: 12px; color: #5C6385">hoje, 13h22</span></li>
+                <li style="display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 14px"><span>Versão 2</span><span style="display: flex; gap: 8px; align-items: center"><span class="mono" style="font-size: 12px; color: #5C6385">2 out, 15h10</span><button type="button" class="btn btn-q" style="height: 32px; padding: 0 10px; font-size: 13px">Restaurar</button></span></li>
+                <li style="display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 14px"><span>Versão 1</span><span style="display: flex; gap: 8px; align-items: center"><span class="mono" style="font-size: 12px; color: #5C6385">25 set, 14h50</span><button type="button" class="btn btn-q" style="height: 32px; padding: 0 10px; font-size: 13px">Restaurar</button></span></li>
+              </ol>
+            </div>
+            <button type="button" class="btn btn-s" style="align-self: flex-start">Editar</button>
+          </div>
+        </sc-if>
+      </section>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1000}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { filter: 'tudo', patient: 'Todos', pfOpen: false, sel: null, type: 'hip', ep: 'Júlia Andrade', epOpen: false, extra: [], justSaved: false };
+  }
+  componentWillUnmount() { clearTimeout(this.t); }
+  renderVals() {
+    const s = this.state;
+    const tipoLabel = { hip: 'Hipótese', obs: 'Observação', plan: 'Planejamento' };
+    const chip = {
+      hip: 'background: #E6EAFD; color: #2B2E9E',
+      obs: 'background: #EFF2FB; color: #3E4466',
+      plan: 'background: #FDEBE7; color: #9E3522'
+    };
+    const base = [
+      { id: 1, t: 'plan', paciente: 'Júlia Andrade', data: 'hoje, 13h22', titulo: 'Próxima sessão · reunião de equipe', texto: 'Trabalhar exposição imaginária com a situação da reunião de quinta. Verificar se a ansiedade antecipatória diminuiu após os registros da semana.' },
+      { id: 2, t: 'hip', paciente: 'Júlia Andrade', data: 'hoje, 13h10', titulo: 'Esquema de subjugação', texto: 'Possível ativação de esquema de subjugação diante da chefia. Investigar relação com a história familiar nas próximas 3 sessões.' },
+      { id: 3, t: 'hip', paciente: 'Pedro Tavares', data: 'ontem, 19h05', titulo: 'Hipótese diagnóstica', texto: 'Quadro depressivo moderado em melhora. Padrão de evitação social; avaliar componente de ansiedade social.' },
+      { id: 4, t: 'obs', paciente: 'Rita Lopes', data: '6 out', titulo: 'Aliança terapêutica', texto: 'Resistência às tarefas entre sessões. Manter ritmo lento e reavaliar na sessão 12.' },
+      { id: 5, t: 'obs', paciente: 'Bruno Felix', data: '2 out', titulo: 'Relato sobre a família', texto: 'Trouxe pela primeira vez conflitos com o pai. Retomar com cuidado.' },
+      { id: 6, t: 'plan', paciente: 'Carolina Mota', data: '30 set', titulo: 'Preparar alta gradual', texto: 'Espaçar para sessões quinzenais a partir de novembro.' }
+    ];
+    const all = s.extra.concat(base);
+    const list = all.filter((e) => (s.filter === 'tudo' || e.t === s.filter) && (s.patient === 'Todos' || e.paciente === s.patient));
+    const count = (t) => all.filter((e) => (t === 'tudo' || e.t === t)).length;
+    const fdefs = [['tudo', 'Tudo'], ['hip', 'Hipóteses'], ['obs', 'Observações'], ['plan', 'Planejamento']];
+    const pats = ['Todos', 'Júlia Andrade', 'Pedro Tavares', 'Rita Lopes', 'Bruno Felix', 'Carolina Mota'];
+    const curE = all.find((e) => e.id === s.sel);
+    return {
+      filters: fdefs.map((f) => ({ label: f[1], count: count(f[0]), on: s.filter === f[0], cls: s.filter === f[0] ? 'flt on' : 'flt', pick: () => this.setState({ filter: f[0] }) })),
+      pfOpen: s.pfOpen,
+      togglePf: () => this.setState({ pfOpen: !s.pfOpen }),
+      pfLabel: s.patient,
+      pfOptions: pats.map((p) => ({ label: p, on: s.patient === p, pick: () => this.setState({ patient: p, pfOpen: false }) })),
+      entries: list.map((e, i) => ({
+        tipo: tipoLabel[e.t], chip: chip[e.t], paciente: e.paciente, data: e.data, titulo: e.titulo,
+        trecho: e.texto.length > 120 ? e.texto.slice(0, 118) + '…' : e.texto,
+        on: s.sel === e.id,
+        cls: s.sel === e.id ? 'entry on fade' : 'entry fade',
+        anim: 'animation-delay: ' + (i * 0.04) + 's',
+        pick: () => this.setState({ sel: e.id })
+      })),
+      noEntries: list.length === 0,
+      showEditor: !curE,
+      showDetail: !!curE,
+      cur: curE ? { tipo: tipoLabel[curE.t], paciente: curE.paciente, titulo: curE.titulo, texto: curE.texto } : { tipo: '', paciente: '', titulo: '', texto: '' },
+      closeDetail: () => this.setState({ sel: null }),
+      newEntry: () => this.setState({ sel: null, justSaved: false }),
+      types: ['hip', 'obs', 'plan'].map((t) => ({ label: tipoLabel[t], on: s.type === t, cls: s.type === t ? 'typ on' : 'typ', pick: () => this.setState({ type: t }) })),
+      epOpen: s.epOpen,
+      toggleEp: () => this.setState({ epOpen: !s.epOpen }),
+      epLabel: s.ep,
+      epOptions: pats.slice(1).map((p) => ({ label: p, on: s.ep === p, pick: () => this.setState({ ep: p, epOpen: false }) })),
+      justSaved: s.justSaved,
+      saveEntry: (e) => {
+        if (e && e.preventDefault) e.preventDefault();
+        const n = { id: 100 + s.extra.length, t: s.type, paciente: s.ep, data: 'agora', titulo: tipoLabel[s.type] + ' sem título', texto: 'Nova anotação registrada.' };
+        this.setState({ extra: [n].concat(s.extra), justSaved: true, filter: 'tudo', patient: 'Todos' });
+        clearTimeout(this.t);
+        this.t = setTimeout(() => this.setState({ justSaved: false }), 2400);
+      }
+    };
+  }
+}
+</script>
+</body>
+</html>

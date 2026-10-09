@@ -105,12 +105,12 @@ const onSubmit = handleSubmit(async (values) => {
             </div>
             <div class="flex flex-col gap-1.5">
               <Label for="password">Senha</Label>
-              <Input id="password" v-model="password" v-bind="passwordAttrs" type="password" autocomplete="new-password" :aria-invalid="!!errors.password" />
+              <PasswordInput id="password" v-model="password" v-bind="passwordAttrs" autocomplete="new-password" :aria-invalid="!!errors.password" />
               <p v-if="errors.password" class="text-xs text-destructive">{{ errors.password }}</p>
             </div>
             <div class="flex flex-col gap-1.5">
               <Label for="confirmPassword">Confirme sua senha</Label>
-              <Input id="confirmPassword" v-model="confirmPassword" v-bind="confirmPasswordAttrs" type="password" autocomplete="new-password" :aria-invalid="!!errors.confirmPassword" />
+              <PasswordInput id="confirmPassword" v-model="confirmPassword" v-bind="confirmPasswordAttrs" autocomplete="new-password" :aria-invalid="!!errors.confirmPassword" />
               <p v-if="errors.confirmPassword" class="text-xs text-destructive">{{ errors.confirmPassword }}</p>
             </div>
           </fieldset>

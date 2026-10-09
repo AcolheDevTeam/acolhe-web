@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Acolhe Admin — Assinaturas e cortesias</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&amp;family=Schibsted+Grotesk:wght@400;500;600;700&amp;display=swap">
+<style>
+body{margin:0;background:#F5F7FE}
+*{box-sizing:border-box}
+a{color:#4040D6}a:hover{color:#1C1A5E}
+.mono{font-family:'IBM Plex Mono',ui-monospace,monospace}
+@keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.rise{animation:rise .7s cubic-bezier(.2,.7,.2,1) both}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.fade{animation:fade .36s cubic-bezier(.2,.7,.2,1) both}
+@keyframes panel{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
+.panel{animation:panel .42s cubic-bezier(.2,.7,.2,1) both}
+@keyframes newrow{from{background:#E6EAFD}to{background:transparent}}
+.newrow{animation:newrow 1.6s ease .2s both}
+.btn{height:42px;padding:0 16px;border-radius:10px;font:inherit;font-size:14px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;transition:background .25s ease,box-shadow .25s ease,transform .25s cubic-bezier(.2,.7,.2,1),border-color .25s ease;white-space:nowrap}
+.btn:active{transform:scale(.985)}
+.btn-p{border:0;background:#4040D6;color:#FFFFFF}.btn-p:hover{background:#3232B5;box-shadow:0 6px 18px rgba(64,64,214,.22)}
+.btn-s{border:1px solid #CBD2EA;background:#FFFFFF;color:#161A3A}.btn-s:hover{border-color:#A7AFCF;background:#F7F8FE}
+.btn-q{border:0;background:transparent;color:#A33A3A;height:34px;padding:0 10px}.btn-q:hover{background:#FDEBE7}
+.card{background:#FFFFFF;border:1px solid #DDE3F3;border-radius:16px}
+.seg{position:relative;z-index:1;width:150px;height:40px;border:0;background:transparent;font:inherit;font-size:14px;font-weight:500;color:#5C6385;cursor:pointer;border-radius:10px;transition:color .3s ease}
+.seg.on{color:#161A3A}
+.seg-pill{position:absolute;top:4px;bottom:4px;left:4px;width:150px;background:#FFFFFF;border-radius:10px;box-shadow:0 1px 2px rgba(22,26,58,.1);transition:transform .42s cubic-bezier(.2,.7,.2,1)}
+.seg-pill.right{transform:translateX(150px)}
+.chip{height:34px;padding:0 14px;border:1px solid #DDE3F3;border-radius:17px;background:#FFFFFF;font:inherit;font-size:13px;color:#3E4466;cursor:pointer;transition:background .25s ease,border-color .25s ease,color .25s ease}
+.chip:hover{border-color:#A7AFCF}
+.chip.on{background:#1C1A5E;border-color:#1C1A5E;color:#FFFFFF}
+.opt{height:38px;padding:0 12px;border:1px solid #CBD2EA;border-radius:10px;background:#FFFFFF;font:inherit;font-size:14px;color:#3E4466;cursor:pointer;transition:background .25s ease,border-color .25s ease,color .25s ease}
+.opt:hover{border-color:#A7AFCF}
+.opt.on{background:#E6EAFD;border-color:#93A9F0;color:#1C1A5E;font-weight:500}
+.step{width:38px;height:38px;border:1px solid #CBD2EA;border-radius:10px;background:#FFFFFF;font:inherit;font-size:18px;color:#161A3A;cursor:pointer;transition:background .2s ease}
+.step:hover{background:#F7F8FE}
+.inp{width:100%;padding:10px 14px;border:1px solid #CBD2EA;border-radius:10px;background:#FFFFFF;font:inherit;font-size:14px;color:#161A3A;outline:none;resize:vertical;transition:border-color .2s ease,box-shadow .2s ease}
+.inp:focus{border-color:#4040D6;box-shadow:0 0 0 4px rgba(64,64,214,.14)}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{padding:12px 16px;text-align:left;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:11px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:#5C6385;border-bottom:1px solid #DDE3F3;white-space:nowrap}
+td{padding:14px 16px;border-bottom:1px solid #EFF2FB;white-space:nowrap}
+tbody tr{transition:background .2s ease}
+tbody tr:hover{background:#F7F8FE}
+.pill{height:24px;padding:0 10px;border-radius:12px;font-size:12px;font-weight:500;display:inline-flex;align-items:center}
+:focus-visible{outline:2px solid #4040D6;outline-offset:2px}
+.top :focus-visible{outline-color:#FF8A70}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition-duration:.01ms!important}}
+</style>
+</helmet>
+<div style="min-height: 1000px; background: #F5F7FE; color: #161A3A; font-family: 'Schibsted Grotesk', ui-sans-serif, system-ui, sans-serif">
+
+  <header class="top" style="background: #1C1A5E; color: #E8EBFB; padding: 14px clamp(16px, 4vw, 48px); display: flex; flex-wrap: wrap; align-items: center; gap: 16px">
+    <div style="display: flex; align-items: center; gap: 10px">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9DB0F5" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M22 17a10 10 0 0 0-20 0"></path><path d="M18 17a6 6 0 0 0-12 0" stroke="#FF7A5C"></path><path d="M14 17a2 2 0 0 0-4 0" stroke="#FFFFFF"></path></svg>
+      <span style="font-size: 18px; font-weight: 600; letter-spacing: -0.02em; color: #FFFFFF">Acolhe <span style="font-weight: 400; color: #A9B2E8">· Admin</span></span>
+    </div>
+    <span class="mono" style="height: 24px; padding: 0 10px; border-radius: 12px; background: rgba(255,138,112,.16); color: #FF8A70; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; display: inline-flex; align-items: center">Ambiente interno</span>
+    <span style="margin-left: auto; font-size: 14px; color: #C3CAF0">Rafael Nunes · Suporte</span>
+  </header>
+
+  <main style="max-width: 1240px; margin: 0 auto; padding: 28px clamp(16px, 4vw, 48px) 64px; display: flex; flex-direction: column; gap: 24px">
+
+    <div class="rise" style="display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px">
+      <div style="display: flex; flex-direction: column; gap: 6px">
+        <h1 style="margin: 0; font-size: 32px; font-weight: 600; letter-spacing: -0.03em">Contas e assinaturas</h1>
+        <p style="margin: 0; font-size: 14px; color: #3E4466">Dados de cobrança e de plano. O admin não tem acesso a pacientes, prontuários nem atividades.</p>
+      </div>
+      <div role="tablist" aria-label="Seções" style="position: relative; display: flex; padding: 4px; background: #E7EBF8; border-radius: 14px">
+        <div class="{{pillClass}}" aria-hidden="true"></div>
+        <button type="button" role="tab" class="{{segAss}}" aria-selected="{{isAss}}" onClick="{{pickAss}}">Assinaturas</button>
+        <button type="button" role="tab" class="{{segCort}}" aria-selected="{{isCort}}" onClick="{{pickCort}}">Cortesias</button>
+      </div>
+    </div>
+
+    <sc-if value="{{isAss}}" hint-placeholder-val="{{ true }}">
+      <div class="fade" role="tabpanel" aria-label="Assinaturas" style="display: flex; flex-direction: column; gap: 24px">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px">
+          <div class="card" style="padding: 20px; display: flex; flex-direction: column; gap: 8px"><span class="mono" style="font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: #5C6385">Contas ativas</span><span style="font-size: 32px; font-weight: 600; letter-spacing: -0.03em">42</span><span style="font-size: 13px; color: #5C6385">31 autônomas · 11 clínicas</span></div>
+          <div class="card" style="padding: 20px; display: flex; flex-direction: column; gap: 8px"><span class="mono" style="font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: #5C6385">Em cortesia</span><span style="font-size: 32px; font-weight: 600; letter-spacing: -0.03em">9</span><span style="font-size: 13px; color: #5C6385">3 terminam nos próximos 15 dias</span></div>
+          <div class="card" style="padding: 20px; display: flex; flex-direction: column; gap: 8px; border-color: #F3C9C0"><span class="mono" style="font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: #9E3522">Inadimplentes</span><span style="font-size: 32px; font-weight: 600; letter-spacing: -0.03em; color: #9E3522">2</span><span style="font-size: 13px; color: #5C6385">em período de carência</span></div>
+        </div>
+
+        <section class="card" aria-labelledby="t-contas" style="padding: 20px 0 8px">
+          <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 0 20px 14px">
+            <h2 id="t-contas" style="margin: 0; font-size: 18px; font-weight: 600">Contas</h2>
+            <div role="group" aria-label="Filtrar por status" style="display: flex; flex-wrap: wrap; gap: 8px">
+              <sc-for list="{{filters}}" as="f" hint-placeholder-count="4">
+                <button type="button" class="{{f.cls}}" aria-pressed="{{f.on}}" onClick="{{f.pick}}">{{f.label}}</button>
+              </sc-for>
+            </div>
+          </div>
+          <div style="overflow-x: auto">
+            <table>
+              <thead><tr><th scope="col">Conta</th><th scope="col">Tipo</th><th scope="col">Plano</th><th scope="col">Status</th><th scope="col">Próxima cobrança</th></tr></thead>
+              <tbody>
+                <sc-for list="{{accounts}}" as="a" hint-placeholder-count="6">
+                  <tr class="fade">
+                    <td><span style="display: flex; flex-direction: column; gap: 2px"><span style="font-weight: 600">{{a.nome}}</span><span style="font-size: 12px; color: #5C6385">{{a.email}}</span></span></td>
+                    <td>{{a.tipo}}</td>
+                    <td>{{a.plano}}</td>
+                    <td><span class="pill" style="{{a.statusStyle}}">{{a.status}}</span></td>
+                    <td class="mono" style="font-size: 13px; color: #3E4466">{{a.prox}}</td>
+                  </tr>
+                </sc-for>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{isCort}}" hint-placeholder-val="{{ false }}">
+      <div class="fade" role="tabpanel" aria-label="Cortesias" style="display: flex; flex-direction: column; gap: 24px">
+        <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px">
+          <p style="margin: 0; font-size: 14px; color: #3E4466; max-width: 620px">Códigos que liberam um plano sem cobrança por um período. Quem usa o código não precisa cadastrar cartão.</p>
+          <sc-if value="{{notCreating}}" hint-placeholder-val="{{ true }}">
+            <button type="button" class="btn btn-p" onClick="{{openCreate}}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>Criar código</button>
+          </sc-if>
+        </div>
+
+        <sc-if value="{{creating}}" hint-placeholder-val="{{ false }}">
+          <section class="card panel" aria-labelledby="t-novo" style="padding: 24px; display: flex; flex-direction: column; gap: 20px">
+            <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px">
+              <h2 id="t-novo" style="margin: 0; font-size: 18px; font-weight: 600">Novo código de cortesia</h2>
+              <button type="button" class="btn btn-s" style="height: 36px" onClick="{{closeCreate}}">Fechar</button>
+            </div>
+
+            <sc-if value="{{notGenerated}}" hint-placeholder-val="{{ true }}">
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px">
+                <div style="display: flex; flex-direction: column; gap: 8px">
+                  <span id="l-plano" style="font-size: 14px; font-weight: 500">Plano</span>
+                  <div role="radiogroup" aria-labelledby="l-plano" style="display: flex; gap: 8px">
+                    <sc-for list="{{planos}}" as="p" hint-placeholder-count="2"><button type="button" role="radio" class="{{p.cls}}" aria-checked="{{p.on}}" onClick="{{p.pick}}">{{p.label}}</button></sc-for>
+                  </div>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 8px">
+                  <span id="l-dur" style="font-size: 14px; font-weight: 500">Duração da cortesia</span>
+                  <div role="radiogroup" aria-labelledby="l-dur" style="display: flex; flex-wrap: wrap; gap: 8px">
+                    <sc-for list="{{duracoes}}" as="d" hint-placeholder-count="4"><button type="button" role="radio" class="{{d.cls}}" aria-checked="{{d.on}}" onClick="{{d.pick}}">{{d.label}}</button></sc-for>
+                  </div>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 8px">
+                  <span id="l-usos" style="font-size: 14px; font-weight: 500">Número de usos</span>
+                  <div role="group" aria-labelledby="l-usos" style="display: flex; align-items: center; gap: 10px">
+                    <button type="button" class="step" aria-label="Menos um uso" onClick="{{decUsos}}">−</button>
+                    <span class="mono" style="width: 32px; text-align: center; font-size: 16px">{{usos}}</span>
+                    <button type="button" class="step" aria-label="Mais um uso" onClick="{{incUsos}}">+</button>
+                  </div>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 8px">
+                  <span id="l-val" style="font-size: 14px; font-weight: 500">Código vale até</span>
+                  <div role="radiogroup" aria-labelledby="l-val" style="display: flex; flex-wrap: wrap; gap: 8px">
+                    <sc-for list="{{validades}}" as="v" hint-placeholder-count="3"><button type="button" role="radio" class="{{v.cls}}" aria-checked="{{v.on}}" onClick="{{v.pick}}">{{v.label}}</button></sc-for>
+                  </div>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 8px; grid-column: 1 / -1">
+                  <label for="obs" style="font-size: 14px; font-weight: 500">Observação interna <span style="font-weight: 400; color: #5C6385">(só a equipe vê)</span></label>
+                  <textarea id="obs" class="inp" rows="2" value="{{obs}}" onChange="{{setObs}}" placeholder="Ex.: grupo de psicólogas do piloto em São Paulo"></textarea>
+                </div>
+              </div>
+              <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding-top: 4px">
+                <span style="flex: 1 1 260px; font-size: 14px; color: #3E4466">{{resumo}}</span>
+                <button type="button" class="btn btn-p" onClick="{{generate}}">Gerar código</button>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{generated}}" hint-placeholder-val="{{ false }}">
+              <div class="fade" style="display: flex; flex-wrap: wrap; align-items: center; gap: 16px; padding: 20px; border-radius: 12px; background: #E6EAFD">
+                <div style="display: flex; flex-direction: column; gap: 4px; flex: 1 1 260px">
+                  <span class="mono" style="font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: #2B2E9E">Código gerado</span>
+                  <span class="mono" style="font-size: 26px; font-weight: 500; letter-spacing: .08em; color: #1C1A5E">{{lastCode}}</span>
+                  <span style="font-size: 13px; color: #2B2E9E">{{resumo}}</span>
+                </div>
+                <span aria-live="polite">
+                  <sc-if value="{{notCopied}}" hint-placeholder-val="{{ true }}"><button type="button" class="btn btn-s" onClick="{{copy}}">Copiar código</button></sc-if>
+                  <sc-if value="{{copied}}" hint-placeholder-val="{{ false }}"><span class="btn btn-s fade" style="cursor: default">Copiado</span></sc-if>
+                </span>
+                <button type="button" class="btn btn-p" onClick="{{another}}">Criar outro</button>
+              </div>
+            </sc-if>
+          </section>
+        </sc-if>
+
+        <section class="card" aria-labelledby="t-codigos" style="padding: 20px 0 8px">
+          <h2 id="t-codigos" style="margin: 0; padding: 0 20px 14px; font-size: 18px; font-weight: 600">Códigos</h2>
+          <div style="overflow-x: auto">
+            <table>
+              <thead><tr><th scope="col">Código</th><th scope="col">Plano</th><th scope="col">Duração</th><th scope="col">Usos</th><th scope="col">Expira em</th><th scope="col">Criado por</th><th scope="col">Status</th><th scope="col"><span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Ações</span></th></tr></thead>
+              <tbody>
+                <sc-for list="{{codes}}" as="c" hint-placeholder-count="4">
+                  <tr class="{{c.rowCls}}">
+                    <td class="mono" style="font-size: 13px; letter-spacing: .06em; font-weight: 500">{{c.code}}</td>
+                    <td>{{c.plano}}</td>
+                    <td>{{c.dur}}</td>
+                    <td class="mono" style="font-size: 13px">{{c.usos}}</td>
+                    <td class="mono" style="font-size: 13px; color: #3E4466">{{c.expira}}</td>
+                    <td>{{c.autor}}</td>
+                    <td><span class="pill" style="{{c.statusStyle}}">{{c.status}}</span></td>
+                    <td style="text-align: right">
+                      <sc-if value="{{c.active}}" hint-placeholder-val="{{ true }}"><button type="button" class="btn btn-q" aria-label="{{c.endLabel}}" onClick="{{c.end}}">Encerrar</button></sc-if>
+                    </td>
+                  </tr>
+                </sc-for>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+    </sc-if>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1000}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = {
+      tab: 'ass', filter: 'todas',
+      creating: false, generated: false, copied: false,
+      plano: 'Clínica', meses: 3, usos: 5, validade: 60, obs: '',
+      lastCode: '', fresh: '',
+      codes: [
+        { code: 'ACOLHE-P1L0', plano: 'Autônomo', meses: 6, usados: 4, total: 10, expira: '30/11/2026', autor: 'Joyce Silva', active: true },
+        { code: 'ACOLHE-CL3N', plano: 'Clínica', meses: 3, usados: 1, total: 1, expira: '15/10/2026', autor: 'Rafael Nunes', active: true },
+        { code: 'ACOLHE-BETA', plano: 'Autônomo', meses: 12, usados: 20, total: 20, expira: '01/09/2026', autor: 'Joyce Silva', active: false }
+      ]
+    };
+  }
+  componentWillUnmount() { clearTimeout(this.t); }
+  renderVals() {
+    const s = this.state;
+    const isAss = s.tab === 'ass';
+    const st = {
+      ativa: ['Ativa', 'background: #E6EAFD; color: #2B2E9E'],
+      cortesia: ['Cortesia', 'background: #EFF2FB; color: #3E4466'],
+      inad: ['Inadimplente', 'background: #FDEBE7; color: #9E3522'],
+      cancelada: ['Cancelada', 'background: #EFF2FB; color: #5C6385']
+    };
+    const accounts = [
+      ['Clínica Travessia', 'contato@travessia.com.br', 'Clínica', 'Clínica · 3 psicólogas · mensal', 'ativa', '12/11/2026'],
+      ['Mariana Sá', 'mariana@consultorio.com', 'Autônomo', 'Autônomo · anual', 'ativa', '03/02/2027'],
+      ['Espaço Vínculo', 'adm@espacovinculo.com', 'Clínica', 'Clínica · 6 psicólogas · mensal', 'inad', 'vencida em 02/10'],
+      ['Beatriz Ramos', 'beatriz.ramos@email.com', 'Autônomo', 'Autônomo · cortesia 3 meses', 'cortesia', 'termina em 20/10'],
+      ['Lucas Prado', 'lucas@pradopsi.com', 'Autônomo', 'Autônomo · mensal', 'ativa', '18/10/2026'],
+      ['Núcleo Aurora', 'financeiro@nucleoaurora.com', 'Clínica', 'Clínica · 4 psicólogas · anual', 'cancelada', '—']
+    ];
+    const fmap = { todas: null, ativa: 'ativa', cortesia: 'cortesia', inad: 'inad' };
+    const fdefs = [['todas', 'Todas'], ['ativa', 'Ativas'], ['cortesia', 'Em cortesia'], ['inad', 'Inadimplentes']];
+    const opt = (cur, v, label, key) => ({ label: label, on: cur === v, cls: cur === v ? 'opt on' : 'opt', pick: () => this.setState({ [key]: v }) });
+    const resumo = 'Plano ' + s.plano + ' grátis por ' + s.meses + (s.meses === 1 ? ' mês' : ' meses') + ' · ' + s.usos + (s.usos === 1 ? ' uso' : ' usos') + ' · vale ' + s.validade + ' dias';
+    return {
+      isAss: isAss, isCort: !isAss,
+      pillClass: isAss ? 'seg-pill' : 'seg-pill right',
+      segAss: isAss ? 'seg on' : 'seg',
+      segCort: isAss ? 'seg' : 'seg on',
+      pickAss: () => this.setState({ tab: 'ass' }),
+      pickCort: () => this.setState({ tab: 'cort' }),
+      filters: fdefs.map((f) => ({ label: f[1], on: s.filter === f[0], cls: s.filter === f[0] ? 'chip on' : 'chip', pick: () => this.setState({ filter: f[0] }) })),
+      accounts: accounts.filter((a) => !fmap[s.filter] || a[4] === fmap[s.filter]).map((a) => ({
+        nome: a[0], email: a[1], tipo: a[2], plano: a[3], status: st[a[4]][0], statusStyle: st[a[4]][1], prox: a[5]
+      })),
+      creating: s.creating, notCreating: !s.creating,
+      openCreate: () => this.setState({ creating: true, generated: false, copied: false }),
+      closeCreate: () => this.setState({ creating: false }),
+      generated: s.generated, notGenerated: !s.generated,
+      planos: ['Autônomo', 'Clínica'].map((p) => opt(s.plano, p, p, 'plano')),
+      duracoes: [1, 3, 6, 12].map((m) => opt(s.meses, m, m + (m === 1 ? ' mês' : ' meses'), 'meses')),
+      validades: [30, 60, 90].map((d) => opt(s.validade, d, d + ' dias', 'validade')),
+      usos: s.usos,
+      decUsos: () => this.setState({ usos: Math.max(1, s.usos - 1) }),
+      incUsos: () => this.setState({ usos: Math.min(100, s.usos + 1) }),
+      obs: s.obs,
+      setObs: (e) => this.setState({ obs: e && e.target ? e.target.value : '' }),
+      resumo: resumo,
+      generate: () => {
+        const code = 'ACOLHE-7K2M';
+        const exp = new Date(Date.now() + s.validade * 86400000);
+        const pad = (n) => (n < 10 ? '0' : '') + n;
+        const expira = pad(exp.getDate()) + '/' + pad(exp.getMonth() + 1) + '/' + exp.getFullYear();
+        this.setState({
+          generated: true, copied: false, lastCode: code, fresh: code,
+          codes: [{ code: code, plano: s.plano, meses: s.meses, usados: 0, total: s.usos, expira: expira, autor: 'Rafael Nunes', active: true }].concat(s.codes.filter((c) => c.code !== code))
+        });
+      },
+      lastCode: s.lastCode,
+      copied: s.copied, notCopied: !s.copied,
+      copy: () => { this.setState({ copied: true }); clearTimeout(this.t); this.t = setTimeout(() => this.setState({ copied: false }), 2200); },
+      another: () => this.setState({ generated: false, copied: false, obs: '' }),
+      codes: s.codes.map((c) => ({
+        code: c.code, plano: c.plano,
+        dur: c.meses + (c.meses === 1 ? ' mês' : ' meses'),
+        usos: c.usados + '/' + c.total,
+        expira: c.expira, autor: c.autor,
+        active: c.active,
+        status: c.active ? 'Ativo' : 'Encerrado',
+        statusStyle: c.active ? 'background: #E6EAFD; color: #2B2E9E' : 'background: #EFF2FB; color: #5C6385',
+        rowCls: c.code === s.fresh ? 'newrow' : '',
+        endLabel: 'Encerrar código ' + c.code,
+        end: () => this.setState({ codes: s.codes.map((x) => (x.code === c.code ? Object.assign({}, x, { active: false }) : x)) })
+      }))
+    };
+  }
+}
+</script>
+</body>
+</html>

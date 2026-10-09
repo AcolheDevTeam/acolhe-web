@@ -69,8 +69,11 @@ function select(option: CustomDropdownOption) {
           props.class,
         )"
       >
-        <span class="truncate text-start">{{ selected?.label ?? placeholder }}</span>
-        <ChevronDown class="size-4 shrink-0 opacity-50" />
+        <!-- `trigger` troca o conteúdo do gatilho (ex.: seletor de workspace). -->
+        <slot name="trigger" :selected="selected">
+          <span class="truncate text-start">{{ selected?.label ?? placeholder }}</span>
+          <ChevronDown class="size-4 shrink-0 opacity-50" />
+        </slot>
       </button>
     </PopoverTrigger>
     <PopoverContent

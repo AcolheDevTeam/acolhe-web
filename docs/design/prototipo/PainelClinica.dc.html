@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Acolhe — Painel da clínica</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&amp;family=Schibsted+Grotesk:wght@400;500;600;700&amp;display=swap">
+<style>
+body{margin:0;background:#F5F7FE}
+*{box-sizing:border-box}
+a{color:#4040D6}a:hover{color:#1C1A5E}
+.mono{font-family:'IBM Plex Mono',ui-monospace,monospace}
+@keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.rise{animation:rise .7s cubic-bezier(.2,.7,.2,1) both}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.fade{animation:fade .36s cubic-bezier(.2,.7,.2,1) both}
+@keyframes grow{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+.bar{transform-origin:bottom;animation:grow .7s cubic-bezier(.2,.7,.2,1) both}
+.nav{display:flex;align-items:center;gap:12px;height:40px;padding:0 12px;border-radius:10px;color:#3E4466;text-decoration:none;font-size:14px;font-weight:500;transition:background .2s ease,color .2s ease}
+.nav:hover{background:#ECEFFB;color:#161A3A}
+.nav.on{background:#E6EAFD;color:#1C1A5E}
+.btn{height:40px;padding:0 16px;border-radius:10px;font:inherit;font-size:14px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:8px;text-decoration:none;transition:background .25s ease,box-shadow .25s ease,border-color .25s ease;white-space:nowrap}
+.btn-s{border:1px solid #CBD2EA;background:#FFFFFF;color:#161A3A}.btn-s:hover{border-color:#A7AFCF;background:#F7F8FE;color:#161A3A}
+.seg{position:relative;z-index:1;height:32px;padding:0 14px;border:0;background:transparent;font:inherit;font-size:13px;font-weight:500;color:#5C6385;cursor:pointer;border-radius:8px;transition:color .3s ease;min-width:84px}
+.seg.on{color:#161A3A}
+.seg-pill{position:absolute;top:3px;bottom:3px;left:3px;width:84px;background:#FFFFFF;border-radius:8px;box-shadow:0 1px 2px rgba(22,26,58,.1);transition:transform .42s cubic-bezier(.2,.7,.2,1)}
+.seg-pill.right{transform:translateX(84px)}
+.card{background:#FFFFFF;border:1px solid #DDE3F3;border-radius:16px}
+table{border-collapse:collapse;width:100%;min-width:560px}
+th{font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:11px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:#5C6385;text-align:left;padding:12px 16px;border-bottom:1px solid #DDE3F3}
+td{padding:14px 16px;border-bottom:1px solid #EFF2FB;font-size:14px}
+tr:last-child td{border-bottom:0}
+:focus-visible{outline:2px solid #4040D6;outline-offset:2px}
+@media (max-width:760px){.side{max-width:none!important}.side nav{flex-direction:row!important;flex-wrap:wrap}.side .sec{display:none!important}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition-duration:.01ms!important}}
+</style>
+</helmet>
+<div style="min-height: 1000px; display: flex; flex-wrap: wrap; background: #F5F7FE; color: #161A3A; font-family: 'Schibsted Grotesk', ui-sans-serif, system-ui, sans-serif">
+
+  <aside class="side" style="flex: 1 1 248px; max-width: 264px; padding: 24px 16px; border-right: 1px solid #DDE3F3; display: flex; flex-direction: column; gap: 24px">
+    <a href="Main.dc.html" aria-label="Acolhe, ir para o login" style="display: flex; align-items: center; gap: 10px; padding: 0 12px; color: #161A3A; text-decoration: none">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#4040D6" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M22 17a10 10 0 0 0-20 0"></path><path d="M18 17a6 6 0 0 0-12 0" stroke="#FF7A5C"></path><path d="M14 17a2 2 0 0 0-4 0" stroke="currentColor"></path></svg>
+      <span style="font-size: 18px; font-weight: 600; letter-spacing: -0.02em">Acolhe</span>
+    </a>
+
+    <div class="sec" style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 1px solid #DDE3F3; border-radius: 12px; background: #FFFFFF">
+      <span aria-hidden="true" style="width: 32px; height: 32px; border-radius: 8px; background: #1C1A5E; color: #FF8A70; font-size: 13px; font-weight: 600; display: flex; align-items: center; justify-content: center">CT</span>
+      <span style="display: flex; flex-direction: column; min-width: 0">
+        <span style="font-size: 14px; font-weight: 600">Clínica Travessia</span>
+        <span style="font-size: 12px; color: #5C6385">Admin da clínica</span>
+      </span>
+    </div>
+
+    <nav aria-label="Principal" style="display: flex; flex-direction: column; gap: 2px">
+      <a href="Dashboard.dc.html" class="nav">Início</a>
+      <a href="Pacientes.dc.html" class="nav">Pacientes</a>
+      <a href="Agenda.dc.html" class="nav">Agenda</a>
+      <a href="Atividades.dc.html" class="nav">Atividades</a>
+      <a href="Documentos.dc.html" class="nav">Documentos</a>
+      <a href="Templates.dc.html" class="nav">Templates</a>
+      <p class="mono sec" style="margin: 18px 12px 6px; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: #5C6385">Só você</p>
+      <a href="Registro.dc.html" class="nav">Registro Documental</a>
+      <p class="mono sec" style="margin: 18px 12px 6px; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: #5C6385">Clínica</p>
+      <a href="#" class="nav on" aria-current="page"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"></path></svg>Painel</a>
+      <a href="Equipe.dc.html" class="nav"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21h18M5 21V8l7-4 7 4v13M10 21v-5h4v5"></path></svg>Equipe</a>
+      <a href="Assinatura.dc.html" class="nav"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5.5" width="18" height="13" rx="2"></rect><path d="M3 10h18M7 15h3"></path></svg>Assinatura</a>
+    </nav>
+
+    <div class="sec" style="margin-top: auto; display: flex; align-items: center; gap: 10px; padding: 12px; border-top: 1px solid #DDE3F3">
+      <span aria-hidden="true" style="width: 34px; height: 34px; border-radius: 50%; background: #E6EAFD; color: #2B2E9E; font-size: 13px; font-weight: 600; display: flex; align-items: center; justify-content: center">MS</span>
+      <span style="display: flex; flex-direction: column; min-width: 0; flex: 1">
+        <span style="font-size: 14px; font-weight: 600">Mariana Sá</span>
+        <span class="mono" style="font-size: 11px; color: #5C6385">CRP 06/123456</span>
+      </span>
+      <a href="Perfil.dc.html" aria-label="Ajustes" style="width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #5C6385"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"></path></svg></a>
+    </div>
+  </aside>
+
+  <main style="flex: 999 1 560px; min-width: 0; padding: 28px clamp(16px, 4vw, 48px) 56px; display: flex; flex-direction: column; gap: 28px">
+
+    <header class="rise" style="display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-end; justify-content: space-between">
+      <div style="display: flex; flex-direction: column; gap: 8px">
+        <p class="mono" style="margin: 0; font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: #5C6385">Clínica Travessia · 3 psicólogas</p>
+        <h1 style="margin: 0; font-size: 34px; line-height: 1.1; font-weight: 600; letter-spacing: -0.03em">Painel da clínica</h1>
+      </div>
+      <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center">
+        <div role="group" aria-label="Período" style="position: relative; display: flex; padding: 3px; background: #EFF2FB; border-radius: 10px">
+          <div class="{{pillClass}}" aria-hidden="true"></div>
+          <button type="button" class="{{segWeek}}" aria-pressed="{{isWeek}}" onClick="{{showWeek}}">Semana</button>
+          <button type="button" class="{{segMonth}}" aria-pressed="{{isMonth}}" onClick="{{showMonth}}">Mês</button>
+        </div>
+        <a href="Equipe.dc.html" class="btn btn-s">Gerenciar equipe</a>
+      </div>
+    </header>
+
+    <div class="rise" role="note" style="animation-delay: .05s; display: flex; gap: 12px; align-items: flex-start; padding: 14px 16px; border-radius: 12px; background: #E6EAFD; color: #2B2E9E; font-size: 14px; line-height: 1.5">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><rect x="5" y="10.5" width="14" height="10" rx="2"></rect><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"></path></svg>
+      <p style="margin: 0">Este painel mostra só dados administrativos. Prontuários, atividades e registros das pacientes não aparecem aqui.</p>
+    </div>
+
+    <section aria-label="Resumo do período" class="rise" style="animation-delay: .1s; display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 16px">
+      <sc-for list="{{stats}}" as="st" hint-placeholder-count="4">
+        <div class="card fade" style="padding: 20px; display: flex; flex-direction: column; gap: 8px">
+          <span class="mono" style="font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: #5C6385">{{st.label}}</span>
+          <span style="font-size: 30px; font-weight: 600; letter-spacing: -0.03em">{{st.value}}</span>
+          <span style="font-size: 13px; color: #5C6385">{{st.note}}</span>
+        </div>
+      </sc-for>
+    </section>
+
+    <section class="card rise" aria-labelledby="t-chart" style="animation-delay: .16s; padding: 24px; display: flex; flex-direction: column; gap: 20px">
+      <div style="display: flex; flex-wrap: wrap; gap: 12px; justify-content: space-between; align-items: baseline">
+        <h2 id="t-chart" style="margin: 0; font-size: 18px; font-weight: 600; letter-spacing: -0.01em">Sessões por psicóloga</h2>
+        <div style="display: flex; gap: 16px; font-size: 13px; color: #3E4466">
+          <span style="display: inline-flex; align-items: center; gap: 6px"><span aria-hidden="true" style="width: 12px; height: 12px; border-radius: 3px; background: #4040D6"></span>Realizadas</span>
+          <span style="display: inline-flex; align-items: center; gap: 6px"><span aria-hidden="true" style="width: 12px; height: 12px; border-radius: 3px; background: #C6D2F7"></span>Faltas</span>
+        </div>
+      </div>
+      <sc-if value="{{isWeek}}" hint-placeholder-val="{{ true }}">
+        <div class="fade" role="img" aria-label="{{weekLabel}}" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; align-items: end; height: 260px">
+          <sc-for list="{{weekBars}}" as="b" hint-placeholder-count="3">
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 10px; height: 100%; justify-content: flex-end">
+              <div style="display: flex; gap: 8px; align-items: flex-end; height: 200px">
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 6px"><span class="mono" style="font-size: 12px">{{b.done}}</span><div class="bar" style="width: 40px; border-radius: 8px 8px 4px 4px; background: #4040D6; {{b.doneStyle}}"></div></div>
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 6px"><span class="mono" style="font-size: 12px">{{b.miss}}</span><div class="bar" style="width: 40px; border-radius: 8px 8px 4px 4px; background: #C6D2F7; {{b.missStyle}}"></div></div>
+              </div>
+              <span style="font-size: 14px; font-weight: 500">{{b.name}}</span>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+      <sc-if value="{{isMonth}}" hint-placeholder-val="{{ false }}">
+        <div class="fade" role="img" aria-label="{{monthLabel}}" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; align-items: end; height: 260px">
+          <sc-for list="{{monthBars}}" as="b" hint-placeholder-count="3">
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 10px; height: 100%; justify-content: flex-end">
+              <div style="display: flex; gap: 8px; align-items: flex-end; height: 200px">
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 6px"><span class="mono" style="font-size: 12px">{{b.done}}</span><div class="bar" style="width: 40px; border-radius: 8px 8px 4px 4px; background: #4040D6; {{b.doneStyle}}"></div></div>
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 6px"><span class="mono" style="font-size: 12px">{{b.miss}}</span><div class="bar" style="width: 40px; border-radius: 8px 8px 4px 4px; background: #C6D2F7; {{b.missStyle}}"></div></div>
+              </div>
+              <span style="font-size: 14px; font-weight: 500">{{b.name}}</span>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+    </section>
+
+    <section class="card rise" aria-labelledby="t-tab" style="animation-delay: .22s; padding: 8px 0 0">
+      <div style="display: flex; justify-content: space-between; align-items: baseline; padding: 14px 16px 8px">
+        <h2 id="t-tab" style="margin: 0; font-size: 18px; font-weight: 600; letter-spacing: -0.01em">Por psicóloga</h2>
+        <a href="Assinatura.dc.html" style="font-size: 13px; text-underline-offset: 3px">3 de 5 vagas do plano</a>
+      </div>
+      <div style="overflow-x: auto">
+        <table>
+          <thead><tr><th scope="col">Psicóloga</th><th scope="col">Sessões</th><th scope="col">Faltas</th><th scope="col">Ocupação</th><th scope="col">Pacientes ativos</th></tr></thead>
+          <tbody>
+            <sc-for list="{{rows}}" as="r" hint-placeholder-count="3">
+              <tr class="fade">
+                <td><span style="display: flex; flex-direction: column; gap: 2px"><span style="font-weight: 600">{{r.name}}</span><span class="mono" style="font-size: 11px; color: #5C6385">{{r.crp}}</span></span></td>
+                <td class="mono">{{r.done}}</td>
+                <td class="mono">{{r.miss}} <span style="color: #5C6385">({{r.missPct}})</span></td>
+                <td>
+                  <span style="display: flex; align-items: center; gap: 10px">
+                    <span aria-hidden="true" style="width: 96px; height: 6px; border-radius: 3px; background: #EFF2FB; overflow: hidden"><span style="display: block; height: 100%; border-radius: 3px; background: #4040D6; {{r.occStyle}}"></span></span>
+                    <span class="mono">{{r.occ}}</span>
+                  </span>
+                </td>
+                <td class="mono">{{r.patients}}</td>
+              </tr>
+            </sc-for>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1000}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { period: 'week' };
+  }
+  renderVals() {
+    const isWeek = this.state.period === 'week';
+    const team = [
+      { name: 'Mariana Sá', crp: 'CRP 06/123456', week: [18, 1, 90], month: [72, 4, 88], patients: 14 },
+      { name: 'Beatriz Ramos', crp: 'CRP 06/204985', week: [15, 2, 75], month: [61, 7, 76], patients: 12 },
+      { name: 'Lucas Prado', crp: 'CRP 06/318822', week: [11, 3, 61], month: [44, 9, 58], patients: 9 }
+    ];
+    const bars = (key, max) => team.map((t, i) => ({
+      name: t.name.split(' ')[0],
+      done: t[key][0],
+      miss: t[key][1],
+      doneStyle: 'height: ' + Math.max(4, Math.round(t[key][0] / max * 180)) + 'px; animation-delay: ' + (i * 0.08) + 's',
+      missStyle: 'height: ' + Math.max(4, Math.round(t[key][1] / max * 180)) + 'px; animation-delay: ' + (i * 0.08 + 0.04) + 's'
+    }));
+    const key = isWeek ? 'week' : 'month';
+    const done = team.reduce((a, t) => a + t[key][0], 0);
+    const miss = team.reduce((a, t) => a + t[key][1], 0);
+    const occ = Math.round(team.reduce((a, t) => a + t[key][2], 0) / team.length);
+    const pct = (a, b) => Math.round(a / (a + b) * 100) + '%';
+    const label = (k) => 'Sessões realizadas e faltas por psicóloga: ' + team.map((t) => t.name + ' ' + t[k][0] + ' realizadas e ' + t[k][1] + ' faltas').join('; ');
+    return {
+      isWeek: isWeek,
+      isMonth: !isWeek,
+      pillClass: isWeek ? 'seg-pill' : 'seg-pill right',
+      segWeek: isWeek ? 'seg on' : 'seg',
+      segMonth: isWeek ? 'seg' : 'seg on',
+      showWeek: () => this.setState({ period: 'week' }),
+      showMonth: () => this.setState({ period: 'month' }),
+      stats: [
+        { label: 'Sessões realizadas', value: String(done), note: isWeek ? 'de 6 a 10 de outubro' : 'em setembro' },
+        { label: 'Taxa de faltas', value: pct(miss, done), note: miss + ' faltas no período' },
+        { label: 'Ocupação da agenda', value: occ + '%', note: 'média das psicólogas' },
+        { label: 'Pacientes ativos', value: '35', note: 'na clínica' }
+      ],
+      weekBars: bars('week', 20),
+      monthBars: bars('month', 80),
+      weekLabel: label('week'),
+      monthLabel: label('month'),
+      rows: team.map((t) => ({
+        name: t.name, crp: t.crp,
+        done: t[key][0], miss: t[key][1], missPct: pct(t[key][1], t[key][0]),
+        occ: t[key][2] + '%', occStyle: 'width: ' + t[key][2] + '%',
+        patients: t.patients
+      }))
+    };
+  }
+}
+</script>
+</body>
+</html>

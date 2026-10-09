@@ -47,26 +47,25 @@ ela aponta novos itens.
 - Considere "conferido" apenas depois de olhar o resultado (screenshot ou navegador) em largura
   de celular.
 
-### A5. Padrão visual: seguir o que existe, sem inventar
+### A5. Padrão visual: seguir o protótipo novo, sem inventar
 
-- Use exclusivamente as fontes, cores, tamanhos e espaçamentos já definidos no projeto.
-- **Não** use emojis. **Não** use cores fortes, gradientes, sombras exageradas, ícones
-  chamativos ou qualquer elemento fora do escopo visual do produto.
-- O design pode mudar no futuro, mas será tudo de uma vez. Portanto **não gaste esforço em
-  refinamento visual nem antecipe redesign**: siga o padrão atual como está.
-
-Referência do padrão atual (já está no código, não é decisão nova):
+- Use exclusivamente os tokens, fontes, tamanhos e espaçamentos do projeto. Desde 2026-10-09
+  eles vêm do protótipo "Acolhe — novo design" (`docs/design/novo-design.md`, seção 1).
+- **Não** use emojis, gradientes, sombras exageradas nem cores fora dos tokens.
+- A troca de identidade é o "redesign de uma vez" previsto antes: as telas migram para o
+  protótipo por área (ordem em `novo-design.md`, seção 4). Até migrar, uma tela pode ficar no
+  visual antigo, mas sem misturar os dois dentro da mesma tela.
 
 | Aspecto | Onde / valor |
 |---|---|
 | Tokens | `assets/css/main.css` e `tailwind.config.ts` |
-| Título / display | serif, Newsreader (`font-serif`) |
-| Corpo | sans, Inter (`font-sans`) |
-| Rótulos | mono maiúsculo, JetBrains Mono, classe `label-mono` |
-| Paleta | fundo creme quente, tinta quase-preta, botões pretos, cinza quente em rótulos |
-| Semânticas | vermelho discreto (erro), verde discreto (sucesso), laranja contido (aviso) |
-| Raio | `--radius: 0.5rem` |
-| Tema escuro | existe e deve continuar funcionando |
+| Texto e títulos | Schibsted Grotesk (`font-sans`); títulos 600 com tracking negativo |
+| Rótulos e dados | IBM Plex Mono maiúsculo, classe `label-mono` |
+| Paleta | fundo névoa `#F5F7FE`, texto tinta `#161A3A`, ação índigo `#4040D6`, marca noite `#1C1A5E` |
+| Semânticas | positivo índigo claro (sem verde), aviso salmão/coral, erro `#A33A3A` |
+| Raio | `--radius: 0.625rem` (10px); cards 16px, diálogos 18px |
+| Movimento | curto, `cubic-bezier(.2,.7,.2,1)`; desligado com `prefers-reduced-motion` |
+| Tema escuro | continua funcionando, com paleta derivada do protótipo (decisão provisória de 2026-10-09: o protótipo não desenha o escuro) |
 
 ### A6. Erros sempre em português e compreensíveis para o usuário
 
@@ -100,7 +99,7 @@ levantamento de 2026-09-09; reconfira as linhas antes de editar.
 
 ### B1. Criar os componentes base que faltam — regras A1, A2, A3
 
-**Status: parcialmente feito** na branch `feat/componentes-base-formulario` (2026-09-09).
+**Status: feito** (branch `feat/componentes-base-formulario`, 2026-09-09). Conferido em 2026-10-09: não há controle nativo nem `Select` em formulário no código.
 
 | Componente | Substitui | Situação |
 |---|---|---|
@@ -179,6 +178,15 @@ página usam `px-4` no celular e `px-8` a partir de `md`; `DialogContent` cabe n
 Pendente de auditoria fina: `pages/sessions/[id]`, `pages/activities/[id]`, tela de aceite com
 muitos documentos, e comportamento dos popovers (calendário/dropdown) em telas muito estreitas
 (&lt; 360px).
+
+**Auditoria fina feita em 2026-10-09** (PR #49), em staging com Chromium headless em 320, 360
+e 390px. Cobriu 24 telas do psicólogo, inclusive as da leva de outubro, e os popovers do
+"Agendar sessão". Só `/patients` rolava na horizontal: o `TabsList` estourava a tela, e agora
+ele rola dentro da própria faixa, o que vale para todas as abas. O calendário encostava na
+borda em 320px e ganhou `collision-padding`. A linha do tempo mostrava status em inglês e
+agora usa os rótulos das listagens. Ficaram sem conferir a tela de aceite com muitos documentos
+e as telas sem dados em staging (detalhe de agendamento, caderno com histórico); o
+acompanhamento está na ACO-85.
 
 ---
 
@@ -645,10 +653,43 @@ Migrations dessa leva: `link_appointment_session`, `patient_confirm_appointment`
 `daily_checkin`, `documentary_notebooks` e `patient_phone`.
 
 **Pendências:** ninguém revisou esse código contra as regras da Parte A. A prioridade é o
-Registro Documental, por envolver criptografia e sigilo. Em produção, ele está
-**indisponível** até existirem os secrets `DOCUMENTARY_ACTIVE_KEY_ID` e
-`DOCUMENTARY_ENCRYPTION_KEYS` no Environment `production` da `acolhe-api`, que hoje só existem
-em staging.
+Registro Documental, por envolver criptografia e sigilo.
+
+**Secrets de produção — resolvido em 2026-10-08.** `DOCUMENTARY_ACTIVE_KEY_ID` e
+`DOCUMENTARY_ENCRYPTION_KEYS` foram criados no Environment `production` da `acolhe-api` às
+11:01. O deploy do release esperou a aprovação do Environment e só chegou à
+VM às 11:02, já com as chaves: o `configure-documentary.py` as validou e a API subiu
+healthy, sem o aviso "registro documental indisponível" no boot. Pendências de operação das chaves: ACO-82.
+
+### C11. Revisão da leva de outubro (C10) — feita em 2026-10-09
+
+Revisão só de leitura dos PRs da tabela da C10, contra a Parte A e com foco no sigilo do
+Registro Documental. Os achados, com arquivo e linha, ficam no Linear; aqui só o resumo.
+Nada foi corrigido ainda. `pnpm typecheck` e `pnpm test` passam em `develop`.
+
+Não há vazamento de conteúdo nem acesso a dados de outra psicóloga, e a criptografia do
+Registro Documental está bem feita. Os problemas estão em perda de texto, regras de negócio nas
+bordas e erros que não distinguem o caso (A6).
+
+| Issue | Prioridade | Assunto |
+|---|---|---|
+| ACO-77 | Alta | Registro Documental: rascunho não salvo some quando a sessão expira ou a API oscila |
+| ACO-78 | Média | Agendamento com evolução aberta pode ser cancelado ou marcado como falta |
+| ACO-79 | Média | Check-in: registro do psicólogo ocupa a vaga do paciente; vínculo inativo vira "já registrou hoje" |
+| ACO-80 | Média | API devolve erro cru do banco em respostas 500 |
+| ACO-81 | Média | Telefone do paciente sem cifra (o CPF é cifrado) — decidir |
+| ACO-82 | Média | Registro Documental (API): endurecimento no banco e na rotação de chave |
+| ACO-83 | Média | Agendamento (web): confirmação nas ações finais; agenda no fuso errado no SSR |
+| ACO-84 | Média | Registro Documental (web): erros específicos por caso (A6) e ajustes do editor |
+| ACO-85 | Baixa | Conferência mobile (A4) das telas novas e revogação de token no logout |
+
+**Regras que ficam:**
+
+- Falha ao consultar a identidade (`/me`) não é troca de usuário: nunca descartar texto da
+  pessoa por causa de erro de rede ou sessão expirada.
+- Ação sem volta (cancelar, registrar falta, concluir) sempre pede confirmação num `Dialog`.
+- Data e hora exibidas no SSR precisam de fuso explícito; o servidor roda em UTC.
+- Achados de segurança com detalhe técnico vão para o Linear, não para este guia.
 
 ---
 

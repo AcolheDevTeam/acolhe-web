@@ -37,13 +37,7 @@ export default defineEventHandler(async (event) => {
     })
     const result = signupResponseSchema.parse(response)
 
-    setCookie(event, 'acolhe_session', result.token, {
-      httpOnly: true,
-      sameSite: 'lax',
-      path: '/',
-      maxAge: 60 * 60 * 24 * 7,
-      secure: !import.meta.dev,
-    })
+    setSessionCookie(event, result.token)
 
     return {
       user: result.user,
@@ -55,7 +49,7 @@ export default defineEventHandler(async (event) => {
       verificationDelivery: result.verificationDelivery,
     }
   } catch (error: unknown) {
-    const statusCode = (error as { response?: { status?: number } }).response?.status
+    const statusCode = (error as { statusCode?: number }).statusCode
     if (statusCode === 409) {
       throw createError({ statusCode: 409, statusMessage: 'Não foi possível concluir o cadastro.' })
     }

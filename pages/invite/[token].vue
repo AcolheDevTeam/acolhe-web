@@ -6,7 +6,6 @@ import { invitationSchema } from '~/schemas/onboarding'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
-import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 
 definePageMeta({ layout: 'auth' })
@@ -178,14 +177,13 @@ async function decline() {
           <div class="grid gap-4 sm:grid-cols-2">
             <div class="flex flex-col gap-1.5">
               <Label for="password">Crie uma senha</Label>
-              <Input id="password" v-model="password" type="password" autocomplete="new-password" />
+              <PasswordInput id="password" v-model="password" autocomplete="new-password" />
             </div>
             <div class="flex flex-col gap-1.5">
               <Label for="password-confirmation">Confirme a senha</Label>
-              <Input
+              <PasswordInput
                 id="password-confirmation"
                 v-model="passwordConfirmation"
-                type="password"
                 autocomplete="new-password"
               />
             </div>

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Plus } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
+import { Card } from '@/components/ui/card'
 
 definePageMeta({ middleware: ['auth', 'psychologist-only'] })
 
@@ -29,12 +30,12 @@ const list = computed(() => activities.value ?? [])
         </AssignActivityDialog>
       </div>
 
-      <div v-if="list.length" class="flex flex-col gap-2">
+      <Card v-if="list.length" class="overflow-hidden">
         <ActivityRow v-for="a in list" :key="a.id" :activity="a" />
-      </div>
-      <p v-else class="rounded-lg border border-dashed px-4 py-10 text-center text-sm text-muted-foreground">
+      </Card>
+      <EmptyState v-else compact>
         Nenhuma atividade atribuída ainda.
-      </p>
+      </EmptyState>
     </div>
   </PatientShell>
 </template>

@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Acolhe — Compartilhar histórico</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&amp;family=Schibsted+Grotesk:wght@400;500;600;700&amp;display=swap">
+<style>
+body{margin:0}
+*{box-sizing:border-box}
+a{color:#4040D6}a:hover{color:#1C1A5E}
+.mono{font-family:'IBM Plex Mono',ui-monospace,monospace}
+@keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.rise{animation:rise .6s cubic-bezier(.2,.7,.2,1) both}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.fade{animation:fade .4s cubic-bezier(.2,.7,.2,1) both}
+@keyframes sheet{from{transform:translateY(100%)}to{transform:none}}
+.sheet{animation:sheet .45s cubic-bezier(.2,.7,.2,1) both}
+@keyframes dim{from{opacity:0}to{opacity:1}}
+.dim{animation:dim .3s ease both}
+.scroll{scrollbar-width:none}.scroll::-webkit-scrollbar{display:none}
+.sw{position:relative;width:48px;height:28px;border:0;border-radius:14px;background:#CBD2EA;cursor:pointer;flex:none;transition:background .3s ease}
+.sw::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#FFFFFF;box-shadow:0 1px 3px rgba(22,26,58,.2);transition:transform .35s cubic-bezier(.2,.7,.2,1)}
+.sw.on{background:#4040D6}.sw.on::after{transform:translateX(20px)}
+.chip{flex:1;height:40px;border:1px solid #DDE3F3;border-radius:10px;background:#FFFFFF;font:inherit;font-size:13px;font-weight:500;color:#3E4466;cursor:pointer;transition:background .25s ease,border-color .25s ease,color .25s ease}
+.chip.on{background:#E6EAFD;border-color:#93A9F0;color:#1C1A5E}
+.btn{height:48px;width:100%;border:0;border-radius:12px;font:inherit;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:background .25s ease,transform .25s cubic-bezier(.2,.7,.2,1)}
+.btn:active{transform:scale(.985)}
+.btn-p{background:#4040D6;color:#FFFFFF}.btn-p:hover{background:#3232B5}
+.btn-p[disabled]{background:#A7AFCF;cursor:not-allowed}
+.btn-s{background:#FFFFFF;color:#161A3A;border:1px solid #CBD2EA}
+@keyframes drawc{from{stroke-dashoffset:24}to{stroke-dashoffset:0}}
+.check path{stroke-dasharray:24;animation:drawc .5s cubic-bezier(.2,.7,.2,1) .15s both}
+:focus-visible{outline:2px solid #4040D6;outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition-duration:.01ms!important}}
+</style>
+</helmet>
+<div style="position: relative; width: 390px; height: 844px; display: flex; flex-direction: column; background: #F5F7FE; color: #161A3A; font-family: 'Schibsted Grotesk', ui-sans-serif, system-ui, sans-serif; overflow: hidden">
+
+  <header style="padding: 20px 16px 12px; display: flex; align-items: center; gap: 8px">
+    <a href="Paciente.dc.html" aria-label="Voltar" style="width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #161A3A"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg></a>
+    <h1 style="margin: 0; font-size: 18px; font-weight: 600">Compartilhar histórico</h1>
+  </header>
+
+  <sc-if value="{{notDone}}" hint-placeholder-val="{{ true }}">
+    <div class="scroll" style="flex: 1; overflow-y: auto; padding: 4px 20px 24px; display: flex; flex-direction: column; gap: 20px">
+      <p class="rise" style="margin: 0; font-size: 15px; line-height: 1.5; color: #3E4466">Escolha o que a nova psicóloga vai poder ver. Os dados são seus e você decide o que enviar.</p>
+
+      <div class="rise" style="animation-delay: .05s; display: flex; align-items: center; gap: 10px; padding: 14px; border-radius: 14px; background: #FFFFFF; border: 1px solid #DDE3F3">
+        <div style="display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0">
+          <span class="mono" style="font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: #5C6385">De</span>
+          <span style="font-size: 14px; font-weight: 600">Mariana Sá</span>
+          <span class="mono" style="font-size: 11px; color: #5C6385">CRP 06/123456</span>
+        </div>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4040D6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
+        <div style="display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; text-align: right">
+          <span class="mono" style="font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: #5C6385">Para</span>
+          <span style="font-size: 14px; font-weight: 600">Beatriz Ramos</span>
+          <span class="mono" style="font-size: 11px; color: #5C6385">CRP 06/204985</span>
+        </div>
+      </div>
+
+      <section class="rise" aria-labelledby="t-oque" style="animation-delay: .1s; display: flex; flex-direction: column; gap: 2px; padding: 4px 16px; border-radius: 14px; background: #FFFFFF; border: 1px solid #DDE3F3">
+        <h2 id="t-oque" class="mono" style="margin: 12px 0 4px; font-size: 11px; font-weight: 500; letter-spacing: .14em; text-transform: uppercase; color: #5C6385">O que compartilhar</h2>
+        <sc-for list="{{itens}}" as="it" hint-placeholder-count="4">
+          <div style="display: flex; align-items: center; gap: 12px; padding: 12px 0; border-top: 1px solid #EFF2FB">
+            <span style="display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0">
+              <span id="{{it.id}}" style="font-size: 15px; font-weight: 600">{{it.nome}}</span>
+              <span style="font-size: 13px; color: #5C6385">{{it.desc}}</span>
+            </span>
+            <button type="button" role="switch" class="{{it.cls}}" aria-checked="{{it.on}}" aria-labelledby="{{it.id}}" onClick="{{it.toggle}}"></button>
+          </div>
+        </sc-for>
+      </section>
+
+      <section class="rise" aria-labelledby="t-per" style="animation-delay: .15s; display: flex; flex-direction: column; gap: 10px">
+        <h2 id="t-per" class="mono" style="margin: 0; font-size: 11px; font-weight: 500; letter-spacing: .14em; text-transform: uppercase; color: #5C6385">Período</h2>
+        <div role="radiogroup" aria-labelledby="t-per" style="display: flex; gap: 8px">
+          <sc-for list="{{periodos}}" as="p" hint-placeholder-count="3">
+            <button type="button" role="radio" class="{{p.cls}}" aria-checked="{{p.on}}" onClick="{{p.pick}}">{{p.label}}</button>
+          </sc-for>
+        </div>
+      </section>
+
+      <div class="rise" style="animation-delay: .2s; display: flex; gap: 10px; padding: 14px; border-radius: 12px; background: #FDEBE7; color: #9E3522; font-size: 13px; line-height: 1.5">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 1px"><rect x="5" y="10.5" width="14" height="10" rx="2"></rect><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"></path></svg>
+        <p style="margin: 0">As anotações particulares da Mariana (Registro Documental) não podem ser compartilhadas. Se quiser um relatório, peça diretamente a ela (Res. CFP 06/2019).</p>
+      </div>
+    </div>
+
+    <footer style="padding: 12px 16px 20px; background: #FFFFFF; border-top: 1px solid #DDE3F3">
+      <button type="button" class="btn btn-p" disabled="{{nothing}}" onClick="{{ask}}">{{ctaLabel}}</button>
+    </footer>
+  </sc-if>
+
+  <sc-if value="{{done}}" hint-placeholder-val="{{ false }}">
+    <div class="fade" style="flex: 1; padding: 64px 24px 24px; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 16px">
+      <span aria-hidden="true" style="width: 72px; height: 72px; border-radius: 50%; background: #E6EAFD; display: flex; align-items: center; justify-content: center">
+        <svg class="check" width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#4040D6" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg>
+      </span>
+      <h2 style="margin: 0; font-size: 22px; font-weight: 600; letter-spacing: -0.02em">Histórico compartilhado</h2>
+      <p style="margin: 0; max-width: 300px; font-size: 15px; line-height: 1.5; color: #3E4466">A Beatriz Ramos já pode ver {{resumo}}. Você pode revogar esse acesso em Ajustes › Privacidade.</p>
+      <a href="Paciente.dc.html" class="btn btn-s" style="margin-top: 16px; text-decoration: none">Voltar para o início</a>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{confirming}}" hint-placeholder-val="{{ false }}">
+    <div class="dim" style="position: absolute; inset: 0; background: rgba(22,26,58,.4); display: flex; align-items: flex-end">
+      <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="t-conf" style="width: 100%; padding: 24px 20px 28px; border-radius: 20px 20px 0 0; background: #FFFFFF; display: flex; flex-direction: column; gap: 14px">
+        <h2 id="t-conf" style="margin: 0; font-size: 20px; font-weight: 600; letter-spacing: -0.02em">Confirmar compartilhamento?</h2>
+        <p style="margin: 0; font-size: 15px; line-height: 1.5; color: #3E4466">Beatriz Ramos vai receber acesso de leitura a {{resumo}} ({{periodo}}).</p>
+        <button type="button" class="btn btn-p" onClick="{{confirm}}">Compartilhar</button>
+        <button type="button" class="btn btn-s" onClick="{{cancel}}">Cancelar</button>
+      </div>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { on: [true, true, false, true], periodo: 0, phase: 'choose' };
+  }
+  renderVals() {
+    const s = this.state;
+    const defs = [['Prontuário', '28 sessões'], ['Respostas de atividades', '112 respostas'], ['Check-ins', '7 meses de registros'], ['Documentos emitidos', '4 documentos']];
+    const pers = ['Tudo', 'Últimos 12 meses', 'Últimos 6 meses'];
+    const chosen = defs.filter((d, i) => s.on[i]).map((d) => d[0].toLowerCase());
+    const resumo = chosen.length === 0 ? 'nenhum item' : chosen.length === 1 ? chosen[0] : chosen.slice(0, -1).join(', ') + ' e ' + chosen[chosen.length - 1];
+    return {
+      itens: defs.map((d, i) => ({
+        id: 'it' + i, nome: d[0], desc: d[1], on: s.on[i], cls: s.on[i] ? 'sw on' : 'sw',
+        toggle: () => { const on = s.on.slice(); on[i] = !on[i]; this.setState({ on: on }); }
+      })),
+      periodos: pers.map((p, i) => ({ label: p, on: s.periodo === i, cls: s.periodo === i ? 'chip on' : 'chip', pick: () => this.setState({ periodo: i }) })),
+      periodo: pers[s.periodo].toLowerCase(),
+      resumo: resumo,
+      nothing: chosen.length === 0,
+      ctaLabel: chosen.length === 0 ? 'Escolha ao menos um item' : 'Compartilhar ' + chosen.length + (chosen.length === 1 ? ' item' : ' itens'),
+      notDone: s.phase !== 'done', done: s.phase === 'done', confirming: s.phase === 'confirm',
+      ask: () => this.setState({ phase: 'confirm' }),
+      cancel: () => this.setState({ phase: 'choose' }),
+      confirm: () => this.setState({ phase: 'done' })
+    };
+  }
+}
+</script>
+</body>
+</html>

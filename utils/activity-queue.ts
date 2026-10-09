@@ -88,3 +88,50 @@ export function activitySummary(activity: Activity, now: Date = new Date()): str
       return activity.status
   }
 }
+
+// Abas da fila no protótipo (Para revisar / Em andamento / Atrasadas /
+// Concluídas). Encerradas sem resposta entram em "Concluídas" para não
+// sumirem da tela.
+export type ActivityQueueTab = 'review' | 'open' | 'late' | 'done'
+
+export const ACTIVITY_QUEUE_TABS: { value: ActivityQueueTab, label: string }[] = [
+  { value: 'review', label: 'Para revisar' },
+  { value: 'open', label: 'Em andamento' },
+  { value: 'late', label: 'Atrasadas' },
+  { value: 'done', label: 'Concluídas' },
+]
+
+const TAB_OF_GROUP: Record<ActivityQueueGroup, ActivityQueueTab> = {
+  awaiting_review: 'review',
+  assigned: 'open',
+  overdue: 'late',
+  reviewed: 'done',
+  closed: 'done',
+}
+
+export function activityQueueTab(activity: Pick<Activity, 'status' | 'dueAt'>, now: Date = new Date()): ActivityQueueTab {
+  return TAB_OF_GROUP[activityQueueGroup(activity, now) ?? 'assigned']
+}
+
+export function isActivityQueueTab(value: unknown): value is ActivityQueueTab {
+  return ACTIVITY_QUEUE_TABS.some((tab) => tab.value === value)
+}
+
+// Pílula de situação da linha, nos tons do protótipo.
+export function activityQueueBadge(
+  activity: Pick<Activity, 'status' | 'dueAt'>,
+  now: Date = new Date(),
+): { label: string, variant: 'warning' | 'positive' | 'danger' | 'neutral' } {
+  switch (activityQueueGroup(activity, now)) {
+    case 'awaiting_review':
+      return { label: 'Para revisar', variant: 'warning' }
+    case 'overdue':
+      return { label: 'Atrasada', variant: 'danger' }
+    case 'reviewed':
+      return { label: 'Concluída', variant: 'neutral' }
+    case 'closed':
+      return { label: activity.status === 'canceled' ? 'Cancelada' : 'Sem resposta', variant: 'neutral' }
+    default:
+      return { label: 'Em andamento', variant: 'positive' }
+  }
+}

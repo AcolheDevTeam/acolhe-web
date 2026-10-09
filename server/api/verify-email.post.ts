@@ -18,7 +18,7 @@ export default defineEventHandler(async (event) => {
     })
     return verifyEmailResponseSchema.parse(response)
   } catch (error: unknown) {
-    const statusCode = (error as { response?: { status?: number } }).response?.status
+    const statusCode = (error as { statusCode?: number }).statusCode
     if (statusCode === 404) {
       throw createError({ statusCode: 404, statusMessage: 'Link de confirmação inválido.' })
     }

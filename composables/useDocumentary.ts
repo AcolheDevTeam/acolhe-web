@@ -1,13 +1,20 @@
 import type { User } from '~/types'
 import {
+  nextDocumentaryIdentity,
+  unknownDocumentaryIdentity,
+} from '~/utils/documentary-identity'
+import {
   notebooksSchema,
   documentaryPatientsSchema,
 } from '~/schemas/documentary'
+// Última identidade válida; só muda quando `/me` traz outro usuário (ACO-77).
+// O plugin documentary-privacy acompanha o `me` e atualiza este estado.
 export function useDocumentaryIdentity() {
   const { data: user } = useNuxtData<User | null>('me')
-  return computed(
-    () => `${user.value?.organizationId ?? ''}:${user.value?.id ?? ''}`,
+  const identity = useState('documentary-identity', () =>
+    nextDocumentaryIdentity(unknownDocumentaryIdentity, user.value),
   )
+  return readonly(identity)
 }
 export function useDocumentaryPatient(patientId: MaybeRefOrGetter<string>) {
   const identity = useDocumentaryIdentity()

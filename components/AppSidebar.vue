@@ -1,22 +1,24 @@
 <script setup lang="ts">
 import type { Component } from 'vue'
 import {
-  BookMarked,
+  BarChart3,
   CalendarDays,
-  ClipboardList,
   FileLock2,
   FileText,
   Home,
+  LayoutTemplate,
+  ListChecks,
   LogOut,
   Settings,
   Users,
+  UsersRound,
 } from 'lucide-vue-next'
-import type { Patient, UserRole } from '~/types'
+import type { Patient, UserRole, WorkspaceContext } from '~/types'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 
 const { user } = defineProps<{
-  user?: { email?: string; name?: string; crp?: string; role?: UserRole } | null
+  user?: { email?: string; name?: string; crp?: string; role?: UserRole; workspace?: WorkspaceContext } | null
 }>()
 
 const { data: patients } = await useFetch<Patient[]>('/api/patients', {
@@ -32,28 +34,47 @@ type NavItem = {
   count?: number
   disabled?: boolean
 }
+type NavSection = { label?: string, items: NavItem[] }
 
-const main = computed<NavItem[]>(() => [
-  { label: 'Início', to: '/dashboard', icon: Home },
-  {
-    label: 'Pacientes',
-    to: '/patients',
-    icon: Users,
-    count: user?.role === 'psychologist' ? patients.value.length : undefined,
-  },
-  { label: 'Agenda', to: '/agenda', icon: CalendarDays },
-  { label: 'Atividades', to: '/activities', icon: ClipboardList },
-  { label: 'Documentos', to: '/documents', icon: FileText, disabled: true },
-])
-
-const personal: NavItem[] = [
-  { label: 'Registro Documental', to: '/registry', icon: FileLock2 },
-  { label: 'Templates', to: '/templates', icon: BookMarked },
+// Seções do protótipo: Principal, "Só você" e "Clínica" (só admin). Quem só
+// administra a clínica não tem área clínica (ADR 0002 da API). "Assinatura"
+// fica de fora até a cobrança ser decidida.
+const adminOnly = computed(() => user?.role === 'org_admin')
+const clinicItems: NavItem[] = [
+  { label: 'Painel', to: '/clinica', icon: BarChart3 },
+  { label: 'Equipe', to: '/clinica/equipe', icon: UsersRound },
 ]
+const home = computed(() => homeFor(user as never))
+
+const sections = computed<NavSection[]>(() => {
+  if (adminOnly.value) return [{ items: isClinicAdmin(user as never) ? clinicItems : [] }]
+  const list: NavSection[] = [
+    {
+      items: [
+        { label: 'Início', to: '/dashboard', icon: Home },
+        {
+          label: 'Pacientes',
+          to: '/patients',
+          icon: Users,
+          count: user?.role === 'psychologist' ? patients.value.length : undefined,
+        },
+        { label: 'Agenda', to: '/agenda', icon: CalendarDays },
+        { label: 'Atividades', to: '/activities', icon: ListChecks },
+        { label: 'Documentos', to: '/documents', icon: FileText, disabled: true },
+        { label: 'Templates', to: '/templates', icon: LayoutTemplate },
+      ],
+    },
+    { label: 'Só você', items: [{ label: 'Registro Documental', to: '/registry', icon: FileLock2 }] },
+  ]
+  if (isClinicAdmin(user as never)) list.push({ label: 'Clínica', items: clinicItems })
+  return list
+})
 
 const route = useRoute()
 const NuxtLinkComponent = resolveComponent('NuxtLink')
 function isActive(to: string) {
+  // "Painel" é a raiz da área; "Equipe" fica embaixo dela e tem destaque próprio.
+  if (to === '/clinica') return route.path === to
   return route.path === to || route.path.startsWith(`${to}/`)
 }
 
@@ -72,89 +93,70 @@ const initials = computed(() =>
 </script>
 
 <template>
-  <aside class="flex h-dvh w-60 shrink-0 flex-col border-r bg-card/40">
-    <div class="flex h-16 items-center px-6">
-      <NuxtLink to="/dashboard">
-        <AppLogo />
-      </NuxtLink>
-    </div>
+  <aside class="flex h-dvh w-64 shrink-0 flex-col gap-6 border-r bg-background px-4 py-6">
+    <NuxtLink :to="home" class="px-3" aria-label="Acolhe, ir para o início">
+      <AppLogo />
+    </NuxtLink>
 
-    <nav class="flex flex-1 flex-col gap-0.5 overflow-y-auto px-3 pb-4">
-      <component
-        :is="item.disabled ? 'span' : NuxtLinkComponent"
-        v-for="item in main"
-        :key="item.to"
-        :to="item.disabled ? undefined : item.to"
-        :aria-disabled="item.disabled || undefined"
-        :title="item.disabled ? 'Em breve' : undefined"
-        :class="[
-          'flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors',
-          item.disabled
-            ? 'cursor-not-allowed text-muted-foreground/45'
-            : isActive(item.to)
-            ? 'bg-accent font-medium text-accent-foreground'
-            : 'text-muted-foreground hover:bg-accent/60 hover:text-foreground',
-        ]"
-      >
-        <component :is="item.icon" class="size-4 shrink-0" :stroke-width="1.75" />
-        <span class="flex-1">{{ item.label }}</span>
-        <span v-if="item.count !== undefined" class="text-xs tabular-nums text-muted-foreground">
-          {{ item.count }}
-        </span>
-      </component>
+    <WorkspaceSwitcher v-if="user?.role !== 'patient'" />
 
-      <p class="label-mono px-3 pb-2 pt-6">Espaço pessoal</p>
-
-      <component
-        :is="item.disabled ? 'span' : NuxtLinkComponent"
-        v-for="item in personal"
-        :key="item.to"
-        :to="item.disabled ? undefined : item.to"
-        :aria-disabled="item.disabled || undefined"
-        :title="item.disabled ? 'Em breve' : undefined"
-        :class="[
-          'flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors',
-          item.disabled
-            ? 'cursor-not-allowed text-muted-foreground/45'
-            : isActive(item.to)
-            ? 'bg-accent font-medium text-accent-foreground'
-            : 'text-muted-foreground hover:bg-accent/60 hover:text-foreground',
-        ]"
-      >
-        <component :is="item.icon" class="size-4 shrink-0" :stroke-width="1.75" />
-        <span class="flex-1">{{ item.label }}</span>
-      </component>
+    <nav aria-label="Principal" class="-mx-1 flex flex-1 flex-col gap-0.5 overflow-y-auto px-1">
+      <template v-for="(section, i) in sections" :key="section.label ?? i">
+        <p v-if="section.label" class="label-mono mx-3 mb-1.5 mt-[18px] text-[11px]">{{ section.label }}</p>
+        <component
+          :is="item.disabled ? 'span' : NuxtLinkComponent"
+          v-for="item in section.items"
+          :key="item.to"
+          :to="item.disabled ? undefined : item.to"
+          :aria-disabled="item.disabled || undefined"
+          :aria-current="!item.disabled && isActive(item.to) ? 'page' : undefined"
+          :title="item.disabled ? 'Em breve' : undefined"
+          :class="[
+            'flex h-10 shrink-0 items-center gap-3 rounded-lg px-3 text-sm font-medium transition-colors',
+            item.disabled
+              ? 'cursor-not-allowed text-muted-foreground/50'
+              : isActive(item.to)
+              ? 'bg-accent text-accent-foreground'
+              : 'text-secondary-foreground hover:bg-surface-hover hover:text-foreground',
+          ]"
+        >
+          <component :is="item.icon" class="size-[18px] shrink-0" :stroke-width="1.7" />
+          <span class="flex-1 truncate">{{ item.label }}</span>
+          <span v-if="item.count !== undefined" class="font-mono text-xs tabular-nums text-muted-foreground">
+            {{ item.count }}
+          </span>
+        </component>
+      </template>
     </nav>
 
-    <div class="mt-auto flex flex-col gap-1 border-t p-3">
+    <div class="-mx-4 -mb-6 mt-auto flex items-center gap-2.5 border-t px-4 py-3">
+      <Avatar class="size-[34px] text-[13px]">
+        <AvatarFallback>{{ initials }}</AvatarFallback>
+      </Avatar>
+      <div class="min-w-0 flex-1">
+        <p class="truncate text-sm font-semibold">{{ displayName }}</p>
+        <p v-if="user?.crp" class="truncate font-mono text-[11px] text-muted-foreground">CRP {{ user.crp }}</p>
+      </div>
+      <!-- Ajustes ainda não existe; fica visível e desabilitado, como antes. -->
       <span
         aria-disabled="true"
-        title="Em breve"
-        class="flex cursor-not-allowed items-center gap-3 rounded-md px-3 py-2 text-sm text-muted-foreground/45"
+        title="Ajustes · em breve"
+        class="flex size-9 shrink-0 cursor-not-allowed items-center justify-center rounded-lg text-muted-foreground/50"
       >
-        <Settings class="size-4" :stroke-width="1.75" />
-        <span>Ajustes</span>
+        <Settings class="size-[18px]" :stroke-width="1.7" />
+        <span class="sr-only">Ajustes (em breve)</span>
       </span>
       <Button
         variant="ghost"
-        class="h-auto w-full justify-start gap-3 rounded-md px-3 py-2 text-sm font-normal text-muted-foreground hover:bg-accent/60 hover:text-foreground"
-        :disabled="isLoggingOut"
+        size="icon-sm"
+        class="shrink-0 text-muted-foreground"
+        :loading="isLoggingOut"
+        :aria-label="isLoggingOut ? 'Saindo…' : 'Sair'"
+        title="Sair"
         @click="logout"
       >
-        <LogOut class="size-4 shrink-0" :stroke-width="1.75" />
-        <span>{{ isLoggingOut ? 'Saindo…' : 'Sair' }}</span>
+        <LogOut v-if="!isLoggingOut" class="size-[18px]" :stroke-width="1.7" />
       </Button>
-      <div class="flex items-center gap-3 rounded-md px-3 py-2">
-        <Avatar class="size-8">
-          <AvatarFallback class="bg-secondary text-xs">{{ initials }}</AvatarFallback>
-        </Avatar>
-        <div class="min-w-0">
-          <p class="truncate text-sm font-medium">{{ displayName }}</p>
-          <p v-if="user?.crp" class="truncate text-xs text-muted-foreground">
-            CRP {{ user.crp }}
-          </p>
-        </div>
-      </div>
     </div>
   </aside>
 </template>
