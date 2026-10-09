@@ -26,13 +26,17 @@ const emit = defineEmits<{
   submit: [values: TemplateRequest]
 }>()
 
-const { handleSubmit, errors, values } = useForm<TemplateFormValues>({
+const { handleSubmit, errors, values, submitCount } = useForm<TemplateFormValues>({
   validationSchema: toTypedSchema(templateRequestSchema),
   initialValues: props.initial,
 })
 
 const { fields, push, remove, move, update, replace } = useFieldArray<TemplateFieldInput>('fields')
-const fieldsError = computed(() => (errors.value as Record<string, string | undefined>).fields)
+// "Adicione pelo menos um campo" só depois de tentar publicar: num template
+// novo a lista começa vazia e o aviso apareceria antes de qualquer ação.
+const fieldsError = computed(() =>
+  submitCount.value > 0 ? (errors.value as Record<string, string | undefined>).fields : undefined,
+)
 
 function addField(fieldType: FieldType) {
   push(emptyField(fieldType))
