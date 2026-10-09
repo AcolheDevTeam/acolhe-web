@@ -2,6 +2,7 @@
 import { toTypedSchema } from '@vee-validate/zod'
 import { Plus } from 'lucide-vue-next'
 import { useFieldArray, useForm } from 'vee-validate'
+import { onBeforeRouteLeave } from 'vue-router'
 import type { FieldType, TemplateFieldInput, TemplateFormValues, TemplateRequest, TemplateTypeCode } from '~/schemas/activity-template'
 import { templateRequestSchema } from '~/schemas/activity-template'
 import { CustomDropdown } from '@/components/ui/custom-dropdown'
@@ -20,6 +21,8 @@ const props = defineProps<{
   readonly?: boolean
   /** Sugere campos ao escolher o tipo base. Só na criação (ACO-74). */
   presets?: boolean
+  /** A página está publicando: o logout espera terminar. */
+  saving?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -70,6 +73,50 @@ watch(() => values.typeCode as TemplateTypeCode | undefined, (typeCode) => {
 
 const onSubmit = handleSubmit((formValues) => {
   emit('submit', formValues as TemplateRequest)
+})
+
+// Proteção contra sair com alterações não salvas (mesmo padrão de
+// SessionNotesForm): trocar de rota, "Descartar", logout e fechar a aba pedem
+// confirmação. "Sujo" = valores diferentes do último estado salvo; texto vazio
+// conta como ausente para um campo apagado não parecer alteração.
+const snapshot = (v: unknown) => JSON.stringify(v, (_key, value) => (value === '' ? undefined : value))
+const savedState = ref(snapshot(props.initial))
+// O estado de referência é o que o formulário montou (com os campos registrados).
+onMounted(() => nextTick(markSaved))
+const dirty = computed(() => !props.readonly && snapshot(values) !== savedState.value)
+
+/** A página chama depois de salvar, antes de navegar ou recarregar. */
+function markSaved() {
+  savedState.value = snapshot(values)
+}
+defineExpose({ markSaved })
+
+const exitProtection = useNuxtApp().$protectedLogout
+const confirmOpen = ref(false)
+let resolveConfirmation: ((discard: boolean) => void) | undefined
+function decide(discard: boolean) {
+  confirmOpen.value = false
+  resolveConfirmation?.(discard)
+  resolveConfirmation = undefined
+}
+function confirmDiscard(): Promise<boolean> {
+  if (!dirty.value) return Promise.resolve(true)
+  if (resolveConfirmation) return Promise.resolve(false)
+  confirmOpen.value = true
+  return new Promise<boolean>((resolve) => { resolveConfirmation = resolve })
+}
+const unregisterExit = exitProtection.register({ saving: toRef(() => !!props.saving), confirm: confirmDiscard })
+onBeforeRouteLeave(() => confirmDiscard())
+function beforeUnload(event: BeforeUnloadEvent) {
+  if (exitProtection.leaving.value || !dirty.value) return
+  event.preventDefault()
+  event.returnValue = ''
+}
+onMounted(() => window.addEventListener('beforeunload', beforeUnload))
+onBeforeUnmount(() => {
+  window.removeEventListener('beforeunload', beforeUnload)
+  unregisterExit()
+  decide(false)
 })
 
 const palette = FIELD_TYPE_OPTIONS.map((option) => ({
@@ -215,4 +262,5 @@ const palette = FIELD_TYPE_OPTIONS.map((option) => ({
       </div>
     </div>
   </form>
+  <UnsavedChangesDialog :open="confirmOpen" @decision="decide" />
 </template>

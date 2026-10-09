@@ -37,14 +37,12 @@ const scopeVariant = computed(() => ({ mine: 'positive', clinic: 'neutral', acol
           {{ template.title }}
         </NuxtLink>
       </h2>
-      <p class="line-clamp-2 text-sm text-secondary-foreground">
-        {{ template.description || fieldSummary }}
-      </p>
+      <p v-if="template.description" class="line-clamp-2 text-sm text-secondary-foreground">{{ template.description }}</p>
     </div>
 
     <div class="mt-auto flex flex-wrap items-center justify-between gap-2 border-t border-secondary pt-3.5">
       <Badge :variant="scopeVariant" class="h-6">{{ templateOriginLabel(template) }}</Badge>
-      <span v-if="template.description" class="text-[13px] text-muted-foreground">{{ fieldSummary }}</span>
+      <span class="text-[13px] text-muted-foreground">{{ fieldSummary }}</span>
     </div>
 
     <div class="relative z-[1] flex gap-2">

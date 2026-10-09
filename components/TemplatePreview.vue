@@ -51,7 +51,7 @@ const rows = computed(() => props.fields.map((field, i) => ({
       <p v-if="!rows.length" class="text-[13px] text-muted-foreground">Os campos aparecem aqui conforme você adiciona.</p>
       <div v-for="row in rows" :key="row.num" class="flex flex-col gap-1.5">
         <p class="text-sm font-medium">
-          {{ row.num }}. {{ row.field.label || 'Pergunta sem texto' }}<span v-if="row.field.required !== false" class="text-warning" aria-label="obrigatória"> *</span>
+          {{ row.num }}. {{ row.field.label || 'Pergunta sem texto' }}<span v-if="row.field.required !== false" class="text-warning"><span aria-hidden="true"> *</span><span class="sr-only"> (obrigatória)</span></span>
         </p>
         <p v-if="row.field.helpText" class="text-xs text-muted-foreground">{{ row.field.helpText }}</p>
         <div v-if="row.box" class="rounded-lg border bg-surface-subtle" :class="row.box" />

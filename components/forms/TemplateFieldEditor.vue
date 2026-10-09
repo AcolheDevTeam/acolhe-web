@@ -43,6 +43,18 @@ const { fields: options, push: pushOption, remove: removeOption } = useFieldArra
 const optionsError = computed(() => (errors.value as Record<string, string | undefined>)[`${name.value}.options`])
 const canAddOption = computed(() => options.value.length < TEMPLATE_LIMITS.options.max)
 const canRemoveOption = computed(() => options.value.length > TEMPLATE_LIMITS.options.min)
+
+// Depois de mover, o foco segue a mesma pergunta. Se a seta usada ficou
+// desabilitada (chegou ao topo ou ao fim), o foco vai para a outra seta.
+const upButton = ref<{ $el: HTMLButtonElement } | null>(null)
+const downButton = ref<{ $el: HTMLButtonElement } | null>(null)
+async function moveField(direction: -1 | 1) {
+  emit('move', direction)
+  await nextTick()
+  const atEdge = direction === -1 ? props.index === 0 : props.index === props.total - 1
+  const target = (direction === -1) !== atEdge ? upButton.value : downButton.value
+  target?.$el.focus()
+}
 </script>
 
 <template>
@@ -75,10 +87,10 @@ const canRemoveOption = computed(() => options.value.length > TEMPLATE_LIMITS.op
         </FormItem>
       </FormField>
       <div v-if="!props.readonly" class="ml-auto flex shrink-0 items-center gap-0.5">
-        <Button type="button" variant="ghost" size="icon-sm" class="size-[34px] text-muted-foreground" :aria-label="`Mover pergunta ${num} para cima`" :disabled="index === 0" @click="emit('move', -1)">
+        <Button ref="upButton" type="button" variant="ghost" size="icon-sm" class="size-[34px] text-muted-foreground" :aria-label="`Mover pergunta ${num} para cima`" :disabled="index === 0" @click="moveField(-1)">
           <ChevronUp />
         </Button>
-        <Button type="button" variant="ghost" size="icon-sm" class="size-[34px] text-muted-foreground" :aria-label="`Mover pergunta ${num} para baixo`" :disabled="index === total - 1" @click="emit('move', 1)">
+        <Button ref="downButton" type="button" variant="ghost" size="icon-sm" class="size-[34px] text-muted-foreground" :aria-label="`Mover pergunta ${num} para baixo`" :disabled="index === total - 1" @click="moveField(1)">
           <ChevronDown />
         </Button>
         <Button type="button" variant="ghost" size="icon-sm" class="size-[34px] text-muted-foreground" :aria-label="`Remover pergunta ${num}`" @click="emit('remove')">

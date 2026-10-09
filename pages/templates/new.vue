@@ -9,11 +9,13 @@ definePageMeta({ middleware: ['auth', 'psychologist-only'] })
 
 const submitting = ref(false)
 const initial = emptyTemplateForm()
+const form = ref<{ markSaved: () => void } | null>(null)
 
 async function create(values: TemplateRequest) {
   submitting.value = true
   try {
     const created = await $fetch<ActivityTemplateDetail>('/api/templates', { method: 'POST', body: values })
+    form.value?.markSaved()
     toast.success('Template publicado. Já pode ser atribuído às pacientes.')
     await refreshNuxtData('templates-list')
     await navigateTo(`/templates/${created.id}`)
@@ -47,6 +49,6 @@ async function create(values: TemplateRequest) {
   </PageHeader>
 
   <div class="px-4 pb-14 pt-6 md:px-8 lg:px-12">
-    <TemplateForm :initial="initial" presets @submit="create" />
+    <TemplateForm ref="form" :initial="initial" :saving="submitting" presets @submit="create" />
   </div>
 </template>

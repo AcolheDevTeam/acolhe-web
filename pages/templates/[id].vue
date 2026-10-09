@@ -18,6 +18,7 @@ const templateId = computed(() => route.params.id as string)
 const { data: template, status, error } = useTemplate(templateId)
 
 const submitting = ref(false)
+const form = ref<{ markSaved: () => void } | null>(null)
 const initial = computed(() => (template.value ? templateToFormValues(template.value) : null))
 const readonly = computed(() => !template.value?.editable)
 
@@ -41,6 +42,7 @@ async function save(values: TemplateRequest) {
   submitting.value = true
   try {
     const saved = await $fetch<ActivityTemplateDetail>(`/api/templates/${template.value.id}`, { method: 'PUT', body: values })
+    form.value?.markSaved()
     await refreshNuxtData('templates-list')
     if (saved.id !== template.value.id) {
       toast.success(`Versão ${saved.version} publicada. As atividades já atribuídas continuam na versão ${template.value.version}.`)
@@ -122,9 +124,11 @@ async function onArchived() {
 
       <TemplateForm
         v-if="initial"
+        ref="form"
         :key="template.id"
         :initial="initial"
         :readonly="readonly"
+        :saving="submitting"
         @submit="save"
       />
     </template>
