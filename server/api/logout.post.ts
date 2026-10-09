@@ -4,7 +4,7 @@
 export default defineEventHandler(async (event) => {
   if (getCookie(event, 'acolhe_session')) {
     try {
-      await apiFetch(event, '/logout', { method: 'POST' })
+      await apiFetch(event, '/logout', { method: 'POST', timeout: 3000 })
     }
     catch {
       // Sessão já inválida (401) ou API fora: nada a fazer além de apagar o cookie.
