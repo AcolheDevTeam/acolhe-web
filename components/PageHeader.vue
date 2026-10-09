@@ -1,8 +1,9 @@
 <script setup lang="ts">
 // Cabeçalho das páginas da área clínica (protótipo): eyebrow mono + H1 à
 // esquerda, ações à direita, alinhadas pela base. Não é fixo. Telas de detalhe
-// usam o slot `title` como breadcrumb no lugar do H1.
-defineProps<{ title?: string, eyebrow?: string, description?: string }>()
+// usam o slot `title` como breadcrumb no lugar do H1. `display` é a saudação
+// maior do Início (40px, descrição em corpo de leitura).
+defineProps<{ title?: string, eyebrow?: string, description?: string, display?: boolean }>()
 </script>
 
 <template>
@@ -13,8 +14,19 @@ defineProps<{ title?: string, eyebrow?: string, description?: string }>()
       </div>
       <template v-else>
         <p v-if="eyebrow" class="label-mono text-xs">{{ eyebrow }}</p>
-        <h1 class="text-[28px] font-semibold leading-[1.1] tracking-[-0.03em] md:text-[34px]">{{ title }}</h1>
-        <p v-if="description" class="max-w-2xl text-sm leading-relaxed text-muted-foreground">{{ description }}</p>
+        <h1
+          class="font-semibold leading-[1.1] tracking-[-0.03em]"
+          :class="display ? 'text-[32px] md:text-[40px]' : 'text-[28px] md:text-[34px]'"
+        >
+          {{ title }}
+        </h1>
+        <p
+          v-if="description"
+          class="max-w-2xl"
+          :class="display ? 'text-base leading-[1.55] text-secondary-foreground' : 'text-sm leading-relaxed text-muted-foreground'"
+        >
+          {{ description }}
+        </p>
       </template>
     </div>
     <div v-if="$slots.actions" class="flex shrink-0 flex-wrap items-center gap-2">
