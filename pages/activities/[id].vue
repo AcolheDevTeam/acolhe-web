@@ -37,9 +37,11 @@ const submission = computed(() =>
     ? activity.value.submission
     : null,
 )
-// Resposta com menos campos do que a versão do template: não é íntegra.
+// Resposta com menos campos do que a versão do template: não é íntegra. Só
+// importa enquanto a resposta aguarda revisão; depois disso o estado manda.
 const incomplete = computed(() =>
-  !!submission.value && submission.value.fields.length !== activity.value?.fieldCount,
+  activity.value?.state === 'submitted'
+  && !!submission.value && submission.value.fields.length !== activity.value?.fieldCount,
 )
 const canReview = computed(() =>
   status.value === 'success'
