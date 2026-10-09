@@ -1,16 +1,20 @@
 <script setup lang="ts">
+import { Upload } from 'lucide-vue-next'
 import { toTypedSchema } from '@vee-validate/zod'
 import { useForm } from 'vee-validate'
 import { signupSchema, signupTermsVersion } from '~/schemas/signup'
+import { crpRegions, firstSignupStepWithError, signupApproaches, signupSteps } from '~/utils/signup-steps'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Checkbox } from '@/components/ui/checkbox'
+import { CheckboxCard } from '@/components/ui/checkbox-card'
+import { CustomDropdown } from '@/components/ui/custom-dropdown'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 
 definePageMeta({ layout: 'auth' })
+useHead({ title: 'Criar conta · Acolhe' })
 
-const steps = ['Conta', 'CRP', 'Perfil', 'Termos']
+const stepNames = signupSteps.map((step) => step.name)
+const lastStep = signupSteps.length - 1
 const step = ref(0)
 const submitError = ref('')
 
@@ -19,32 +23,40 @@ const { defineField, errors, handleSubmit, isSubmitting, validateField } = useFo
   initialValues: { termsVersion: signupTermsVersion, privacyVersion: signupTermsVersion, acceptTerms: false, acceptPrivacy: false },
 })
 
+const [fullName, fullNameAttrs] = defineField('fullName')
 const [email, emailAttrs] = defineField('email')
 const [password, passwordAttrs] = defineField('password')
 const [confirmPassword, confirmPasswordAttrs] = defineField('confirmPassword')
-const [fullName, fullNameAttrs] = defineField('fullName')
 const [crpNumber, crpNumberAttrs] = defineField('crpNumber')
-const [crpState, crpStateAttrs] = defineField('crpState')
+const [crpState] = defineField('crpState')
 const [cpf, cpfAttrs] = defineField('cpf')
-const [approach, approachAttrs] = defineField('approach')
+const [approach] = defineField('approach')
 const [acceptTerms] = defineField('acceptTerms')
 const [acceptPrivacy] = defineField('acceptPrivacy')
 
-const fieldsByStep = [
-  ['email', 'password', 'confirmPassword'],
-  ['crpNumber', 'crpState', 'cpf'],
-  ['fullName', 'approach'],
-  ['acceptTerms', 'acceptPrivacy'],
-] as const
+const regionOptions = crpRegions.map((region) => ({ value: region.value, label: `${region.value} · ${region.name}`, description: region.uf }))
+
+// Abordagem é opcional: clicar de novo na escolhida desmarca.
+function pickApproach(option: string) {
+  approach.value = approach.value === option ? undefined : option
+}
+
+// O título de cada etapa recebe o foco ao trocar, para leitor de tela anunciar.
+const stepHeading = ref<HTMLElement | null>(null)
+async function goTo(index: number) {
+  step.value = index
+  await nextTick()
+  stepHeading.value?.focus()
+}
 
 async function nextStep() {
-  const results = await Promise.all(fieldsByStep[step.value].map((field) => validateField(field)))
-  if (results.every((result) => result.valid)) step.value++
+  const results = await Promise.all(signupSteps[step.value].fields.map((field) => validateField(field)))
+  if (results.every((result) => result.valid)) await goTo(step.value + 1)
 }
 
 function previousStep() {
-  step.value--
   submitError.value = ''
+  goTo(step.value - 1)
 }
 
 interface SignupResponse {
@@ -65,95 +77,186 @@ const onSubmit = handleSubmit(async (values) => {
     }
     await navigateTo('/dashboard')
   } catch (error: unknown) {
+    // A API não diz qual campo falhou (409 vale para e-mail ou CRP já usados),
+    // então o erro fica nesta etapa, com a orientação de revisar as anteriores.
     submitError.value = apiErrorMessage(error, {
       400: 'Alguns dados não foram aceitos. Revise as etapas e tente novamente.',
       409: 'Não foi possível concluir o cadastro. Confira os dados e tente novamente.',
       default: 'Não foi possível concluir o cadastro agora. Tente novamente.',
     })
   }
+}, ({ errors: invalid }) => {
+  // Campo de outra etapa reprovado no envio final: volta para a etapa dele.
+  const target = firstSignupStepWithError(invalid)
+  if (target !== undefined && target !== step.value) goTo(target)
 })
+
+const canSubmit = computed(() => acceptTerms.value === true && acceptPrivacy.value === true)
 </script>
 
 <template>
-  <main class="flex min-h-dvh items-center justify-center p-6">
-    <Card class="w-full max-w-2xl">
-      <CardHeader class="gap-5">
-        <div class="flex items-center justify-between gap-4">
-          <AppLogo />
-          <NuxtLink to="/login" class="text-sm text-muted-foreground underline underline-offset-4">Já tem conta? Entrar</NuxtLink>
-        </div>
-        <div>
-          <p class="label-mono">Onboarding</p>
-          <CardTitle class="display-serif mt-2 text-3xl">Cadastro do psicólogo</CardTitle>
-          <CardDescription class="mt-2">Validamos o CRP manualmente em até 24h úteis.</CardDescription>
-        </div>
-        <ol class="grid grid-cols-4 gap-2" aria-label="Etapas do cadastro">
-          <li v-for="(label, index) in steps" :key="label" class="border-t pt-2 text-xs" :class="index <= step ? 'border-foreground text-foreground' : 'text-muted-foreground'">
-            <span class="font-mono">0{{ index + 1 }}</span> {{ label }}
-          </li>
-        </ol>
-      </CardHeader>
+  <AuthTopbarShell>
+    <template #aside>
+      <p class="text-sm text-secondary-foreground">
+        Já tem conta?
+        <NuxtLink to="/login" class="font-medium text-primary underline-offset-[3px] hover:underline">Entrar</NuxtLink>
+      </p>
+    </template>
 
-      <CardContent>
-        <form class="flex flex-col gap-5" @submit.prevent="step === steps.length - 1 ? onSubmit() : nextStep()">
-          <fieldset v-if="step === 0" class="flex flex-col gap-4">
-            <legend class="display-serif text-2xl">Comece pela sua conta</legend>
-            <div class="flex flex-col gap-1.5">
+    <div class="flex flex-col gap-7">
+      <StepProgress :steps="stepNames" :current="step" label="Etapas do cadastro" class="animate-rise [animation-delay:.08s]" />
+
+      <form
+        class="rounded-[20px] border bg-card p-5 sm:p-9"
+        novalidate
+        @submit.prevent="step === lastStep ? onSubmit() : nextStep()"
+      >
+        <div :key="step" class="step-in flex flex-col gap-5">
+          <!-- 1. Conta -->
+          <template v-if="step === 0">
+            <div>
+              <h1 ref="stepHeading" tabindex="-1" class="text-[28px] font-semibold tracking-[-0.025em] outline-none">Crie sua conta</h1>
+              <p class="mt-1.5 text-[15px] text-secondary-foreground">Esses dados servem para você entrar no Acolhe.</p>
+            </div>
+            <div class="flex flex-col gap-2">
+              <Label for="fullName">Nome completo</Label>
+              <Input id="fullName" v-model="fullName" v-bind="fullNameAttrs" class="h-12" autocomplete="name" placeholder="Como aparece no seu registro" :aria-invalid="!!errors.fullName" />
+              <p v-if="errors.fullName" class="text-xs text-destructive">{{ errors.fullName }}</p>
+            </div>
+            <div class="flex flex-col gap-2">
               <Label for="email">E-mail</Label>
-              <Input id="email" v-model="email" v-bind="emailAttrs" type="email" autocomplete="email" :aria-invalid="!!errors.email" />
+              <Input id="email" v-model="email" v-bind="emailAttrs" type="email" class="h-12" autocomplete="email" placeholder="voce@exemplo.com" :aria-invalid="!!errors.email" />
               <p v-if="errors.email" class="text-xs text-destructive">{{ errors.email }}</p>
             </div>
-            <div class="flex flex-col gap-1.5">
+            <div class="flex flex-col gap-2">
               <Label for="password">Senha</Label>
-              <PasswordInput id="password" v-model="password" v-bind="passwordAttrs" autocomplete="new-password" :aria-invalid="!!errors.password" />
+              <PasswordInput id="password" v-model="password" v-bind="passwordAttrs" class="[&_input]:h-12" autocomplete="new-password" placeholder="Mínimo de 8 caracteres" :aria-invalid="!!errors.password" />
               <p v-if="errors.password" class="text-xs text-destructive">{{ errors.password }}</p>
             </div>
-            <div class="flex flex-col gap-1.5">
-              <Label for="confirmPassword">Confirme sua senha</Label>
-              <PasswordInput id="confirmPassword" v-model="confirmPassword" v-bind="confirmPasswordAttrs" autocomplete="new-password" :aria-invalid="!!errors.confirmPassword" />
+            <div class="flex flex-col gap-2">
+              <Label for="confirmPassword">Confirme a senha</Label>
+              <PasswordInput id="confirmPassword" v-model="confirmPassword" v-bind="confirmPasswordAttrs" class="[&_input]:h-12" autocomplete="new-password" :aria-invalid="!!errors.confirmPassword" />
               <p v-if="errors.confirmPassword" class="text-xs text-destructive">{{ errors.confirmPassword }}</p>
             </div>
-          </fieldset>
+          </template>
 
-          <fieldset v-else-if="step === 1" class="flex flex-col gap-4">
-            <legend class="display-serif text-2xl">Sobre seu registro profissional</legend>
-            <p class="text-sm leading-relaxed text-muted-foreground">O CRP começa como pendente e passa por validação manual.</p>
-            <div class="grid gap-4 sm:grid-cols-[1fr_8rem]">
-              <div class="flex flex-col gap-1.5"><Label for="crpNumber">Número CRP</Label><Input id="crpNumber" v-model="crpNumber" v-bind="crpNumberAttrs" placeholder="123456" inputmode="numeric" /><p v-if="errors.crpNumber" class="text-xs text-destructive">{{ errors.crpNumber }}</p></div>
-              <div class="flex flex-col gap-1.5"><Label for="crpState">Região</Label><Input id="crpState" v-model="crpState" v-bind="crpStateAttrs" placeholder="06" maxlength="2" /><p v-if="errors.crpState" class="text-xs text-destructive">{{ errors.crpState }}</p></div>
+          <!-- 2. CRP -->
+          <template v-else-if="step === 1">
+            <div>
+              <h1 ref="stepHeading" tabindex="-1" class="text-[28px] font-semibold tracking-[-0.025em] outline-none">Registro profissional</h1>
+              <p class="mt-1.5 text-[15px] leading-normal text-secondary-foreground">Conferimos o CRP manualmente em até 24 horas úteis. Até lá, ele aparece como pendente.</p>
             </div>
-            <div class="flex flex-col gap-1.5"><Label for="cpf">CPF <span class="text-muted-foreground">(opcional)</span></Label><Input id="cpf" v-model="cpf" v-bind="cpfAttrs" placeholder="•••.•••.•••-••" inputmode="numeric" autocomplete="off" /><p v-if="errors.cpf" class="text-xs text-destructive">{{ errors.cpf }}</p></div>
-            <p class="border border-dashed p-3 text-xs leading-relaxed text-muted-foreground">Comprovante CRP: upload indisponível nesta etapa. O arquivo não é aceito, enviado nem armazenado até existir um fluxo privado com varredura, limite e expiração.</p>
-          </fieldset>
-
-          <fieldset v-else-if="step === 2" class="flex flex-col gap-4">
-            <legend class="display-serif text-2xl">Seu perfil profissional</legend>
-            <div class="flex flex-col gap-1.5"><Label for="fullName">Nome completo</Label><Input id="fullName" v-model="fullName" v-bind="fullNameAttrs" autocomplete="name" /><p v-if="errors.fullName" class="text-xs text-destructive">{{ errors.fullName }}</p></div>
-            <div class="flex flex-col gap-1.5"><Label for="approach">Abordagem principal <span class="text-muted-foreground">(opcional)</span></Label><Input id="approach" v-model="approach" v-bind="approachAttrs" placeholder="Ex.: TCC, Psicanálise" /></div>
-          </fieldset>
-
-          <fieldset v-else class="flex flex-col gap-4">
-            <legend class="display-serif text-2xl">Leia com calma</legend>
-            <p class="text-sm leading-relaxed text-muted-foreground">Ao continuar, você concorda com os Termos de Uso e a Política de Privacidade (versão 0.3). Seu consentimento fica registrado com data, IP e versão exata do documento.</p>
-            <div class="flex items-start gap-3 text-sm">
-              <Checkbox id="acceptTerms" class="mt-1" :model-value="acceptTerms === true" @update:model-value="(checked) => (acceptTerms = checked === true)" />
-              <Label for="acceptTerms" class="font-normal leading-relaxed">Aceito os Termos de Uso (versão 0.3).</Label>
+            <div class="grid gap-4 sm:grid-cols-2">
+              <div class="flex flex-col gap-2">
+                <Label for="crpNumber">Número do CRP</Label>
+                <Input id="crpNumber" v-model="crpNumber" v-bind="crpNumberAttrs" class="h-12" inputmode="numeric" autocomplete="off" placeholder="123456" :aria-invalid="!!errors.crpNumber" />
+                <p v-if="errors.crpNumber" class="text-xs text-destructive">{{ errors.crpNumber }}</p>
+              </div>
+              <div class="flex flex-col gap-2">
+                <Label for="crpState">Região</Label>
+                <CustomDropdown
+                  id="crpState"
+                  :model-value="crpState"
+                  :options="regionOptions"
+                  search-placeholder="Buscar região ou estado"
+                  empty-text="Nenhuma região encontrada."
+                  class="h-12 rounded-xl border-input bg-card px-3.5 text-[15px] shadow-none hover:border-input-hover focus:ring-0 focus-visible:border-primary focus-visible:ring-4 focus-visible:ring-primary/15 aria-expanded:border-primary aria-expanded:ring-4 aria-expanded:ring-primary/15 aria-[invalid=true]:border-destructive"
+                  :aria-invalid="!!errors.crpState"
+                  @update:model-value="(value) => { crpState = value; validateField('crpState') }"
+                />
+                <p v-if="errors.crpState" class="text-xs text-destructive">{{ errors.crpState }}</p>
+              </div>
             </div>
-            <p v-if="errors.acceptTerms" class="text-xs text-destructive">{{ errors.acceptTerms }}</p>
-            <div class="flex items-start gap-3 text-sm">
-              <Checkbox id="acceptPrivacy" class="mt-1" :model-value="acceptPrivacy === true" @update:model-value="(checked) => (acceptPrivacy = checked === true)" />
-              <Label for="acceptPrivacy" class="font-normal leading-relaxed">Aceito a Política de Privacidade (versão 0.3).</Label>
+            <div class="flex flex-col gap-2">
+              <Label for="cpf">CPF <span class="font-normal text-muted-foreground">(opcional)</span></Label>
+              <Input id="cpf" v-model="cpf" v-bind="cpfAttrs" class="h-12" inputmode="numeric" autocomplete="off" placeholder="000.000.000-00" aria-describedby="cpf-hint" :aria-invalid="!!errors.cpf" />
+              <p v-if="errors.cpf" class="text-xs text-destructive">{{ errors.cpf }}</p>
+              <p v-else id="cpf-hint" class="text-[13px] text-muted-foreground">Guardado com criptografia.</p>
             </div>
-            <p v-if="errors.acceptPrivacy" class="text-xs text-destructive">{{ errors.acceptPrivacy }}</p>
-            <p v-if="submitError" class="text-sm text-destructive" role="alert">{{ submitError }}</p>
-          </fieldset>
+            <div class="flex flex-col gap-2">
+              <span class="text-sm font-medium">Comprovante do CRP</span>
+              <!-- Sem fluxo de upload no backend: a área fica desligada e explica por quê. -->
+              <div class="flex flex-col items-center gap-2.5 rounded-[14px] border-[1.5px] border-dashed border-input-hover bg-card p-6 text-center" aria-disabled="true">
+                <Upload class="size-7 text-muted-foreground" :stroke-width="1.7" aria-hidden="true" />
+                <p class="text-sm font-medium text-secondary-foreground">Envio do comprovante indisponível por enquanto</p>
+                <p class="max-w-[420px] text-xs leading-relaxed text-muted-foreground">O arquivo não é aceito, enviado nem armazenado até existir um fluxo privado com varredura, limite e expiração.</p>
+              </div>
+            </div>
+          </template>
 
-          <div class="flex justify-between gap-3 border-t pt-5">
-            <Button v-if="step > 0" type="button" variant="outline" :disabled="isSubmitting" @click="previousStep">Voltar</Button><span v-else />
-            <Button type="submit" :disabled="isSubmitting">{{ isSubmitting ? 'Enviando…' : step === steps.length - 1 ? 'Aceitar e criar minha conta' : 'Continuar' }}</Button>
-          </div>
-        </form>
-      </CardContent>
-    </Card>
-  </main>
+          <!-- 3. Perfil -->
+          <template v-else-if="step === 2">
+            <div>
+              <h1 ref="stepHeading" tabindex="-1" class="text-[28px] font-semibold tracking-[-0.025em] outline-none">Seu perfil</h1>
+              <p class="mt-1.5 text-[15px] text-secondary-foreground">Esta etapa é opcional.</p>
+            </div>
+            <div class="flex flex-col gap-2.5">
+              <span id="approach-label" class="text-sm font-medium">Abordagem principal</span>
+              <div role="radiogroup" aria-labelledby="approach-label" class="flex flex-wrap gap-2">
+                <Button
+                  v-for="option in signupApproaches"
+                  :key="option"
+                  type="button"
+                  role="radio"
+                  variant="outline"
+                  :aria-checked="approach === option"
+                  class="h-10 rounded-full border-border px-4 font-normal text-secondary-foreground"
+                  :class="approach === option && 'border-selected-border bg-accent text-brand hover:border-selected-border hover:bg-accent'"
+                  @click="pickApproach(option)"
+                >
+                  {{ option }}
+                </Button>
+              </div>
+            </div>
+          </template>
+
+          <!-- 4. Termos -->
+          <template v-else>
+            <div>
+              <h1 ref="stepHeading" tabindex="-1" class="text-[28px] font-semibold tracking-[-0.025em] outline-none">Termos</h1>
+              <p class="mt-1.5 text-[15px] text-secondary-foreground">Leia e aceite para concluir o cadastro. O aceite fica registrado com data e versão do documento.</p>
+            </div>
+            <div class="flex flex-col gap-3">
+              <CheckboxCard
+                id="acceptTerms"
+                :model-value="acceptTerms === true"
+                title="Termos de Uso"
+                description="Obrigatório · versão 0.3"
+                :invalid="!!errors.acceptTerms"
+                @update:model-value="(checked) => (acceptTerms = checked)"
+              />
+              <CheckboxCard
+                id="acceptPrivacy"
+                :model-value="acceptPrivacy === true"
+                title="Política de Privacidade"
+                description="Obrigatório · versão 0.3 · como tratamos dados de pacientes (LGPD)"
+                :invalid="!!errors.acceptPrivacy"
+                @update:model-value="(checked) => (acceptPrivacy = checked)"
+              />
+            </div>
+            <InlineNotice v-if="submitError" tone="danger">{{ submitError }}</InlineNotice>
+          </template>
+        </div>
+
+        <div class="mt-7 flex items-center justify-between gap-3 border-t pt-5">
+          <Button v-if="step > 0" type="button" variant="ghost" size="xl" class="px-5" :disabled="isSubmitting" @click="previousStep">Voltar</Button>
+          <span v-else />
+          <Button type="submit" size="xl" :loading="isSubmitting" :disabled="step === lastStep && !canSubmit">
+            {{ step < lastStep ? 'Continuar' : isSubmitting ? 'Criando conta…' : 'Criar conta' }}
+          </Button>
+        </div>
+      </form>
+    </div>
+  </AuthTopbarShell>
 </template>
+
+<style scoped>
+/* Troca de etapa do protótipo: entra deslizando 16px da direita. */
+.step-in {
+  animation: step-in .45s var(--ease-out) both;
+}
+@keyframes step-in {
+  from { opacity: 0; transform: translateX(16px); }
+  to { opacity: 1; transform: none; }
+}
+</style>
