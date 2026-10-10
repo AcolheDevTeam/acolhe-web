@@ -84,11 +84,11 @@ const faq = [
   },
   {
     q: 'O que acontece quando o teste acaba?',
-    a: 'Se você não assinar, a conta fica só para leitura: dá para ver e exportar o que já está lá, mas não criar nem editar. Ao assinar, tudo volta a funcionar como antes.',
+    a: 'Se você não assinar, a conta fica só para leitura: dá para ver o que já está lá, mas não criar nem editar. Ao assinar, tudo volta a funcionar como antes.',
   },
   {
     q: 'Como cancelo?',
-    a: 'Pelo portal de assinatura do Stripe, a qualquer momento, sem precisar falar com ninguém.',
+    a: 'Pela tela de assinatura, a qualquer momento, sem precisar falar com ninguém.',
   },
   {
     q: 'Onde ficam os dados das minhas pacientes?',
