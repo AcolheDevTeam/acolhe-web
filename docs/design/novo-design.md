@@ -12,7 +12,8 @@ e a [ADR 0003](../../../acolhe-api/docs/architecture/0003-cadastro-direto-de-cli
 O CNPJ da clínica é obrigatório; o cadastro é direto, sem aprovação; o superadmin pode criar
 clínicas e consultar assinaturas. A aba de cortesias do protótipo fica fora de escopo (cupons
 eventuais são gerados no Stripe). A verificação de titularidade do CNPJ é bloqueio de release
-público. O protótipo continua como referência visual, mas essas decisões prevalecem sobre os
+público; até lá, `CLINIC_SELF_SIGNUP_ENABLED` fica desabilitada por padrão na API e no web.
+O protótipo continua como referência visual, mas essas decisões prevalecem sobre os
 campos e ações desenhados em 2026-10-09.
 
 **Decisões tomadas em 2026-10-09 (ao adotar o protótipo)**
