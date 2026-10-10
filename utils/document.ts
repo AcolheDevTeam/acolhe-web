@@ -150,23 +150,30 @@ export function documentPreview(input: DocumentPreviewInput): DocumentPreview {
     .map(iso => `${formatLongDate(iso)}, às ${formatHour(iso)}`)
   const city = input.city.trim() || '[cidade]'
   const placeAndDate = `${city}, ${formatLongDate(input.today ?? new Date())}.`
+  // Mesmo texto do PDF (acolhe-api internal/docpdf): singular com uma sessão.
+  const plural = dates.length > 1
+  const sessionWord = plural ? 'sessões de psicoterapia' : 'sessão de psicoterapia'
+  const datesWord = plural ? 'nas datas' : 'na data'
   if (input.type === 'declaration') {
-    const purpose = input.purpose?.trim()
+    const purpose = input.purpose?.trim().replace(/\.$/, '')
     return {
       title: 'Declaração de comparecimento',
-      body: `Declaro, para os devidos fins, que ${patient} compareceu a sessão de psicoterapia nas datas:`,
+      body: `Declaro, para os devidos fins, que ${patient} compareceu a ${sessionWord} ${datesWord}:`,
       dates,
-      purpose: purpose ? `Finalidade: ${purpose}` : undefined,
+      purpose: purpose ? `Finalidade: ${purpose}.` : undefined,
       placeAndDate,
     }
   }
-  const payer = input.payerName?.trim() || patient
+  const payerName = input.payerName?.trim() ?? ''
+  const payer = payerName || patient
   const cpfDigits = input.payerCpf?.replace(/\D/g, '') ?? ''
   const cpf = isValidCpf(cpfDigits) ? `, CPF ${maskCpf(cpfDigits)},` : ''
   const amount = input.amountCents ? `R$ ${formatCents(input.amountCents)}` : 'R$ [valor]'
+  // Só cita a paciente quando quem pagou é outra pessoa.
+  const ofPatient = payerName && payerName.toLocaleLowerCase('pt-BR') !== patient.toLocaleLowerCase('pt-BR') ? ` de ${patient}` : ''
   return {
     title: 'Recibo',
-    body: `Recebi de ${payer}${cpf} a importância de ${amount} referente a sessões de psicoterapia de ${patient} nas datas:`,
+    body: `Recebi de ${payer}${cpf} a importância de ${amount} referente a ${sessionWord}${ofPatient} ${datesWord}:`,
     dates,
     placeAndDate,
   }

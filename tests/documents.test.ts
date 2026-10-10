@@ -135,9 +135,11 @@ describe('pré-visualização', () => {
       type: 'declaration', patientName: 'Júlia Andrade', city: 'São Paulo', purpose: 'Empregador', today,
       sessionDates: ['2026-10-09T17:00:00Z', '2026-10-02T17:00:00Z'],
     })
-    expect(p.body).toBe('Declaro, para os devidos fins, que Júlia Andrade compareceu a sessão de psicoterapia nas datas:')
+    expect(p.body).toBe('Declaro, para os devidos fins, que Júlia Andrade compareceu a sessões de psicoterapia nas datas:')
     expect(p.dates).toEqual(['2 de outubro de 2026, às 14:00', '9 de outubro de 2026, às 14:00'])
-    expect(p.purpose).toBe('Finalidade: Empregador')
+    expect(p.purpose).toBe('Finalidade: Empregador.')
+    const single = documentPreview({ type: 'declaration', patientName: 'Júlia Andrade', city: 'Recife', today, sessionDates: ['2026-10-09T17:00:00Z'] })
+    expect(single.body).toBe('Declaro, para os devidos fins, que Júlia Andrade compareceu a sessão de psicoterapia na data:')
     expect(p.placeAndDate).toBe('São Paulo, 9 de outubro de 2026.')
   })
 
@@ -146,10 +148,12 @@ describe('pré-visualização', () => {
       type: 'receipt', patientName: 'Júlia Andrade', city: '', today, sessionDates: [],
       amountCents: 30000, payerName: 'Ana Andrade', payerCpf: '52998224725',
     })
-    expect(p.body).toBe('Recebi de Ana Andrade, CPF 529.982.247-25, a importância de R$ 300,00 referente a sessões de psicoterapia de Júlia Andrade nas datas:')
+    expect(p.body).toBe('Recebi de Ana Andrade, CPF 529.982.247-25, a importância de R$ 300,00 referente a sessão de psicoterapia de Júlia Andrade na data:')
     expect(p.placeAndDate).toBe('[cidade], 9 de outubro de 2026.')
     const empty = documentPreview({ type: 'receipt', patientName: 'Júlia', city: 'Recife', sessionDates: [], today })
-    expect(empty.body).toContain('Recebi de Júlia a importância de R$ [valor]')
+    expect(empty.body).toBe('Recebi de Júlia a importância de R$ [valor] referente a sessão de psicoterapia na data:')
+    const two = documentPreview({ type: 'receipt', patientName: 'Júlia', city: 'Recife', today, amountCents: 100, sessionDates: ['2026-10-02T17:00:00Z', '2026-10-09T17:00:00Z'] })
+    expect(two.body).toBe('Recebi de Júlia a importância de R$ 1,00 referente a sessões de psicoterapia nas datas:')
   })
 })
 
