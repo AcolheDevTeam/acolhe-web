@@ -10,11 +10,11 @@ export default defineEventHandler(async (event) => {
     method: 'POST',
     responseType: 'arrayBuffer',
   })
-  const today = new Date().toISOString().slice(0, 10)
+  // O nome do arquivo é decidido no cliente, que sabe a clínica e o fuso.
   setResponseHeaders(event, {
     'Cache-Control': 'private, no-store',
     'Content-Type': 'application/zip',
-    'Content-Disposition': `attachment; filename="registro-documental-${today}.zip"`,
+    'Content-Disposition': 'attachment; filename="registro-documental.zip"',
   })
   return Buffer.from(zip)
 })

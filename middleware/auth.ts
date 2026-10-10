@@ -13,6 +13,10 @@ export default defineNuxtRouteMiddleware(async (to) => {
   if (user.value?.workspace && !user.value.workspace.active && to.path !== INACTIVE_WORKSPACE_PATH && to.path !== DEPARTURE_EXPORT_PATH) {
     return navigateTo(INACTIVE_WORKSPACE_PATH)
   }
+  // Cadernos são só de psicólogas: paciente volta para a área dela.
+  if (to.path === DEPARTURE_EXPORT_PATH && user.value?.role === 'patient') {
+    return navigateTo(homeFor(user.value))
+  }
   // Vínculo ativo (ex.: reativado pela clínica) não fica preso na página.
   if (to.path === INACTIVE_WORKSPACE_PATH && user.value?.workspace?.active !== false) {
     return navigateTo(homeFor(user.value))

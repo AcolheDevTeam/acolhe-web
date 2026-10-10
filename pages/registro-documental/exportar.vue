@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import type { User } from '~/types'
 
 // Destino do e-mail de saída da clínica (ACO-96). Abre mesmo com o vínculo
 // encerrado: o middleware de auth deixa esta rota passar.
 definePageMeta({ layout: 'auth', middleware: ['auth'] })
 
-const { data: user } = useNuxtData<{ workspace?: { active?: boolean } } | null>('me')
-const { data: departures } = useNuxtData<unknown[]>('documentary-departures')
-const back = computed(() => homeFor(user.value as Parameters<typeof homeFor>[0]))
+const { data: user } = useNuxtData<User | null>('me')
+const back = computed(() => homeFor(user.value))
 </script>
 
 <template>
@@ -25,10 +25,11 @@ const back = computed(() => homeFor(user.value as Parameters<typeof homeFor>[0])
         </div>
       </CardHeader>
       <CardContent class="flex flex-col gap-4">
-        <DocumentaryDepartures :framed="false" />
-        <p v-if="!departures?.length" class="text-sm text-muted-foreground">
-          Não há cadernos para baixar. O prazo pode ter acabado, ou você não escreveu cadernos na clínica.
-        </p>
+        <DocumentaryDepartures
+          :framed="false"
+          show-error
+          empty-text="Não há cadernos para baixar. O prazo pode ter acabado, ou você não escreveu cadernos na clínica."
+        />
         <Button variant="ghost" class="self-start" as-child>
           <NuxtLink :to="back">Voltar</NuxtLink>
         </Button>

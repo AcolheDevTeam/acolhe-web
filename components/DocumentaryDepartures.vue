@@ -5,15 +5,28 @@ import type { Departure } from '~/schemas/documentary'
 
 // Clínicas de onde a psicóloga saiu: 30 dias para baixar os próprios cadernos
 // do Registro Documental (ACO-96). Sem saídas no prazo, não mostra nada.
-const props = withDefaults(defineProps<{ framed?: boolean }>(), { framed: true })
-const { data } = await useFetch<Departure[]>('/api/documentary/departures', {
+// Com showError, a falha ao carregar aparece com "Tentar novamente"; sem ele
+// (telas onde o quadro é acessório), o quadro só não aparece.
+// emptyText é para a página dedicada; nas outras telas, sem saídas, nada aparece.
+const props = withDefaults(defineProps<{ framed?: boolean, showError?: boolean, emptyText?: string }>(), { framed: true, showError: false, emptyText: '' })
+const { data, error, refresh } = await useFetch<Departure[]>('/api/documentary/departures', {
   key: 'documentary-departures',
   default: () => [],
 })
 const downloading = ref<string | null>(null)
+// Calculado uma vez: Date.now() no render poderia divergir entre SSR e cliente.
+const now = Date.now()
 
 function daysLeft(until: string): number {
-  return Math.max(0, Math.ceil((new Date(until).getTime() - Date.now()) / 86_400_000))
+  return Math.max(0, Math.ceil((new Date(until).getTime() - now) / 86_400_000))
+}
+
+function filename(departure: Departure): string {
+  const today = new Date().toLocaleDateString('sv-SE', { timeZone: 'America/Sao_Paulo' })
+  const clinic = departure.organizationName
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+  return `registro-documental-${clinic || 'clinica'}-${today}.zip`
 }
 
 async function download(departure: Departure) {
@@ -26,7 +39,7 @@ async function download(departure: Departure) {
     const url = URL.createObjectURL(zip)
     const link = document.createElement('a')
     link.href = url
-    link.download = `registro-documental-${new Date().toISOString().slice(0, 10)}.zip`
+    link.download = filename(departure)
     link.click()
     setTimeout(() => URL.revokeObjectURL(url), 1000)
   }
@@ -43,8 +56,12 @@ async function download(departure: Departure) {
 </script>
 
 <template>
-  <section v-if="data?.length" :class="props.framed ? 'rounded-lg border bg-card p-5' : ''" aria-labelledby="saidas-titulo">
-    <p id="saidas-titulo" class="label-mono">Cadernos de clínicas anteriores</p>
+  <div v-if="error && props.showError" role="alert" class="space-y-3">
+    <p class="text-sm text-destructive">Não foi possível carregar seus cadernos agora. O prazo continua valendo; tente de novo.</p>
+    <Button variant="outline" @click="refresh()">Tentar novamente</Button>
+  </div>
+  <section v-else-if="data?.length" :class="props.framed ? 'rounded-lg border bg-card p-5' : ''" aria-labelledby="saidas-titulo">
+    <h2 id="saidas-titulo" class="label-mono">Cadernos de clínicas anteriores</h2>
     <p class="mt-2 text-sm text-muted-foreground">
       Ninguém da clínica tem acesso aos seus cadernos. Baixe uma cópia completa, com o histórico, antes do fim do prazo.
       Depois disso, eles ficam lacrados.
@@ -66,6 +83,7 @@ async function download(departure: Departure) {
         <Button
           variant="outline"
           :disabled="downloading !== null"
+          :aria-busy="downloading === departure.organizationId"
           @click="download(departure)"
         >
           {{ downloading === departure.organizationId ? 'Preparando…' : 'Baixar cadernos' }}
@@ -73,4 +91,5 @@ async function download(departure: Departure) {
       </li>
     </ul>
   </section>
+  <p v-else-if="props.emptyText && !error" class="text-sm text-muted-foreground">{{ props.emptyText }}</p>
 </template>
