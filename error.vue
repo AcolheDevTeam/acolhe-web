@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 const props = defineProps<{ error: NuxtError }>()
 
 const status = computed(() => props.error.statusCode ?? 500)
+const supportHref = contactHref(useRuntimeConfig().public.contactEmail as string | undefined, 'Suporte do Acolhe')
 
 // Sem conexão só quando o navegador diz que está offline: um fetch que falha
 // com a internet ok é o Acolhe fora do ar, e cai em "algo deu errado" com
@@ -130,14 +131,16 @@ onBeforeUnmount(() => clearTimeout(copyTimer))
           <template v-if="kind === 'not-found'">
             <h1 class="text-[32px] font-semibold leading-tight tracking-[-0.03em]">Página não encontrada</h1>
             <p class="text-[15px] leading-relaxed text-secondary-foreground">
-              O endereço pode estar errado, ou a página foi removida. Se você chegou aqui por um link do Acolhe, avise o suporte.
+              O endereço pode estar errado, ou a página foi removida. Se você chegou aqui por um link do Acolhe, avise o
+              <a v-if="supportHref" :href="supportHref" class="font-medium text-primary underline-offset-4 hover:underline">suporte</a><template v-else>suporte</template>.
             </p>
             <Button size="xl" @click="goHome">Voltar para o início</Button>
           </template>
           <template v-else>
             <h1 class="text-[32px] font-semibold leading-tight tracking-[-0.03em]">Algo deu errado do nosso lado</h1>
             <p class="text-[15px] leading-relaxed text-secondary-foreground">
-              Tente de novo em alguns segundos. Se continuar, envie o código abaixo para o suporte.
+              Tente de novo em alguns segundos. Se continuar, envie o código abaixo para o
+              <a v-if="supportHref" :href="supportHref" class="font-medium text-primary underline-offset-4 hover:underline">suporte</a><template v-else>suporte</template>.
             </p>
             <div class="flex max-w-full items-center gap-2 rounded-lg border bg-card py-2 pl-3.5 pr-2">
               <span class="select-all font-mono text-[13px] text-secondary-foreground">Código: {{ code }}</span>

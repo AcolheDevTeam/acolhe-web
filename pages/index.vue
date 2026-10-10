@@ -5,6 +5,9 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import type { User } from '~/types'
 import { TRIAL_DAYS } from '~/utils/plans'
 
+// Contato do rodapé: o mesmo e-mail de suporte da configuração pública.
+const supportHref = contactHref(useRuntimeConfig().public.contactEmail as string | undefined, 'Suporte do Acolhe')
+
 // Landing pública do Acolhe. Sem middleware de auth: quem tem sessão vê "Ir
 // para o app" no topo; as rotas privadas continuam mandando ao /login.
 definePageMeta({ layout: 'auth' })
@@ -336,6 +339,7 @@ const year = new Date().getFullYear()
             <p class="label-mono mb-1">Conta</p>
             <NuxtLink to="/login" class="text-secondary-foreground hover:text-foreground">Entrar</NuxtLink>
             <NuxtLink to="/signup" class="text-secondary-foreground hover:text-foreground">Criar conta</NuxtLink>
+            <a v-if="supportHref" :href="supportHref" class="text-secondary-foreground hover:text-foreground">Suporte</a>
           </nav>
         </div>
       </div>
