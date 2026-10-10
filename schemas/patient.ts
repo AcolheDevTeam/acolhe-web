@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { CHECKIN_FEELINGS, CHECKIN_FEELING_VALUES } from '~/utils/checkin'
 
 const earliestBirthDate = new Date('1900-01-01T00:00:00Z')
 
@@ -78,6 +79,8 @@ export const patientPendingActivitySchema = z.array(z.object({
   dueAt: z.string().nullable().optional(),
 }))
 
+// ACO-103: sono e sentimentos são opcionais. Na resposta, um sentimento que o
+// front ainda não conhece não derruba a tela (aparece pelo código).
 export const patientCheckinSchema = z.object({
   day: z.string().date(),
   updatedAt: z.string().datetime({ offset: true }),
@@ -85,6 +88,11 @@ export const patientCheckinSchema = z.object({
   mood: z.number().int().min(1).max(5),
   note: z.string().nullable().optional(),
   createdAt: z.string(),
+  sleepBedtime: z.string().nullable().optional(),
+  sleepWakeTime: z.string().nullable().optional(),
+  sleepMinutes: z.number().int().nonnegative().nullable().optional(),
+  sleepQuality: z.number().int().min(1).max(5).nullable().optional(),
+  feelings: z.array(z.string()).nullable().optional().transform(value => value ?? []),
 })
 
 export const patientCheckinsSchema = z.array(patientCheckinSchema)
@@ -95,10 +103,29 @@ export const patientProcessSummarySchema = z.object({
   checkinCount: z.number().int().nonnegative(),
 })
 
+const sleepClockSchema = (field: string) => z.string({ invalid_type_error: `Horário em que ${field} inválido.` })
+  .regex(/^([01]\d|2[0-3]):(00|15|30|45)$/, `Horário em que ${field} inválido: use HH:MM, em passos de 15 minutos.`)
+
 export const patientCheckinInputSchema = z.object({
-  mood: z.number().int().min(1).max(5),
+  mood: z.number({ required_error: 'Escolha como você está, de 1 a 5.', invalid_type_error: 'Escolha como você está, de 1 a 5.' })
+    .int('Escolha como você está, de 1 a 5.').min(1, 'Escolha como você está, de 1 a 5.').max(5, 'Escolha como você está, de 1 a 5.'),
   note: z.string().trim().max(1000, 'A observação deve ter no máximo 1.000 caracteres').optional(),
-}).strict()
+  sleepBedtime: sleepClockSchema('dormiu').nullable().optional(),
+  sleepWakeTime: sleepClockSchema('acordou').nullable().optional(),
+  sleepQuality: z.number({ invalid_type_error: 'A qualidade do sono vai de 1 a 5.' })
+    .int('A qualidade do sono vai de 1 a 5.').min(1, 'A qualidade do sono vai de 1 a 5.').max(5, 'A qualidade do sono vai de 1 a 5.')
+    .nullable().optional(),
+  feelings: z.array(z.enum(CHECKIN_FEELING_VALUES, { errorMap: () => ({ message: 'Escolha os sentimentos da lista.' }) }))
+    .max(CHECKIN_FEELINGS.length, 'Escolha os sentimentos da lista.').optional(),
+}).strict().superRefine((value, ctx) => {
+  const bed = value.sleepBedtime ?? null
+  const wake = value.sleepWakeTime ?? null
+  if ((bed == null) !== (wake == null)) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: [bed == null ? 'sleepBedtime' : 'sleepWakeTime'], message: 'Informe o horário em que dormiu e o horário em que acordou, ou deixe os dois em branco.' })
+  } else if (bed != null && bed === wake) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['sleepWakeTime'], message: 'O horário em que acordou precisa ser diferente do horário em que dormiu.' })
+  }
+})
 
 // "Meu prontuário" da paciente (ACO-88): sessões já ocorridas, a mais recente
 // primeiro. A lista não traz o texto; `hasNotes` diz se há algum registro. A
