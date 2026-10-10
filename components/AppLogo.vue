@@ -1,10 +1,11 @@
 <script setup lang="ts">
 // Símbolo do Acolhe: três arcos (índigo, salmão e a cor do texto). Com
 // `animated`, os arcos aparecem um de cada vez, como no login do protótipo.
-withDefaults(defineProps<{ withWordmark?: boolean, size?: number, animated?: boolean }>(), {
+withDefaults(defineProps<{ withWordmark?: boolean, size?: number, animated?: boolean, onDark?: boolean }>(), {
   withWordmark: true,
   size: 24,
   animated: false,
+  onDark: false,
 })
 </script>
 
@@ -15,7 +16,7 @@ withDefaults(defineProps<{ withWordmark?: boolean, size?: number, animated?: boo
       :height="size"
       viewBox="0 0 24 24"
       fill="none"
-      stroke="hsl(var(--primary))"
+      :stroke="onDark ? '#9DB0F5' : 'hsl(var(--primary))'"
       stroke-width="2"
       stroke-linecap="round"
       aria-hidden="true"
@@ -23,7 +24,7 @@ withDefaults(defineProps<{ withWordmark?: boolean, size?: number, animated?: boo
     >
       <path pathLength="1" d="M22 17a10 10 0 0 0-20 0" />
       <path pathLength="1" d="M18 17a6 6 0 0 0-12 0" stroke="#FF7A5C" />
-      <path pathLength="1" d="M14 17a2 2 0 0 0-4 0" stroke="currentColor" />
+      <path pathLength="1" d="M14 17a2 2 0 0 0-4 0" :stroke="onDark ? '#FFFFFF' : 'currentColor'" />
     </svg>
     <span v-if="withWordmark" class="text-lg font-semibold tracking-[-0.02em]">Acolhe</span>
   </span>
