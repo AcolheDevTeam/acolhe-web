@@ -4,10 +4,12 @@ import { computed } from "vue"
 import { cn } from "@/lib/utils"
 
 // Status de salvamento em mono no cabeçalho de formulários
-// ("Salvando…", "Salvo · versão 3").
+// ("Salvando…", "Salvo · versão 3"). `savedText` troca o "Salvo" de quem
+// salva sozinho ("Salvo automaticamente").
 const props = defineProps<{
   state: "idle" | "dirty" | "saving" | "saved" | "error"
   version?: number | null
+  savedText?: string
   class?: HTMLAttributes["class"]
 }>()
 
@@ -15,7 +17,7 @@ const text = computed(() => {
   switch (props.state) {
     case "dirty": return "Alterações não salvas"
     case "saving": return "Salvando…"
-    case "saved": return props.version ? `Salvo · versão ${props.version}` : "Salvo"
+    case "saved": return props.version ? `Salvo · versão ${props.version}` : props.savedText ?? "Salvo"
     case "error": return "Não foi possível salvar"
     default: return ""
   }
