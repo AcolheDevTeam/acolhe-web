@@ -2,9 +2,10 @@
 import { ChevronLeft, RefreshCw } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
 
-// Leitura de uma sessão do "Meu prontuário" (ACO-88). A API tem um único texto
-// livre por sessão: ele aparece como foi escrito, com as quebras de linha, e
-// sem as seções Demanda/Evolução/Conduta do protótipo, que ainda não existem.
+// Leitura de uma sessão do "Meu prontuário" (ACO-88). Desde a ACO-101 o
+// registro vem em seções (Demanda, Evolução, Conduta, Encaminhamento); o texto
+// livre dos registros antigos aparece como "Anotações". O texto é exibido como
+// foi escrito, com as quebras de linha.
 definePageMeta({ layout: 'patient', middleware: ['auth', 'patient-only'] })
 
 const route = useRoute()
@@ -34,9 +35,16 @@ const meta = computed(() => session.value ? historyDetailMeta(session.value) : '
       <article v-if="session" class="flex flex-col gap-5">
         <PatientPageHeader :title="`Sessão ${session.number} · ${historyDateLabel(session.occurredAt)}`" :description="meta || undefined" />
         <section class="animate-rise flex flex-col gap-3 rounded-2xl border bg-card p-5 [animation-delay:60ms]" aria-labelledby="t-registro">
-          <h2 id="t-registro" class="label-mono">Registro da sessão</h2>
-          <p v-if="session.notes.trim()" class="whitespace-pre-wrap break-words text-[15px] leading-relaxed">{{ session.notes }}</p>
-          <p v-else class="text-sm text-muted-foreground">Sua psicóloga não fez anotações nesta sessão.</p>
+          <h2 id="t-registro" class="sr-only">Registro da sessão</h2>
+          <ClinicalRecordSections
+            audience="patient"
+            :demand="session.demand"
+            :evolution="session.evolution"
+            :conduct="session.conduct"
+            :referral="session.referral"
+            :notes="session.notes"
+            empty-text="Sua psicóloga não fez anotações nesta sessão."
+          />
         </section>
         <p class="font-mono text-xs text-muted-foreground">{{ historyVersionLabel(session) }}</p>
       </article>

@@ -122,9 +122,15 @@ async function send() {
   catch (err) {
     const { status: code, technical } = apiErrorInfo(err)
     // 400 da API nomeia a pergunta e o motivo, em português: mostra como veio.
-    submitError.value = code === 400 && technical
+    // Mensagens técnicas ("corpo inválido", "id inválido") e o JSON do Zod do
+    // BFF não servem à paciente: caem no texto genérico.
+    const readable = code === 400 && technical
+      && !/^(corpo|id|dados)\b.*inválid/i.test(technical)
+      && !/^[[{]/.test(technical.trim())
+    submitError.value = readable
       ? technical
       : apiErrorMessage(err, {
+          400: 'Confira suas respostas e tente de novo.',
           409: 'Esta atividade não está mais disponível para resposta. Volte e recarregue a lista.',
           404: 'Esta atividade não existe mais.',
         })

@@ -51,6 +51,9 @@ const ordered = computed(() =>
       </div>
     </template>
 
+    <!-- Prontuário da sessão mais recente em seções (protótipo Ficha, aba Prontuário). -->
+    <SessionRecordPreview v-if="!loading && ordered[0]" :key="ordered[0].id" :session-id="ordered[0].id" heading="Última sessão" />
+
     <div class="flex flex-wrap items-center justify-between gap-3">
       <p class="label-mono">Sessões · {{ ordered.length }}</p>
       <RecordExportButton />

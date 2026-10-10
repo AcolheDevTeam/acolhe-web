@@ -138,7 +138,18 @@ export interface Session {
   modality?: SessionModality | string
   durationMin?: number
   status: SessionStatus | string
+  // Texto livre dos registros anteriores ao prontuário em seções (ACO-101).
+  // Só leitura; aparece como "Anotações".
   notes?: string
+  // Seções do prontuário (ACO-101). Vêm na leitura de uma sessão, não nas listas.
+  demand?: string
+  evolution?: string
+  conduct?: string
+  referral?: string
+  // Sessão concluída (ACO-101). Não trava: edições depois viram novas versões.
+  concluded?: boolean
+  concludedAt?: string | null
+  updatedAt?: string | null
 }
 
 export type ActivityType = 'record' | 'scale' | 'checklist' | 'checkin'

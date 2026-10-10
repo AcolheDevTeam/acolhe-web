@@ -101,8 +101,9 @@ export const patientCheckinInputSchema = z.object({
 }).strict()
 
 // "Meu prontuário" da paciente (ACO-88): sessões já ocorridas, a mais recente
-// primeiro. A lista não traz o texto; `hasNotes` diz se há anotação. A leitura
-// de uma sessão traz o texto livre (`notes`) e a duração.
+// primeiro. A lista não traz o texto; `hasNotes` diz se há algum registro. A
+// leitura de uma sessão traz as seções do prontuário (ACO-101), o texto livre
+// dos registros antigos (`notes`, exibido como "Anotações") e a duração.
 export const patientRecordSessionSchema = z.object({
   id: z.string().uuid(),
   number: z.number().int().positive(),
@@ -118,6 +119,11 @@ export const patientRecordSessionsSchema = z.array(patientRecordSessionSchema)
 export const patientRecordSessionDetailSchema = patientRecordSessionSchema.extend({
   durationMinutes: z.number().int().positive().nullable().optional(),
   notes: z.string(),
+  demand: z.string().default(''),
+  evolution: z.string().default(''),
+  conduct: z.string().default(''),
+  referral: z.string().default(''),
+  concluded: z.boolean().default(false),
 })
 
 export type PatientRecordSession = z.infer<typeof patientRecordSessionSchema>

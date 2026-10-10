@@ -30,6 +30,16 @@ describe('contrato do Meu prontuário', () => {
     expect(patientRecordSessionDetailSchema.safeParse({ ...base, notes: 'x', durationMinutes: 50 }).success).toBe(true)
   })
 
+  it('mantém as seções do prontuário e o texto antigo, com padrão vazio (ACO-101)', () => {
+    const parsed = patientRecordSessionDetailSchema.parse({
+      ...base, notes: 'Texto antigo.', evolution: 'Relatou melhora.', conduct: 'Manter registros.', concluded: true,
+    })
+    expect(parsed).toMatchObject({
+      notes: 'Texto antigo.', demand: '', evolution: 'Relatou melhora.', conduct: 'Manter registros.', referral: '', concluded: true,
+    })
+    expect(patientRecordSessionDetailSchema.parse({ ...base, notes: '' }).concluded).toBe(false)
+  })
+
   it('recusa id que não é uuid', () => {
     expect(patientRecordSessionsSchema.safeParse([{ ...base, id: '1' }]).success).toBe(false)
   })
