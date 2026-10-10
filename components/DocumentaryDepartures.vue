@@ -60,13 +60,13 @@ async function download(departure: Departure) {
     <p class="text-sm text-destructive">Não foi possível carregar seus cadernos agora. O prazo continua valendo; tente de novo.</p>
     <Button variant="outline" @click="refresh()">Tentar novamente</Button>
   </div>
-  <section v-else-if="data?.length" :class="props.framed ? 'rounded-lg border bg-card p-5' : ''" aria-labelledby="saidas-titulo">
+  <section v-else-if="data?.length" :class="props.framed ? 'rounded-2xl border bg-card p-6' : ''" aria-labelledby="saidas-titulo">
     <h2 id="saidas-titulo" class="label-mono">Cadernos de clínicas anteriores</h2>
     <p class="mt-2 text-sm text-muted-foreground">
       Ninguém da clínica tem acesso aos seus cadernos. Baixe uma cópia completa, com o histórico, antes do fim do prazo.
       Depois disso, eles ficam lacrados.
     </p>
-    <ul class="mt-4 divide-y rounded-lg border">
+    <ul class="mt-4 divide-y rounded-xl border">
       <li
         v-for="departure in data"
         :key="departure.organizationId"

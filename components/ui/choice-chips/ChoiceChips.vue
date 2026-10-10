@@ -9,10 +9,19 @@ import { cn } from "@/lib/utils"
 // - Escolha única (padrão): `radiogroup` com `radio`, uma parada de Tab e setas
 //   movendo a seleção (tabindex móvel).
 // - `multiple`: cada chip é um `checkbox` independente; o modelo é uma lista.
+// - `variant="strong"`: filtro forte do protótipo (pílula de 36px, ativo em
+//   Noite com texto branco), como os tipos do Registro Documental.
+// - `manual`: as setas só movem o foco; Enter/Espaço seleciona. Para quando
+//   trocar de opção tem custo (ex.: confirmar descarte de rascunho).
+// - `disabled` usa aria-disabled: o chip continua focável e o foco não cai
+//   para o body enquanto, por exemplo, um salvamento está em andamento.
 const props = defineProps<{
   options: { value: T, label: string }[]
   label: string
   multiple?: boolean
+  variant?: "soft" | "strong"
+  manual?: boolean
+  disabled?: boolean
   class?: HTMLAttributes["class"]
 }>()
 const model = defineModel<T | T[]>({ required: true })
@@ -21,6 +30,7 @@ const selected = (value: T) =>
   Array.isArray(model.value) ? model.value.includes(value) : model.value === value
 
 function toggle(value: T) {
+  if (props.disabled) return
   if (!props.multiple) {
     model.value = value
     return
@@ -46,7 +56,7 @@ function onKeydown(event: KeyboardEvent, index: number) {
   }[event.key]
   if (next === undefined) return
   event.preventDefault()
-  model.value = props.options[next]!.value
+  if (!props.manual && !props.disabled) model.value = props.options[next]!.value
   buttons.value[next]?.focus()
 }
 </script>
@@ -65,10 +75,12 @@ function onKeydown(event: KeyboardEvent, index: number) {
       :role="multiple ? 'checkbox' : 'radio'"
       :aria-checked="selected(option.value)"
       :tabindex="multiple || index === activeIndex ? 0 : -1"
+      :aria-disabled="disabled || undefined"
       :class="cn(
-        'h-8 rounded-full border px-3 text-[13px] transition-[background-color,border-color,color] duration-200 ease-out focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/15',
+        'rounded-full border transition-[background-color,border-color,color] duration-200 ease-out focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/15 aria-disabled:cursor-not-allowed aria-disabled:opacity-45',
+        variant === 'strong' ? 'h-9 px-3.5 text-sm font-medium' : 'h-8 px-3 text-[13px]',
         selected(option.value)
-          ? 'border-selected-border bg-accent text-success'
+          ? (variant === 'strong' ? 'border-brand bg-brand text-primary-foreground' : 'border-selected-border bg-accent text-success')
           : 'border-border bg-card text-secondary-foreground hover:border-input-hover',
       )"
       @click="toggle(option.value)"
