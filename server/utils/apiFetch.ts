@@ -15,6 +15,7 @@ export async function apiFetch<T>(
     return await $fetch<T>(`${config.apiUrl}${path}`, {
       ...opts,
       headers: {
+        ...clientHeaders(event),
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
         ...opts.headers,
       },

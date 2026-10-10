@@ -92,6 +92,8 @@ function isActive(to: string) {
   return route.path === to || route.path.startsWith(`${to}/`)
 }
 
+const settingsPath = computed(() => user?.role === 'psychologist' ? '/ajustes/perfil' : '/ajustes/seguranca')
+
 const { logout, isLoggingOut } = useLogout()
 
 const displayName = computed(() => user?.name ?? user?.email ?? 'Minha conta')
@@ -182,15 +184,22 @@ const initials = computed(() =>
         <p class="truncate text-sm font-semibold">{{ displayName }}</p>
         <p v-if="user?.crp" class="truncate font-mono text-[11px] text-muted-foreground">CRP {{ user.crp }}</p>
       </div>
-      <!-- Ajustes ainda não existe; fica visível e desabilitado, como antes. -->
-      <span
-        aria-disabled="true"
-        title="Ajustes · em breve"
-        class="flex size-9 shrink-0 cursor-not-allowed items-center justify-center rounded-lg text-muted-foreground/50"
+      <!-- Ajustes (ACO-98): a engrenagem abre Perfil; quem só administra a
+           clínica não tem perfil de psicóloga e cai em Segurança. -->
+      <NuxtLink
+        :to="settingsPath"
+        aria-label="Ajustes"
+        title="Ajustes"
+        :aria-current="route.path.startsWith('/ajustes') ? 'page' : undefined"
+        :class="[
+          'flex size-9 shrink-0 items-center justify-center rounded-lg transition-colors',
+          route.path.startsWith('/ajustes')
+            ? 'bg-accent text-accent-foreground'
+            : 'text-muted-foreground hover:bg-surface-hover hover:text-foreground',
+        ]"
       >
         <Settings class="size-[18px]" :stroke-width="1.7" />
-        <span class="sr-only">Ajustes (em breve)</span>
-      </span>
+      </NuxtLink>
       <Button
         variant="ghost"
         size="icon-sm"

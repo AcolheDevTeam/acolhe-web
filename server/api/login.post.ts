@@ -9,6 +9,7 @@ export default defineEventHandler(async (event) => {
     res = await $fetch<{ token: string, user: unknown }>(`${config.apiUrl}/login`, {
       method: 'POST',
       body,
+      headers: clientHeaders(event),
     })
   }
   catch (error) {
