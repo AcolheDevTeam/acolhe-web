@@ -29,10 +29,9 @@ export const FOUNDERS_LIMIT = 50
 
 const shared = [
   'Agenda com confirmação da paciente',
-  'Prontuário por sessão, com versões',
+  'Prontuário por sessão',
   'Atividades e check-ins entre as sessões',
   'Registro Documental cifrado, só seu',
-  'Exportação dos dados (LGPD)',
 ]
 
 export const PLANS: Plan[] = [
