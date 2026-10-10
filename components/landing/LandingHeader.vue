@@ -49,8 +49,7 @@ onBeforeUnmount(() => {
     :class="scrolled ? 'border-border bg-background/80 backdrop-blur-md backdrop-saturate-150' : 'border-transparent bg-transparent'"
   >
     <div
-      class="mx-auto flex max-w-[1200px] items-center gap-6 px-4 transition-[height] duration-300 ease-[cubic-bezier(.2,.7,.2,1)] md:px-8"
-      class="h-16 md:h-[72px]"
+      class="mx-auto flex h-16 max-w-[1200px] items-center gap-6 px-4 md:h-[72px] md:px-8"
     >
       <NuxtLink to="/" aria-label="Acolhe, início" class="shrink-0 rounded-md">
         <AppLogo :size="26" />
