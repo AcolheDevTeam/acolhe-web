@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button'
 
 definePageMeta({ layout: 'patient', middleware: ['auth', 'patient-only'] })
 
-const { me, context, nextSession, activities, checkins, summary, pending, error } = usePatientPortal()
+const { me, context, nextSession, activities, checkins, pending, error } = usePatientPortal()
 const confirmationSubmitting = ref(false)
 const confirmationError = ref('')
 const now = useNow({ interval: 60000 })
@@ -38,41 +38,45 @@ const firstName = computed(() => (context.data.value?.fullName ?? me.value?.pati
 const eyebrow = patientEyebrowDate()
 
 async function onCheckinSaved() {
-  await Promise.all([checkins.refresh(), summary.refresh()])
+  await checkins.refresh()
 }
 
+const pendingLabel = computed(() => {
+  const count = activities.data.value.length
+  return count === 1 ? '1 pendente' : `${count} pendentes`
+})
+
+// "Quinta, 9 de outubro, 14h00" (horário de Brasília).
 function formatDate(value: string) {
-  return new Intl.DateTimeFormat('pt-BR', { weekday: 'long', day: 'numeric', month: 'long', timeZone: APP_TIMEZONE }).format(new Date(value))
-}
-
-function formatTime(value: string) {
-  return new Intl.DateTimeFormat('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: APP_TIMEZONE }).format(new Date(value))
+  const date = new Date(value)
+  const day = new Intl.DateTimeFormat('pt-BR', { weekday: 'long', day: 'numeric', month: 'long', timeZone: APP_TIMEZONE }).format(date).split('-feira').join('')
+  const time = new Intl.DateTimeFormat('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: APP_TIMEZONE }).format(date).replace(':', 'h')
+  return `${day.charAt(0).toUpperCase()}${day.slice(1)}, ${time}`
 }
 </script>
 
 <template>
   <div class="flex flex-col gap-6">
-    <PatientPageHeader :eyebrow="eyebrow" :title="`Oi${firstName ? `, ${firstName}` : ''}.`" />
+    <PatientPageHeader :eyebrow="eyebrow" :title="`Oi${firstName ? `, ${firstName}` : ''}.`" account />
 
     <PortalLoadState :pending="pending" :error="error">
       <div class="flex flex-col gap-6">
-        <section class="animate-rise flex flex-col gap-3.5 rounded-3xl bg-brand p-5 text-brand-foreground" aria-labelledby="t-sessao">
-          <h2 id="t-sessao" class="label-mono text-brand-muted">Sua próxima sessão</h2>
+        <section class="animate-rise flex flex-col gap-3.5 rounded-[18px] bg-brand p-5 text-brand-foreground [animation-delay:80ms]" aria-labelledby="t-sessao">
+          <h2 id="t-sessao" class="label-mono font-medium text-brand-muted">Sua próxima sessão</h2>
           <div>
             <p class="text-2xl font-semibold tracking-[-0.02em] text-white">
               {{ nextSession.data.value ? formatDate(nextSession.data.value.scheduledFor) : 'Ainda não há uma sessão marcada' }}
             </p>
-            <p class="mt-1 text-sm text-brand-foreground/80">
+            <p class="mt-1 text-sm text-[#C3CAF0]">
               <template v-if="nextSession.data.value">
-                {{ formatTime(nextSession.data.value.scheduledFor) }} · {{ nextSession.data.value.durationMinutes }} min ·
-                {{ nextSession.data.value.modality === 'online' ? 'Online' : 'Presencial' }}
+                {{ nextSession.data.value.modality === 'online' ? 'Online' : 'Presencial' }} · {{ nextSession.data.value.durationMinutes }} min
               </template>
               <template v-else>Quando houver uma nova sessão, ela aparecerá aqui.</template>
             </p>
           </div>
           <div aria-live="polite">
-            <p v-if="nextSession.data.value?.status === 'confirmed'" class="flex items-center gap-2 text-sm text-white"><Check class="size-4" />Presença confirmada</p>
-            <Button v-else-if="canConfirm" variant="on-brand" class="w-full" :loading="confirmationSubmitting" @click="confirmAppointment">
+            <p v-if="nextSession.data.value?.status === 'confirmed'" class="animate-fade flex h-12 items-center gap-2 text-[15px] font-medium text-highlight"><Check class="size-5" :stroke-width="2.4" aria-hidden="true" />Presença confirmada.</p>
+            <Button v-else-if="canConfirm" variant="on-brand" size="xl" class="w-full" :loading="confirmationSubmitting" @click="confirmAppointment">
               {{ confirmationSubmitting ? 'Confirmando…' : 'Confirmar presença' }}
             </Button>
           </div>
@@ -80,23 +84,19 @@ function formatTime(value: string) {
         </section>
 
         <PatientCheckinCard
+          class="animate-rise [animation-delay:160ms]"
           :checkins="checkins.data.value ?? []"
           @saved="onCheckinSaved"
           @conflict="checkins.refresh()"
         />
 
-        <section class="flex flex-col gap-3" aria-labelledby="t-atividades">
-          <div class="flex items-center justify-between">
-            <h2 id="t-atividades" class="label-mono">Atividades · {{ activities.data.value.length }} pendentes</h2>
-            <NuxtLink v-if="activities.data.value.length > 3" to="/patient/activities" class="text-sm font-medium text-primary">Ver todas</NuxtLink>
+        <section class="animate-rise flex flex-col gap-3 [animation-delay:240ms]" aria-labelledby="t-atividades">
+          <div class="flex items-baseline justify-between gap-3">
+            <h2 id="t-atividades" class="text-lg font-semibold tracking-[-0.01em]">Atividades</h2>
+            <span class="font-mono text-xs text-muted-foreground">{{ pendingLabel }}</span>
           </div>
           <PatientActivityList :activities="activities.data.value" :limit="3" />
-        </section>
-
-        <section class="grid grid-cols-3 gap-3 rounded-2xl border bg-card p-5" aria-label="Resumo do processo">
-          <div><p class="text-2xl font-semibold tabular-nums">{{ summary.data.value.sessionCount }}</p><p class="text-xs text-muted-foreground">sessões</p></div>
-          <div><p class="text-2xl font-semibold tabular-nums">{{ summary.data.value.pendingActivityCount }}</p><p class="text-xs text-muted-foreground">pendentes</p></div>
-          <div><p class="text-2xl font-semibold tabular-nums">{{ summary.data.value.checkinCount }}</p><p class="text-xs text-muted-foreground">check-ins</p></div>
+          <NuxtLink v-if="activities.data.value.length > 3" to="/patient/activities" class="self-start text-sm font-medium text-primary">Ver todas as atividades</NuxtLink>
         </section>
       </div>
     </PortalLoadState>

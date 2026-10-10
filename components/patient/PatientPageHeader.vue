@@ -11,9 +11,9 @@ import {
 } from '@/components/ui/dropdown-menu'
 
 // Cabeçalho das telas da paciente (protótipo): eyebrow mono + H1 e o avatar à
-// direita. No protótipo o avatar leva a Ajustes; enquanto Ajustes não existe,
-// ele abre um menu com "Sair".
-defineProps<{ title: string, eyebrow?: string, description?: string }>()
+// direita (só no Início, como no protótipo: `account`). No protótipo o avatar
+// leva a Ajustes; enquanto Ajustes não existe, ele abre um menu com "Sair".
+defineProps<{ title: string, eyebrow?: string, description?: string, account?: boolean }>()
 
 const { data: me } = useFetch<User | null>('/api/me', { key: 'me' })
 const { logout, isLoggingOut } = useLogout()
@@ -22,13 +22,13 @@ const initials = computed(() => name.value.split(' ').map(p => p[0]).filter(Bool
 </script>
 
 <template>
-  <header class="animate-rise flex items-start justify-between gap-4">
+  <header class="animate-rise flex items-center justify-between gap-4">
     <div class="flex min-w-0 flex-col gap-1.5">
       <p v-if="eyebrow" class="label-mono">{{ eyebrow }}</p>
-      <h1 class="text-[30px] font-semibold leading-[1.1] tracking-[-0.03em]">{{ title }}</h1>
-      <p v-if="description" class="text-sm leading-relaxed text-muted-foreground">{{ description }}</p>
+      <h1 :class="['font-semibold leading-[1.1] tracking-[-0.03em]', account ? 'text-[30px]' : 'text-[28px]']">{{ title }}</h1>
+      <p v-if="description || $slots.description" class="flex items-center gap-1.5 text-[13px] leading-relaxed text-muted-foreground"><slot name="description">{{ description }}</slot></p>
     </div>
-    <DropdownMenu>
+    <DropdownMenu v-if="account">
       <DropdownMenuTrigger
         class="flex size-11 shrink-0 items-center justify-center rounded-full bg-positive-soft text-sm font-semibold text-positive focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/15"
         aria-label="Sua conta"
