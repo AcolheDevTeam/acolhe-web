@@ -146,9 +146,9 @@ export interface Session {
   evolution?: string
   conduct?: string
   referral?: string
-  // Preenchido quando a sessão foi concluída e o prontuário travou.
-  lockedAt?: string | null
-  lockedReason?: string | null
+  // Sessão concluída (ACO-101). Não trava: edições depois viram novas versões.
+  concluded?: boolean
+  concludedAt?: string | null
   updatedAt?: string | null
 }
 

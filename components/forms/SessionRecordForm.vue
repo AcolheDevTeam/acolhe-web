@@ -9,10 +9,12 @@ import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Card } from '@/components/ui/card'
 import { InlineNotice } from '@/components/ui/inline-notice'
-import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
+import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
+import { Undo2 } from 'lucide-vue-next'
 
 // Prontuário da sessão em quatro seções (ACO-101). Salvar é explícito
-// ("Salvar rascunho"), como no resto do app; "Concluir sessão" grava e trava.
+// ("Salvar rascunho"), como no resto do app. "Concluir sessão" grava uma
+// versão e marca a sessão como realizada; editar depois gera nova versão.
 const props = defineProps<{ session: Session, title?: string }>()
 const emit = defineEmits<{
   saved: [session: Session]
@@ -22,6 +24,8 @@ const emit = defineEmits<{
 }>()
 const dirty = ref(false)
 const conflict = ref(false)
+// Prontuário travado por outro motivo que não a conclusão (423).
+const blocked = ref(false)
 const failed = ref(false)
 const concluding = ref(false)
 const { handleSubmit, isSubmitting, resetForm, values: formValues } = useForm({ validationSchema: toTypedSchema(updateSessionRecordSchema) })
@@ -41,8 +45,13 @@ function resetToSaved() {
   failed.value = false
 }
 watch(() => [props.session.id, props.session.version], () => {
+  // Nunca apaga texto não salvo por baixo do usuário: com alterações
+  // pendentes, a troca de versão só acontece por "Recarregar prontuário",
+  // que pede confirmação antes.
+  if (dirty.value) return
   resetToSaved()
   conflict.value = false
+  blocked.value = false
 }, { immediate: true })
 
 const placeholders: Record<string, string> = {
@@ -52,24 +61,41 @@ const placeholders: Record<string, string> = {
 function statusOf(error: unknown) {
   return apiErrorInfo(error).status
 }
-// Mensagens por status (A6): versão velha, sessão já concluída, tamanho, vínculo.
+// A API diz qual campo falhou ("o campo Conduta passa do limite…"); o BFF
+// repassa essa frase em data.message. Só ela é exibida, nunca outro texto técnico.
+function fieldMessage(error: unknown): string | undefined {
+  const technical = apiErrorInfo(error).technical
+  if (!technical || !/^o campo .+/.test(technical)) return undefined
+  return `${technical.charAt(0).toUpperCase()}${technical.slice(1)}.`
+}
+const CONFLICT_TEXT = 'O prontuário foi alterado em outra aba ou dispositivo. Seu texto continua aqui: copie o que precisar antes de recarregar.'
+// Mensagens por status (A6): versão velha, consulta com falta, tamanho, vínculo.
 function recordErrorMessage(error: unknown, action: 'save' | 'conclude') {
   return apiErrorMessage(error, {
-    400: 'Confira o tamanho dos campos: cada um aceita até 10.000 caracteres.',
+    400: fieldMessage(error) ?? 'Alguns campos não foram aceitos. Cada um aceita até 10.000 caracteres.',
     403: 'A edição exige vínculo ativo com a paciente.',
     404: 'Esta sessão não está disponível para você.',
-    409: 'O prontuário foi alterado em outra aba ou dispositivo. Copie seu texto antes de recarregar.',
-    423: 'Esta sessão já foi concluída e o prontuário não aceita mais edições.',
+    409: action === 'conclude' && apiErrorInfo(error).technical?.includes('falta ou cancelada')
+      ? 'Esta sessão está ligada a uma consulta marcada como falta ou cancelada e não pode ser concluída.'
+      : CONFLICT_TEXT,
+    423: 'Este prontuário está bloqueado para edição.',
     default: action === 'conclude' ? 'Não foi possível concluir a sessão agora.' : 'Não foi possível salvar o prontuário agora.',
   })
 }
 function handleWriteError(error: unknown, action: 'save' | 'conclude') {
   failed.value = true
   const status = statusOf(error)
-  conflict.value = status === 409
+  const technical = apiErrorInfo(error).technical ?? ''
+  // O texto digitado fica no formulário em qualquer erro.
+  conflict.value = status === 409 && !technical.includes('falta ou cancelada')
+  blocked.value = status === 423
   toast.error(recordErrorMessage(error, action))
-  // Concluída em outra aba: recarrega para mostrar o prontuário travado.
-  if (status === 423) emit('reload')
+}
+// Recarregar descarta o texto não salvo: pede a mesma confirmação da saída.
+async function reloadRecord() {
+  if (!(await confirmDiscard())) return
+  dirty.value = false
+  emit('reload')
 }
 
 async function write(values: UpdateSessionRecordInput, action: 'save' | 'conclude') {
@@ -159,10 +185,12 @@ onBeforeUnmount(() => {
   decide(false)
 })
 
-const lockedLabel = computed(() => props.session.lockedAt ? formatDateTime(props.session.lockedAt) : '')
+const concludedLabel = computed(() => props.session.concludedAt ? formatDateTime(props.session.concludedAt) : '')
+const nextVersion = computed(() => (props.session.version ?? 1) + 1)
 const disabled = computed(() => busy.value || exitProtection.pending.value)
-const conclusionTitle = computed(() => props.title ? `Concluir a ${props.title.charAt(0).toLowerCase()}${props.title.slice(1)}?` : 'Concluir esta sessão?')
-// Contador só perto do limite, para não poluir o formulário.
+const conclusionTitle = computed(() => props.title && props.title !== 'Sessão' ? `Concluir a ${props.title.charAt(0).toLowerCase()}${props.title.slice(1)}?` : 'Concluir esta sessão?')
+// Contador só perto do limite, para não poluir o formulário. Fica ligado ao
+// campo pelo aria-describedby do FormControl (FormDescription).
 function nearLimit(key: string) {
   const length = [...String((formValues as Record<string, unknown>)[key] ?? '')].length
   return length > 9000 ? `${length.toLocaleString('pt-BR')} de 10.000 caracteres` : ''
@@ -180,9 +208,7 @@ function nearLimit(key: string) {
         <h2 id="t-pront" class="label-mono">Prontuário</h2>
 
         <template v-if="session.locked">
-          <InlineNotice tone="neutral">
-            Sessão concluída<template v-if="lockedLabel"> em {{ lockedLabel }}</template>. O prontuário não aceita mais edições.
-          </InlineNotice>
+          <InlineNotice tone="neutral">Este prontuário está bloqueado para edição.</InlineNotice>
           <ClinicalRecordSections
             :demand="session.demand"
             :evolution="session.evolution"
@@ -193,6 +219,10 @@ function nearLimit(key: string) {
         </template>
 
         <template v-else>
+          <InlineNotice v-if="session.concluded" tone="positive">
+            Sessão concluída<template v-if="concludedLabel"> em {{ concludedLabel }}</template>.
+            Se você editar, as alterações são salvas como versão {{ nextVersion }}, e o histórico fica guardado.
+          </InlineNotice>
           <!-- Registro anterior às seções: fica visível, só leitura. -->
           <section v-if="session.notes?.trim()" aria-labelledby="t-notes" class="flex flex-col gap-1.5 rounded-xl bg-secondary px-4 py-3">
             <h3 id="t-notes" class="label-mono">Anotações</h3>
@@ -212,12 +242,13 @@ function nearLimit(key: string) {
                   @update:model-value="onInput"
                 />
               </FormControl>
-              <p v-if="nearLimit(section.key)" class="font-mono text-xs text-muted-foreground">{{ nearLimit(section.key) }}</p>
+              <FormDescription v-if="nearLimit(section.key)" class="font-mono text-xs">{{ nearLimit(section.key) }}</FormDescription>
               <FormMessage />
             </FormItem>
           </FormField>
-          <p class="text-xs leading-relaxed text-muted-foreground">Todos os campos são opcionais. Salve o rascunho quando quiser; ao concluir, o prontuário fica fechado para edição.</p>
-          <InlineNotice v-if="conflict" tone="warning">O prontuário foi alterado em outra aba ou dispositivo. Copie seu texto antes de recarregar.</InlineNotice>
+          <p v-if="!session.concluded" class="text-xs leading-relaxed text-muted-foreground">Todos os campos são opcionais. Salve o rascunho quando quiser e conclua a sessão quando terminar.</p>
+          <InlineNotice v-if="conflict" tone="warning">{{ CONFLICT_TEXT }}</InlineNotice>
+          <InlineNotice v-if="blocked" tone="warning">Este prontuário foi bloqueado para edição. Seu texto continua aqui: copie o que precisar antes de recarregar.</InlineNotice>
         </template>
       </Card>
       <div v-if="$slots.aside" class="flex min-w-0 flex-[2_1_320px] flex-col gap-6">
@@ -229,27 +260,36 @@ function nearLimit(key: string) {
       v-if="!session.locked"
       class="sticky bottom-0 z-10 -mx-4 flex animate-rise flex-wrap justify-end gap-2.5 border-t bg-background px-4 pt-3 pb-[max(12px,env(safe-area-inset-bottom))] [animation-delay:.3s] md:static md:mx-0 md:px-0 md:pb-0 md:pt-2"
     >
+      <!-- No celular o descartar vira só ícone, para os três botões caberem numa linha. -->
       <Button
         type="button"
         variant="destructive-soft"
-        class="mr-auto"
+        class="mr-auto px-3 sm:px-4"
         :disabled="!dirty || disabled"
         @click="discardChanges"
       >
-        Descartar alterações
+        <Undo2 class="sm:hidden" aria-hidden="true" />
+        <span class="sr-only sm:not-sr-only">Descartar alterações</span>
       </Button>
-      <Button v-if="conflict" type="button" variant="outline" @click="emit('reload')">Recarregar prontuário</Button>
-      <Button type="submit" variant="outline" :loading="isSubmitting" :disabled="conflict || disabled">
-        {{ isSubmitting ? 'Salvando…' : 'Salvar rascunho' }}
-      </Button>
-      <Button type="button" :disabled="conflict || disabled" @click="askConclude">Concluir sessão</Button>
+      <Button v-if="conflict || blocked" type="button" variant="outline" @click="reloadRecord">Recarregar prontuário</Button>
+      <template v-if="session.concluded">
+        <Button type="submit" :loading="isSubmitting" :disabled="conflict || blocked || disabled">
+          {{ isSubmitting ? 'Salvando…' : 'Salvar alterações' }}
+        </Button>
+      </template>
+      <template v-else>
+        <Button type="submit" variant="outline" :loading="isSubmitting" :disabled="conflict || blocked || disabled">
+          {{ isSubmitting ? 'Salvando…' : 'Salvar rascunho' }}
+        </Button>
+        <Button type="button" :disabled="conflict || blocked || disabled" @click="askConclude">Concluir sessão</Button>
+      </template>
     </div>
   </form>
   <UnsavedChangesDialog :open="confirmOpen" @decision="decide" />
   <ConcludeSessionDialog
     :open="concludeOpen"
     :title="conclusionTitle"
-    :next-version="(session.version ?? 1) + (concludedVersion ? 0 : 1)"
+    :next-version="nextVersion"
     :concluded-version="concludedVersion"
     :patient-id="session.patientId"
     :pending="concluding"

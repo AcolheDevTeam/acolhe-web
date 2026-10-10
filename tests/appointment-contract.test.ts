@@ -45,7 +45,7 @@ describe('agendamento e evolução', () => {
     expect(updateSessionRecordSchema.safeParse({ evolution: 'á'.repeat(10000), version: 1 }).success).toBe(true)
     const tooLong = updateSessionRecordSchema.safeParse({ evolution: 'á'.repeat(10001), version: 1 })
     expect(tooLong.success).toBe(false)
-    expect(tooLong.error?.issues[0]?.message).toBe('Evolução: no máximo 10.000 caracteres.')
+    expect(tooLong.error?.issues[0]?.message).toBe('Evolução desta sessão: no máximo 10.000 caracteres.')
     // Emoji conta como um caractere, como na API (não como dois do UTF-16).
     expect(updateSessionRecordSchema.safeParse({ conduct: '🙂'.repeat(10000), version: 1 }).success).toBe(true)
   })

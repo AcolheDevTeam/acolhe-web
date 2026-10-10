@@ -22,6 +22,15 @@ const props = defineProps<{
   pending?: boolean
 }>()
 const emit = defineEmits<{ confirm: [], close: [] }>()
+
+// Ao trocar para "Sessão concluída", o foco vai para o título: o leitor de
+// tela anuncia o novo estado sem depender de aria-live em conteúdo trocado.
+const doneTitle = ref<{ $el?: HTMLElement } | null>(null)
+watch(() => props.concludedVersion, async (version) => {
+  if (!version) return
+  await nextTick()
+  doneTitle.value?.$el?.focus()
+})
 </script>
 
 <template>
@@ -31,8 +40,8 @@ const emit = defineEmits<{ confirm: [], close: [] }>()
         <DialogHeader>
           <DialogTitle>{{ props.title }}</DialogTitle>
           <DialogDescription>
-            O prontuário é salvo como versão {{ props.nextVersion }} e não pode mais ser editado.
-            A sessão fica marcada como realizada.
+            A sessão fica marcada como realizada e o prontuário é salvo como versão {{ props.nextVersion }}.
+            Edições depois disso geram uma nova versão, e o histórico fica guardado.
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
@@ -44,10 +53,8 @@ const emit = defineEmits<{ confirm: [], close: [] }>()
       </template>
       <template v-else>
         <DialogHeader>
-          <DialogTitle>Sessão concluída</DialogTitle>
-          <DialogDescription aria-live="polite">
-            Prontuário salvo na versão {{ props.concludedVersion }}.
-          </DialogDescription>
+          <DialogTitle ref="doneTitle" tabindex="-1" class="outline-none">Sessão concluída</DialogTitle>
+          <DialogDescription>Prontuário salvo na versão {{ props.concludedVersion }}.</DialogDescription>
         </DialogHeader>
         <DialogFooter>
           <Button variant="outline" as-child>

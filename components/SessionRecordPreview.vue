@@ -19,7 +19,7 @@ const meta = computed(() => {
 const state = computed(() => {
   const s = session.value
   if (!s) return ''
-  return `${s.locked ? 'Concluída' : 'Em registro'} · versão ${s.version ?? 1}`
+  return `${s.concluded ? 'Concluída' : 'Em registro'} · versão ${s.version ?? 1}`
 })
 </script>
 
@@ -44,7 +44,7 @@ const state = computed(() => {
       />
       <Button variant="outline" class="self-start" as-child>
         <NuxtLink :to="`/sessions/${session.id}`">
-          {{ session.locked ? 'Abrir sessão' : 'Continuar registro' }}
+          {{ session.concluded ? 'Abrir sessão' : 'Continuar registro' }}
           <ArrowRight aria-hidden="true" />
         </NuxtLink>
       </Button>

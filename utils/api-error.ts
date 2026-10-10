@@ -44,12 +44,15 @@ export function apiErrorInfo(error: unknown): ApiErrorInfo {
     statusCode?: number
     status?: number
     response?: { status?: number, _data?: { message?: string, statusMessage?: string } }
-    data?: { message?: string, statusMessage?: string }
+    data?: { message?: string, statusMessage?: string, data?: { message?: unknown } }
     statusMessage?: string
     message?: string
   }
   const status = err.statusCode ?? err.status ?? err.response?.status
-  const technical = err.data?.message ?? err.response?._data?.message ?? err.data?.statusMessage ?? err.statusMessage ?? err.message
+  // A frase da API chega do BFF em data.data.message (relayApiError); o
+  // data.message do h3 vem vazio. Strings vazias não contam.
+  const relayed = typeof err.data?.data?.message === 'string' ? err.data.data.message : undefined
+  const technical = relayed || err.data?.message || err.response?._data?.message || err.data?.statusMessage || err.statusMessage || err.message
   return { status, technical }
 }
 

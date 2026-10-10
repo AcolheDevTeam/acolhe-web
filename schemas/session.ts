@@ -26,11 +26,14 @@ function recordSection(label: string) {
     .default('')
 }
 
+// Mensagens com o mesmo rótulo do campo na tela (e da API).
+const sectionLabel = (key: RecordSectionKey) => RECORD_SECTIONS.find(section => section.key === key)!.label
+
 export const updateSessionRecordSchema = z.object({
-  demand: recordSection('Demanda e objetivos'),
-  evolution: recordSection('Evolução'),
-  conduct: recordSection('Conduta'),
-  referral: recordSection('Encaminhamento ou encerramento'),
+  demand: recordSection(sectionLabel('demand')),
+  evolution: recordSection(sectionLabel('evolution')),
+  conduct: recordSection(sectionLabel('conduct')),
+  referral: recordSection(sectionLabel('referral')),
   version: z.number({ required_error: 'Versão do prontuário ausente. Recarregue a página.' }).int().positive(),
 })
 
