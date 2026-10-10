@@ -17,11 +17,12 @@ const items = [
 ]
 // Sem vínculo ativo, Início, Atividades e Check-in não têm dados para ela; em
 // vez do erro genérico, a tela diz o motivo e leva ao Histórico, que continua
-// aberto (CFP 01/2009, art. 5º, II).
+// aberto (CFP 01/2009, art. 5º, II), e aos Ajustes, onde ela revê os
+// consentimentos e pede os próprios dados (ACO-102).
 const { data: me } = useNuxtData<User | null>('me')
 const linkReason = computed(() => inactiveLinkReason(me.value?.patient))
 const blocked = computed(() => linkReason.value !== null && !openWithoutLink(route.path))
-// "Sair" fica no Início, que aqui não abre: o aviso oferece a saída.
+// "Sair" fica em Ajustes; o aviso também oferece a saída.
 const { logout, isLoggingOut } = useLogout()
 function isActive(to: string) {
   if (to === '/patient') return route.path === to
@@ -58,6 +59,9 @@ function isActive(to: string) {
         <div class="flex flex-wrap gap-2">
           <Button as-child>
             <NuxtLink to="/patient/historico">Ver meu histórico</NuxtLink>
+          </Button>
+          <Button variant="outline" as-child>
+            <NuxtLink to="/patient/ajustes">Abrir ajustes</NuxtLink>
           </Button>
           <Button variant="ghost" :disabled="isLoggingOut" @click="logout">{{ isLoggingOut ? 'Saindo…' : 'Sair' }}</Button>
         </div>
