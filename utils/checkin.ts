@@ -59,6 +59,12 @@ export const CHECKIN_FEELINGS = [
 export type CheckinFeeling = typeof CHECKIN_FEELINGS[number]['value']
 export const CHECKIN_FEELING_VALUES = CHECKIN_FEELINGS.map(f => f.value) as [CheckinFeeling, ...CheckinFeeling[]]
 
+// Ao editar, só os códigos que este front conhece voltam para os chips: uma
+// opção nova na API não pode travar a validação do check-in.
+export function knownFeelings(codes: readonly string[] | null | undefined): CheckinFeeling[] {
+  return (codes ?? []).filter((code): code is CheckinFeeling => (CHECKIN_FEELING_VALUES as readonly string[]).includes(code))
+}
+
 // Código desconhecido (opção nova na API) aparece como veio.
 export function feelingLabel(code: string): string {
   return CHECKIN_FEELINGS.find(f => f.value === code)?.label ?? code

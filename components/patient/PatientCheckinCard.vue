@@ -39,7 +39,6 @@ const noteId = useId()
 const sleepTitleId = useId()
 
 const sleepTotal = computed(() => sleepOn.value ? sleepDurationMinutes(bedtime.value, wakeTime.value) : null)
-const hasSleep = computed(() => sleepOn.value || sleepQuality.value != null)
 const todaySummary = computed(() => today.value ? checkinSummary(today.value) : '')
 
 function reset() {
@@ -50,10 +49,14 @@ function reset() {
 }
 
 function clearSleep() {
+  clearSleepTimes()
+  sleepQuality.value = null
+}
+
+function clearSleepTimes() {
   sleepOn.value = false
   bedtime.value = DEFAULT_BEDTIME
   wakeTime.value = DEFAULT_WAKE
-  sleepQuality.value = null
 }
 
 watch(() => today.value?.id, (id, previousId) => {
@@ -69,7 +72,9 @@ function edit() {
   if (!current) return
   mood.value = current.mood
   note.value = current.note ?? ''
-  feelings.value = [...(current.feelings ?? [])]
+  // Código que este front não conhece (opção nova na API) sai da edição em vez
+  // de travar a validação.
+  feelings.value = knownFeelings(current.feelings)
   sleepOn.value = Boolean(current.sleepBedtime && current.sleepWakeTime)
   bedtime.value = current.sleepBedtime ?? DEFAULT_BEDTIME
   wakeTime.value = current.sleepWakeTime ?? DEFAULT_WAKE
@@ -171,7 +176,7 @@ const saveLabel = computed(() => submitting.value ? 'Salvando…' : editing.valu
       <section class="flex flex-col gap-4 rounded-2xl border bg-card p-[18px]" :aria-labelledby="sleepTitleId">
         <div class="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
           <h2 :id="sleepTitleId" class="text-base font-semibold">Sono da última noite <span class="text-sm font-normal text-muted-foreground">(opcional)</span></h2>
-          <button v-if="hasSleep" type="button" class="rounded text-[13px] text-primary underline underline-offset-[3px]" :disabled="submitting" @click="clearSleep">Limpar sono</button>
+          <button v-if="sleepOn" type="button" class="rounded text-[13px] text-primary underline underline-offset-[3px]" :disabled="submitting" @click="clearSleepTimes">Remover horários</button>
         </div>
         <div v-if="sleepOn" class="flex flex-col gap-3">
           <div class="flex items-center justify-between gap-3">
@@ -183,11 +188,14 @@ const saveLabel = computed(() => submitting.value ? 'Salvando…' : editing.valu
             <TimeStepper v-model="wakeTime" label="Horário em que acordou" :disabled="submitting" />
           </div>
           <p v-if="sleepTotal != null" class="text-sm text-secondary-foreground"><strong class="font-semibold text-foreground">{{ durationLabel(sleepTotal) }}</strong> de sono</p>
-          <p v-else class="text-sm text-destructive">O horário em que acordou precisa ser diferente do horário em que dormiu.</p>
+          <p v-else class="text-sm text-destructive" role="alert">O horário em que acordou precisa ser diferente do horário em que dormiu.</p>
         </div>
         <Button v-else variant="outline" class="w-full" :disabled="submitting" @click="sleepOn = true">Informar horários de sono</Button>
         <div class="flex flex-col gap-2">
-          <span class="text-sm text-secondary-foreground" aria-hidden="true">Qualidade do sono</span>
+          <div class="flex items-baseline justify-between gap-3">
+            <span class="text-sm text-secondary-foreground" aria-hidden="true">Qualidade do sono</span>
+            <button v-if="sleepQuality != null" type="button" class="rounded text-[13px] text-primary underline underline-offset-[3px]" :disabled="submitting" @click="sleepQuality = null">Limpar qualidade</button>
+          </div>
           <RatingScale v-model="sleepQuality" label="Qualidade do sono, de 1 (ruim) a 5 (ótima)" min-label="Ruim" max-label="Ótima" :disabled="submitting" />
         </div>
       </section>

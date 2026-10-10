@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   CHECKIN_FEELINGS, checkinAverages, checkinRejectionMessage, checkinSummary, clockLabel, clockToMinutes,
-  durationLabel, durationSpoken, feelingCounts, feelingLabel, minutesToClock, scoreLabel, sleepDurationMinutes,
+  durationLabel, durationSpoken, feelingCounts, feelingLabel, knownFeelings, minutesToClock, scoreLabel, sleepDurationMinutes,
 } from '~/utils/checkin'
 import { patientCheckinInputSchema, patientCheckinSchema } from '~/schemas/patient'
 
@@ -54,6 +54,13 @@ describe('validação do check-in', () => {
     expect(old.feelings).toEqual([])
     const future = patientCheckinSchema.parse({ ...base, mood: 3, day: '2026-10-09', feelings: ['novo'], sleepMinutes: 420 })
     expect(feelingLabel(future.feelings[0]!)).toBe('novo')
+  })
+
+  it('descarta códigos desconhecidos ao editar, sem travar a validação', () => {
+    const feelings = knownFeelings(['calma', 'novo', 'foco'])
+    expect(feelings).toEqual(['calma', 'foco'])
+    expect(patientCheckinInputSchema.safeParse({ mood: 3, feelings }).success).toBe(true)
+    expect(knownFeelings(null)).toEqual([])
   })
 
   it('usa a mesma lista de sentimentos da API', () => {

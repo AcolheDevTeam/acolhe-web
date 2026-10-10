@@ -51,7 +51,6 @@ function onKeydown(event: KeyboardEvent) {
       :aria-valuemax="24 * 60 - step"
       :aria-valuetext="display"
       :aria-disabled="disabled || undefined"
-      aria-live="polite"
       class="min-w-[4.25rem] rounded-md text-center font-mono text-lg font-medium tabular-nums text-foreground focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/15"
       @keydown="onKeydown"
     >{{ display }}</span>
