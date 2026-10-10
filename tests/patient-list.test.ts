@@ -29,7 +29,7 @@ describe('patientListMeta', () => {
     expect(patientListMeta(make({ age: 28 }), now)).toBe('28 anos · há 7 meses')
     expect(patientListMeta(make({ relationshipStatus: 'pending' }), now)).toBe('convite enviado')
     expect(patientListMeta(make({ relationshipStatus: 'ended' }), now)).toBe('vínculo encerrado')
-    expect(patientListMeta(make({ relationshipStatus: 'transferred' }), now)).toBe('encaminhado')
+    expect(patientListMeta(make({ relationshipStatus: 'transferred' }), now)).toBe('encaminhado(a)')
   })
 })
 

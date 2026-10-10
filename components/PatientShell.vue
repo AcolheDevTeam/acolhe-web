@@ -164,7 +164,7 @@ const crumbs = computed(() => {
       <Clock3 class="mt-0.5 size-4 shrink-0" aria-hidden="true" />
       <p>
         <span class="font-medium text-foreground">Vínculo ainda não ativado.</span>
-        Sessões e atividades serão liberadas somente depois que a paciente aceitar o consentimento.
+        Sessões e atividades serão liberadas somente depois que o(a) paciente aceitar o consentimento.
       </p>
     </InlineNotice>
 

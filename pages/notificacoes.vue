@@ -151,7 +151,7 @@ const filterOptions = computed(() => [
       v-else-if="!items.length"
       class="animate-fade"
       title="Nenhuma notificação ainda."
-      description="Você recebe um aviso aqui quando uma paciente responde uma atividade, confirma presença ou aceita o convite."
+      description="Você recebe um aviso aqui quando um(a) paciente responde uma atividade, confirma presença ou aceita o convite."
     />
 
     <template v-else>

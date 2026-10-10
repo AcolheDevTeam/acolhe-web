@@ -57,7 +57,7 @@ const details = computed(() => {
             <h1 class="text-[28px] font-semibold leading-tight tracking-[-0.03em]">
               {{ sessionTitle }}<template v-if="session.patientName"> · {{ session.patientName }}</template>
             </h1>
-            <p class="mt-1 text-sm text-muted-foreground">Prontuário visível para a paciente</p>
+            <p class="mt-1 text-sm text-muted-foreground">Prontuário visível para o(a) paciente</p>
           </div>
         </div>
         <SaveStatus :state="saveState" :version="session.version" />
@@ -103,8 +103,8 @@ const details = computed(() => {
               <h2 id="t-rd" class="label-mono text-brand-foreground/80">Registro Documental · só você</h2>
             </div>
             <p class="text-sm leading-relaxed text-brand-muted">
-              Hipóteses, observações técnicas e planejamento ficam no caderno da paciente.
-              Não aparece para a paciente nem na exportação de dados dela.
+              Hipóteses, observações técnicas e planejamento ficam no caderno do(a) paciente.
+              Não aparece para o(a) paciente nem na exportação de dados dela(e).
             </p>
             <Button variant="on-brand-outline" class="self-start" as-child>
               <NuxtLink :to="`/patients/${session.patientId}/registry`">

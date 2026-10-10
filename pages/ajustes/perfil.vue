@@ -138,7 +138,7 @@ async function save() {
     }
     toast.error(apiErrorMessage(err, {
       400: 'Alguns dados não foram aceitos. Revise os campos e tente de novo.',
-      404: 'Não encontramos seu perfil de psicóloga. Recarregue a página.',
+      404: 'Não encontramos seu perfil de psicóloga(o). Recarregue a página.',
       // O único 503 próprio do perfil é o telefone sem a chave de cifra.
       503: 'Não foi possível salvar agora. Se você preencheu o telefone, tente de novo mais tarde ou deixe o campo em branco.',
       default: 'Não foi possível salvar o perfil agora. Tente novamente em instantes.',
@@ -184,7 +184,7 @@ function decide(leave: boolean) {
     </div>
 
     <div v-else-if="error || !profile" class="flex flex-col items-start gap-3 text-sm" role="alert">
-      <p>{{ apiErrorMessage(error, { 404: 'Não encontramos seu perfil de psicóloga.', default: 'Não foi possível carregar o perfil agora.' }) }}</p>
+      <p>{{ apiErrorMessage(error, { 404: 'Não encontramos seu perfil de psicóloga(o).', default: 'Não foi possível carregar o perfil agora.' }) }}</p>
       <Button variant="outline" @click="refresh()">Tentar de novo</Button>
     </div>
 

@@ -17,7 +17,7 @@ export const DOCUMENT_TYPE_SHORT: Record<string, string> = {
 }
 
 export const DOCUMENT_TYPE_OPTIONS = [
-  { value: 'declaration' as const, label: 'Declaração de comparecimento', description: 'Datas das sessões em que a paciente compareceu' },
+  { value: 'declaration' as const, label: 'Declaração de comparecimento', description: 'Datas das sessões em que o(a) paciente compareceu' },
   { value: 'receipt' as const, label: 'Recibo', description: 'Valor recebido pelas sessões' },
 ]
 
@@ -189,9 +189,9 @@ export function sessionChoiceLabel(iso: string): { date: string, hour: string } 
 export const GENERATE_DOCUMENT_ERRORS: ApiErrorOverrides = {
   400: 'A API recusou alguns dados do documento. Confira as sessões, a cidade e, no recibo, o valor e o CPF.',
   // A API usa 403 para duas causas; sem a frase dela, o texto cobre as duas.
-  403: 'Para emitir documentos para esta paciente, é preciso ter perfil de psicóloga e vínculo ativo com ela.',
-  404: 'Não encontramos esta paciente na sua lista. Ela pode ter sido removida.',
-  422: 'Uma das sessões escolhidas não é desta paciente. Recarregue a página e selecione as sessões de novo.',
+  403: 'Para emitir documentos para este(a) paciente, é preciso ter perfil de psicóloga(o) e vínculo ativo.',
+  404: 'Não encontramos este(a) paciente na sua lista. O cadastro pode ter sido removido.',
+  422: 'Uma das sessões escolhidas não é deste(a) paciente. Recarregue a página e selecione as sessões de novo.',
   503: 'A emissão de documentos está fora do ar agora. Tente de novo em alguns minutos.',
   default: 'Não foi possível emitir o documento. Tente de novo em instantes.',
 }
@@ -204,7 +204,7 @@ export const DOCUMENT_LINK_ERRORS: ApiErrorOverrides = {
 }
 
 export const DOCUMENT_LIST_ERRORS: ApiErrorOverrides = {
-  403: 'Só psicólogas podem ver documentos emitidos.',
+  403: 'Só psicólogas(os) podem ver documentos emitidos.',
   default: 'Não foi possível carregar os documentos. Recarregue a página.',
 }
 
@@ -226,9 +226,9 @@ export function generateDocumentErrorMessage(error: unknown): string {
   if (status === 503 && /código do documento/i.test(text))
     return 'Não foi possível gerar o código do documento. Tente de novo.'
   if (status === 403 && /restrita a psic/i.test(text))
-    return 'Só contas com perfil de psicóloga podem emitir documentos.'
+    return 'Só contas com perfil de psicóloga(o) podem emitir documentos.'
   if (status === 403 && /vínculo/i.test(text))
-    return 'O vínculo com esta paciente não está ativo. Reative o vínculo para emitir documentos.'
+    return 'O vínculo com este(a) paciente não está ativo. Reative o vínculo para emitir documentos.'
   return apiErrorMessage(error, GENERATE_DOCUMENT_ERRORS)
 }
 

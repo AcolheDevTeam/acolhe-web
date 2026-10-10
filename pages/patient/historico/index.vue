@@ -16,7 +16,7 @@ const errorText = computed(() => error.value ? patientHistoryErrorMessage(error.
   <div class="flex flex-col gap-5">
     <PatientPageHeader eyebrow="Histórico" title="Meu prontuário" />
     <p class="animate-rise text-sm leading-relaxed text-secondary-foreground [animation-delay:60ms]">
-      Este é o registro das suas sessões feito pela sua psicóloga. Se quiser uma cópia, peça a ela.
+      Este é o registro das suas sessões feito por sua(seu) psicóloga(o). Se quiser uma cópia, peça a ela(e).
     </p>
     <PortalLoadState :pending="pending && !sessions.length" :error="error" error-title="Não foi possível carregar o seu histórico." :error-text="errorText">
       <template #error-action>

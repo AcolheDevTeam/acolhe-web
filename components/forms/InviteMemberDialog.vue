@@ -28,7 +28,7 @@ const roleHint: Record<WorkspaceRole, string> = {
   psychologist: 'Atende os próprios pacientes',
   clinic_admin: 'Gerencia a equipe e vê só os números da clínica',
   clinical_supervisor: 'Sempre junto com outro papel',
-  clinic_owner: 'Também gerencia outras responsáveis',
+  clinic_owner: 'Também gerencia outros(as) responsáveis',
 }
 
 watch(open, (value) => {
@@ -49,7 +49,7 @@ async function submit() {
   if (!roles.value.length) { error.value = 'Escolha ao menos um papel.'; return }
   // Supervisão sozinha não dá acesso a nada (sem leitura clínica nem administração).
   if (roles.value.length === 1 && roles.value[0] === 'clinical_supervisor') {
-    error.value = 'Supervisão clínica vem junto com outro papel, como Psicóloga.'
+    error.value = 'Supervisão clínica vem junto com outro papel, como Psicóloga(o).'
     return
   }
   submitting.value = true
@@ -82,7 +82,7 @@ async function copyLink() {
     <SheetTrigger as-child><slot /></SheetTrigger>
     <SheetContent class="flex w-full flex-col gap-[22px] overflow-y-auto border-0 bg-card p-6 shadow-[-18px_0_40px_rgba(22,26,58,.12)] sm:max-w-[440px] sm:p-8">
       <SheetHeader class="gap-2 pr-8 text-left">
-        <SheetTitle class="text-[22px] font-semibold tracking-[-0.02em]">Convidar psicóloga</SheetTitle>
+        <SheetTitle class="text-[22px] font-semibold tracking-[-0.02em]">Convidar psicóloga(o)</SheetTitle>
         <SheetDescription>A pessoa recebe um link de uso único, válido por 7 dias, para entrar com a conta do Acolhe ou criar uma.</SheetDescription>
       </SheetHeader>
       <div v-if="result" class="flex animate-fade flex-col gap-4" aria-live="polite">

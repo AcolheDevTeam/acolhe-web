@@ -29,7 +29,7 @@ async function choose(organizationId: string) {
         <div>
           <p class="label-mono">Acesso</p>
           <CardTitle class="display-serif mt-2 text-3xl">Nada para mostrar aqui</CardTitle>
-          <CardDescription class="mt-2">O seu papel neste espaço de trabalho não inclui atender nem administrar a clínica. Se precisar de acesso, fale com a responsável pela clínica.</CardDescription>
+          <CardDescription class="mt-2">O seu papel neste espaço de trabalho não inclui atender nem administrar a clínica. Se precisar de acesso, fale com o(a) responsável pela clínica.</CardDescription>
         </div>
       </CardHeader>
       <CardContent class="flex flex-col gap-4">

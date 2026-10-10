@@ -13,7 +13,7 @@ export function useOpenAppointmentRecord() {
       await navigateTo(`/sessions/${session.id}`)
     } catch (error) {
       toast.error(apiErrorMessage(error, {
-        403: 'O vínculo com esta paciente precisa estar ativo para registrar a evolução.',
+        403: 'O vínculo com este(a) paciente precisa estar ativo para registrar a evolução.',
         404: 'Este agendamento não está disponível para você.',
         409: 'A evolução pode ser registrada a partir do horário de um atendimento não cancelado.',
         default: 'Não foi possível abrir o prontuário agora.',

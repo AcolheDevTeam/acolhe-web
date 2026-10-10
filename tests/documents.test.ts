@@ -54,7 +54,7 @@ describe('generateDocumentSchema', () => {
   })
 
   it('mensagens específicas em português', () => {
-    expect(messages({ ...base, patientId: '' }).patientId).toBe('Selecione a paciente')
+    expect(messages({ ...base, patientId: '' }).patientId).toBe('Selecione o(a) paciente')
     expect(messages({ ...base, sessionIds: [] }).sessionIds).toBe('Selecione pelo menos uma sessão')
     expect(messages({ ...base, city: '  ' }).city).toBe('Informe a cidade')
     expect(messages({ ...base, type: 'receipt', amountCents: 100, payerCpf: '123' }).payerCpf).toBe('O CPF tem 11 dígitos')
@@ -190,7 +190,7 @@ describe('erros da API', () => {
 
   it('403 separa perfil de psicóloga e vínculo', () => {
     expect(generateDocumentErrorMessage(relayed(403, 'ação restrita a psicólogos'))).toContain('perfil de psicóloga')
-    expect(generateDocumentErrorMessage(relayed(403, 'vínculo com a paciente não está ativo'))).toContain('vínculo com esta paciente não está ativo')
+    expect(generateDocumentErrorMessage(relayed(403, 'vínculo com a paciente não está ativo'))).toContain('vínculo com este(a) paciente não está ativo')
     expect(generateDocumentErrorMessage(err(403))).toBe(GENERATE_DOCUMENT_ERRORS[403])
   })
 

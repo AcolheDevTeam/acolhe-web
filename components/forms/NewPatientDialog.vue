@@ -39,7 +39,7 @@ const onSubmit = handleSubmit(async (values) => {
   } catch (error) {
     toast.error(apiErrorMessage(error, {
       400: 'Confira o nome, o e-mail, o telefone e a data de nascimento.',
-      403: 'Só psicólogas com perfil ativo podem cadastrar pacientes.',
+      403: 'Só psicólogas(os) com perfil ativo podem cadastrar pacientes.',
       default: 'Não foi possível criar o paciente agora.',
     }))
   }

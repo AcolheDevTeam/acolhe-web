@@ -45,7 +45,7 @@ function toggle(id: string) {
           :aria-controls="`comentario-${activity.id}`"
           @click="toggle(activity.id)"
         >
-          {{ open === activity.id ? 'Ocultar comentário' : 'Ver comentário da sua psicóloga' }}
+          {{ open === activity.id ? 'Ocultar comentário' : 'Ver comentário de sua(seu) psicóloga(o)' }}
           <ChevronDown :class="['size-4 transition-transform duration-300', open === activity.id ? 'rotate-180' : '']" aria-hidden="true" />
         </Button>
         <div
@@ -53,7 +53,7 @@ function toggle(id: string) {
           :id="`comentario-${activity.id}`"
           class="animate-fade mt-2 flex flex-col gap-1.5 rounded-xl bg-accent px-4 py-3"
         >
-          <span class="label-mono">Comentário da sua psicóloga · {{ formatDayMonth(activity.comment.updatedAt) }}</span>
+          <span class="label-mono">Comentário de sua(seu) psicóloga(o) · {{ formatDayMonth(activity.comment.updatedAt) }}</span>
           <p class="whitespace-pre-line break-words text-sm leading-relaxed">{{ activity.comment.text }}</p>
         </div>
       </div>

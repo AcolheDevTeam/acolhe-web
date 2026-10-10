@@ -28,13 +28,13 @@ const ordered = computed(() =>
     <InlineNotice tone="positive" class="flex items-start gap-3">
       <Eye class="mt-0.5 size-[18px] shrink-0" aria-hidden="true" />
       <p>
-        A paciente tem acesso a este prontuário (Res. CFP 01/2009, art. 5º, II). Para anotações que só
+        O(A) paciente tem acesso a este prontuário (Res. CFP 01/2009, art. 5º, II). Para anotações que só
         você vê, use o <NuxtLink :to="`/patients/${patientId}/registry`" class="font-medium underline underline-offset-[3px]">Registro Documental</NuxtLink>.
       </p>
     </InlineNotice>
 
     <div v-if="sessionsError || appointmentsError" role="alert" class="text-sm">
-      <p>{{ apiErrorMessage(sessionsError || appointmentsError, { default: 'Não foi possível carregar todos os atendimentos desta paciente.' }) }}</p>
+      <p>{{ apiErrorMessage(sessionsError || appointmentsError, { default: 'Não foi possível carregar todos os atendimentos deste(a) paciente.' }) }}</p>
       <Button variant="outline" class="mt-2" @click="retry">Tentar novamente</Button>
     </div>
     <p v-if="loading" class="text-sm text-muted-foreground" role="status">Carregando atendimentos…</p>

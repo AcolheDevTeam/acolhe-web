@@ -123,15 +123,15 @@ const visibilityOptions: { value: CommentVisibility, label: string }[] = [
   { value: 'private', label: 'Interno' },
 ]
 const visibilityHelp = computed(() => visibility.value === 'shared'
-  ? 'A paciente vê este comentário junto da resposta.'
-  : 'Só você vê. Não aparece para a paciente nem na exportação dela.')
+  ? 'O(A) paciente vê este comentário junto da resposta.'
+  : 'Só você vê. Não aparece para o(a) paciente nem na exportação de dados dela(e).')
 const commentPlaceholder = computed(() => visibility.value === 'shared'
-  ? 'Escreva um retorno para a paciente'
+  ? 'Escreva um retorno para o(a) paciente'
   : 'Anotação para você')
 const savedLine = computed(() => {
   const saved = savedReview.value
   if (!saved.comment || !saved.commentUpdatedAt) return ''
-  const label = saved.visibility === 'shared' ? 'Compartilhado com a paciente' : 'Interno'
+  const label = saved.visibility === 'shared' ? 'Compartilhado com o(a) paciente' : 'Interno'
   return `${label} · salvo em ${formatDateTime(saved.commentUpdatedAt)}`
 })
 // Um comentário interno já salvo que vira compartilhado passa a aparecer para a
@@ -308,7 +308,7 @@ onBeforeUnmount(() => {
         </InlineNotice>
         <EmptyState v-else compact>
           {{ activity.state === 'awaiting_response'
-            ? 'A paciente ainda não respondeu esta atividade.'
+            ? 'O(A) paciente ainda não respondeu esta atividade.'
             : 'Esta atividade foi encerrada sem resposta.' }}
         </EmptyState>
       </div>
@@ -334,7 +334,7 @@ onBeforeUnmount(() => {
             />
             <p class="text-[13px] leading-relaxed text-muted-foreground">{{ visibilityHelp }}</p>
             <InlineNotice v-if="becomingShared" tone="warning">
-              Este comentário era interno. Ao salvar, a paciente passa a vê-lo.
+              Este comentário era interno. Ao salvar, o(a) paciente passa a vê-lo.
             </InlineNotice>
             <div class="flex flex-col gap-1.5">
               <Label for="review-comment">Comentário</Label>

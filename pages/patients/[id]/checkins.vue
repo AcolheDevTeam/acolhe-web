@@ -8,7 +8,7 @@ const { patientId, patient, clinicalAccess: canLoad } = usePatientFicha()
 const { data: checkins, error, status, refresh } = usePatientCheckins(patientId, canLoad)
 // Sem vínculo ativo a API devolve lista vazia; dizer o motivo em vez de "nenhum check-in".
 const inactiveMessage = computed(() => patient.value && patient.value.relationshipStatus !== 'active'
-  ? 'O vínculo com esta paciente não está ativo. Os check-ins aparecem enquanto o vínculo estiver ativo.'
+  ? 'O vínculo com este(a) paciente não está ativo. Os check-ins aparecem enquanto o vínculo estiver ativo.'
   : undefined)
 
 // ACO-103: só o que a paciente registrou. Sentimentos contados nos mesmos 35
@@ -25,9 +25,9 @@ const feelings = computed(() => feelingCounts(recent.value))
 <template>
   <div class="flex flex-col gap-4">
     <p class="label-mono">Check-ins · {{ checkins?.length ?? 0 }} registros</p>
-    <p class="text-sm text-muted-foreground">Registros da paciente entre as sessões. Ela pode editar apenas o check-in do mesmo dia.</p>
+    <p class="text-sm text-muted-foreground">Registros do(a) paciente entre as sessões. Só o check-in do mesmo dia pode ser editado.</p>
     <div v-if="error" class="flex flex-col items-start gap-3 text-sm">
-      <p>{{ apiErrorMessage(error, { 403: 'Seu vínculo precisa estar ativo para consultar os check-ins.', default: 'Não foi possível carregar os check-ins desta paciente.' }) }}</p>
+      <p>{{ apiErrorMessage(error, { 403: 'Seu vínculo precisa estar ativo para consultar os check-ins.', default: 'Não foi possível carregar os check-ins deste(a) paciente.' }) }}</p>
       <Button variant="outline" @click="refresh()">Tentar novamente</Button>
     </div>
     <p v-else-if="status === 'pending' || (canLoad && status === 'idle')" class="text-sm text-muted-foreground">Carregando check-ins…</p>

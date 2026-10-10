@@ -32,7 +32,7 @@ const optionalText = (max: number, message: string, invisible: string) =>
     .optional().transform(value => value || undefined))
 
 export const generateDocumentSchema = z.object({
-  patientId: z.string({ required_error: 'Selecione a paciente' }).uuid('Selecione a paciente'),
+  patientId: z.string({ required_error: 'Selecione o(a) paciente' }).uuid('Selecione o(a) paciente'),
   type: z.enum(DOCUMENT_TYPES, { errorMap: () => ({ message: 'Escolha o tipo de documento' }) }),
   sessionIds: z.array(z.string().uuid('Sessão inválida'), { required_error: 'Selecione pelo menos uma sessão' })
     .min(1, 'Selecione pelo menos uma sessão')

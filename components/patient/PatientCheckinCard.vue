@@ -115,7 +115,7 @@ async function submit() {
   } catch (error) {
     errorMessage.value = apiErrorMessage(error, {
       400: checkinRejectionMessage(error),
-      403: 'Seu vínculo com a psicóloga não está ativo no momento, então não é possível registrar check-ins.',
+      403: 'Seu vínculo com a(o) psicóloga(o) não está ativo no momento, então não é possível registrar check-ins.',
       404: 'Este check-in não está mais disponível. Atualize a página.',
       409: editing.value
         ? 'O dia virou e este check-in não pode mais ser editado. Ele continua no seu histórico.'
@@ -137,7 +137,7 @@ const saveLabel = computed(() => submitting.value ? 'Salvando…' : editing.valu
     <template v-if="showForm">
       <div class="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
         <h2 id="t-checkin" class="text-lg font-semibold tracking-[-0.01em]">Como você está agora?</h2>
-        <span class="text-xs text-muted-foreground">visível para você e sua psicóloga</span>
+        <span class="text-xs text-muted-foreground">visível para você e sua(seu) psicóloga(o)</span>
       </div>
       <MoodPicker v-model="mood" label="Humor de agora" :disabled="submitting" />
       <div v-if="mood" class="animate-fade flex flex-col gap-3.5">

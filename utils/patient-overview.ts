@@ -47,7 +47,7 @@ export function relationshipBadge(patient: Patient, now: Date = new Date()): { l
     case 'pending': return { label: 'Aguardando aceite', variant: 'warning' }
     case 'paused': return { label: 'Vínculo pausado', variant: 'neutral' }
     case 'ended': return { label: 'Vínculo encerrado', variant: 'neutral' }
-    case 'transferred': return { label: 'Encaminhada', variant: 'neutral' }
+    case 'transferred': return { label: 'Encaminhado(a)', variant: 'neutral' }
     default: return { label: 'Vínculo não informado', variant: 'neutral' }
   }
 }

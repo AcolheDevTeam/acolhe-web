@@ -82,9 +82,9 @@ const onSubmit = handleSubmit(async (values) => {
     await refreshNuxtData('activities-all')
   } catch (error) {
     toast.error(apiErrorMessage(error, {
-      403: 'Esta paciente ainda não aceitou o convite. Atividades só podem ser atribuídas com o vínculo ativo.',
+      403: 'Este(a) paciente ainda não aceitou o convite. Atividades só podem ser atribuídas com o vínculo ativo.',
       404: 'Template ou paciente não encontrado. Atualize a página e tente de novo.',
-      400: 'Confira o template, a paciente e o prazo.',
+      400: 'Confira o template, o(a) paciente e o prazo.',
       default: 'Não foi possível atribuir a atividade agora.',
     }))
   }

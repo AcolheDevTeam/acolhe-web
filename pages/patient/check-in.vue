@@ -14,7 +14,7 @@ async function onCheckinSaved() {
 <template>
   <div class="flex flex-col gap-5">
     <PatientPageHeader :eyebrow="eyebrow" title="Check-in de hoje">
-      <template #description><Eye class="size-3.5" aria-hidden="true" />Visível para você e sua psicóloga</template>
+      <template #description><Eye class="size-3.5" aria-hidden="true" />Visível para você e sua(seu) psicóloga(o)</template>
     </PatientPageHeader>
     <PortalLoadState :pending="pending" :error="error">
       <div class="flex flex-col gap-5">

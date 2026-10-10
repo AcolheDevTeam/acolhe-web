@@ -5,10 +5,10 @@ import { Building2, CalendarCheck, Check, FileLock2, ListChecks, LockKeyhole, No
 // feita de divs (agenda, check-in, Registro Documental), dois blocos
 // pequenos e dois largos. Só o que existe no produto hoje.
 const small = [
-  { icon: NotebookPen, title: 'Prontuário por sessão', text: 'Registre a evolução de cada atendimento. A ficha da paciente reúne as sessões em ordem.' },
+  { icon: NotebookPen, title: 'Prontuário por sessão', text: 'Registre a evolução de cada atendimento. A ficha do(a) paciente reúne as sessões em ordem.' },
   { icon: ListChecks, title: 'Atividades com templates', text: 'Monte tarefas e questionários uma vez e envie para quem precisar. As respostas chegam para você revisar.' },
-  { icon: Smartphone, title: 'Área da paciente no celular', text: 'Nada para instalar. A paciente entra pelo navegador e vê sessões, atividades e o check-in do dia.' },
-  { icon: Building2, title: 'Clínicas e equipes', text: 'Convide a equipe e acompanhe números agregados no painel. Cada psicóloga cuida dos próprios pacientes.' },
+  { icon: Smartphone, title: 'Área do(a) paciente no celular', text: 'Nada para instalar. O(A) paciente entra pelo navegador e vê sessões, atividades e o check-in do dia.' },
+  { icon: Building2, title: 'Clínicas e equipes', text: 'Convide a equipe e acompanhe números agregados no painel. Cada psicóloga(o) cuida dos próprios pacientes.' },
 ]
 
 const week = [
@@ -29,8 +29,8 @@ const cipher = ['7f3a·c91e·04bd·e2a7', 'b8d0·5c6f·a113·9e4c', '2e7b·f0a9�
     <article data-reveal class="tile flex flex-col gap-6 overflow-hidden rounded-[20px] border bg-card p-6 md:col-span-2 md:p-8">
       <div class="flex flex-col gap-3">
         <span class="tile-icon"><CalendarCheck :stroke-width="1.8" aria-hidden="true" /></span>
-        <h3 class="text-xl font-semibold tracking-[-0.02em]">Agenda com confirmação da paciente</h3>
-        <p class="max-w-[440px] text-[15px] leading-relaxed text-secondary-foreground">Marque as sessões da semana. A paciente confirma o horário pela área dela, e você vê quem já confirmou.</p>
+        <h3 class="text-xl font-semibold tracking-[-0.02em]">Agenda com confirmação do(a) paciente</h3>
+        <p class="max-w-[440px] text-[15px] leading-relaxed text-secondary-foreground">Marque as sessões da semana. O(A) paciente confirma o horário pela própria área, e você vê quem já confirmou.</p>
       </div>
       <div aria-hidden="true" class="mt-auto flex flex-col gap-2 rounded-2xl bg-surface-subtle p-3 sm:p-4">
         <div
@@ -57,7 +57,7 @@ const cipher = ['7f3a·c91e·04bd·e2a7', 'b8d0·5c6f·a113·9e4c', '2e7b·f0a9�
       <div class="flex flex-col gap-3">
         <span class="tile-icon"><Smile :stroke-width="1.8" aria-hidden="true" /></span>
         <h3 class="text-xl font-semibold tracking-[-0.02em]">Check-in diário de humor</h3>
-        <p class="max-w-[440px] text-[15px] leading-relaxed text-secondary-foreground">A paciente marca como está em poucos segundos. Você acompanha os últimos dias na ficha, antes da sessão.</p>
+        <p class="max-w-[440px] text-[15px] leading-relaxed text-secondary-foreground">O(A) paciente marca como está em poucos segundos. Você acompanha os últimos dias na ficha, antes da sessão.</p>
       </div>
       <div aria-hidden="true" class="mt-auto rounded-2xl bg-surface-subtle p-4">
         <div class="flex items-baseline justify-between">

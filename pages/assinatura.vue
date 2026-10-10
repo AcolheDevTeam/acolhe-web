@@ -94,7 +94,7 @@ const summary = computed(() => {
   const plan = currentPlan.value
   const title = plan ? `${plan.name} · ${cycleLabel(s.billingCycle)}` : subscriptionStatusLabel(s.status)
   const lines: string[] = []
-  if (currentUnit.value) lines.push(`${currentUnit.value} ${plan?.perSeat ? 'por psicóloga por mês' : 'por mês'}${s.billingCycle === 'annual' ? ', cobrado por ano' : ''}`)
+  if (currentUnit.value) lines.push(`${currentUnit.value} ${plan?.perSeat ? 'por psicóloga(o) por mês' : 'por mês'}${s.billingCycle === 'annual' ? ', cobrado por ano' : ''}`)
   if (s.status === 'canceled' || cancelScheduled.value) lines.push('Sem cobranças futuras')
   else if (s.currentPeriodEnd) lines.push(`Próxima cobrança em ${longDate(s.currentPeriodEnd)}`)
   return { title, lines }
@@ -254,7 +254,7 @@ onMounted(async () => {
         </section>
 
         <Card v-if="isClinic && canManage" role="region" aria-labelledby="t-vagas" class="flex animate-rise flex-col gap-3.5 p-6 [animation-delay:.06s]">
-          <h2 id="t-vagas" class="label-mono text-[11px]">Psicólogas</h2>
+          <h2 id="t-vagas" class="label-mono text-[11px]">Psicólogas(os)</h2>
           <p class="text-[26px] font-semibold tracking-[-0.02em]">
             {{ activeCount }} <span class="text-[15px] font-normal text-muted-foreground">{{ activeCount === 1 ? 'ativa' : 'ativas' }} · cobradas {{ billedCount }} (mínimo {{ clinicPlan.minSeats }})</span>
           </p>
@@ -269,7 +269,7 @@ onMounted(async () => {
             <span v-if="activeMembers.length > 6" class="-ml-2 flex h-[34px] items-center rounded-full border-2 border-card bg-secondary px-2 font-mono text-xs text-muted-foreground">+{{ activeMembers.length - 6 }}</span>
           </div>
           <p class="text-sm leading-relaxed text-muted-foreground">
-            As vagas acompanham a equipe: quando alguém entra ou sai, a cobrança se ajusta sozinha. Quem só administra não paga.
+            As vagas acompanham a equipe: quando alguém entra ou sai, a cobrança se ajusta sozinha.
           </p>
         </Card>
 
@@ -296,7 +296,7 @@ onMounted(async () => {
       </div>
 
       <InlineNotice v-if="!canManage" tone="neutral">
-        A cobrança da clínica é feita pela responsável ou pela administração. Fale com elas para assinar ou mudar o plano.
+        A cobrança da clínica é feita pelo(a) responsável ou pela administração. Para assinar ou mudar o plano, fale com uma dessas pessoas.
       </InlineNotice>
 
       <template v-else-if="paid">

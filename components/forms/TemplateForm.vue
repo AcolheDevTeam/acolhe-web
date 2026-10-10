@@ -146,7 +146,7 @@ const palette = FIELD_TYPE_OPTIONS.map((option) => ({
 
       <FormField v-slot="{ componentField }" name="instructions">
         <FormItem class="max-w-[720px]">
-          <FormLabel class="text-[13px] text-secondary-foreground">Instrução para a paciente <span class="font-normal text-muted-foreground">(opcional)</span></FormLabel>
+          <FormLabel class="text-[13px] text-secondary-foreground">Instrução para o(a) paciente <span class="font-normal text-muted-foreground">(opcional)</span></FormLabel>
           <FormControl>
             <Textarea
               placeholder="Ex.: Preencha quando sentir uma emoção forte. Leva uns 5 minutos."

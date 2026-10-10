@@ -160,7 +160,7 @@ const rowClass = 'flex min-h-[52px] w-full items-center justify-between gap-3 bo
         </section>
 
         <section v-if="psychologist" class="animate-rise flex flex-col gap-2.5 [animation-delay:100ms]" aria-labelledby="t-psi">
-          <h2 id="t-psi" class="label-mono">Sua psicóloga</h2>
+          <h2 id="t-psi" class="label-mono">Sua(seu) psicóloga(o)</h2>
           <div class="flex items-center gap-3.5 rounded-2xl border bg-card p-4">
             <span aria-hidden="true" class="flex size-10 shrink-0 items-center justify-center rounded-full bg-brand text-sm font-semibold text-highlight">{{ initialsOf(psychologist.name) }}</span>
             <span class="flex min-w-0 flex-col gap-0.5">

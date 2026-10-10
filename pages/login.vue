@@ -55,7 +55,7 @@ const onSubmit = handleSubmit(async (values) => {
       <div class="flex min-h-0 flex-1 items-center justify-center">
         <img
           src="/images/login-ilustracao.jpg"
-          alt="Ilustração de uma sessão de psicologia: paciente e psicóloga conversando em frente a uma ficha clínica"
+          alt="Ilustração de uma sessão de psicologia: paciente e psicóloga(o) conversando em frente a uma ficha clínica"
           class="login-illus h-auto w-full max-w-[520px] mix-blend-multiply min-[900px]:h-full min-[900px]:object-contain"
         >
       </div>

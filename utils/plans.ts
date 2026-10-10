@@ -28,7 +28,7 @@ export const TRIAL_DAYS = 7
 export const FOUNDERS_LIMIT = 50
 
 const shared = [
-  'Agenda com confirmação da paciente',
+  'Agenda com confirmação do(a) paciente',
   'Prontuário por sessão',
   'Atividades e check-ins entre as sessões',
   'Registro Documental cifrado, só seu',
@@ -50,7 +50,7 @@ export const PLANS: Plan[] = [
   {
     code: 'clinica',
     name: 'Clínica',
-    audience: 'Para equipes: cada psicóloga com a própria agenda e pacientes.',
+    audience: 'Para equipes: cada psicóloga(o) com a própria agenda e pacientes.',
     perSeat: true,
     minSeats: 2,
     prices: {
@@ -58,12 +58,12 @@ export const PLANS: Plan[] = [
       annual: { monthlyCents: 2900, annualTotalCents: 34800 },
     },
     features: [...shared, 'Painel da clínica com números agregados', 'Convites e gestão da equipe'],
-    note: 'Cobrado por psicóloga ativa, mínimo de 2. Quem só administra não paga.',
+    note: 'Cobrado por psicóloga(o) ativa(o), mínimo de 2.',
   },
   {
     code: 'fundador',
     name: 'Fundadores',
-    audience: `Para as primeiras ${FOUNDERS_LIMIT} psicólogas que assinarem.`,
+    audience: `Para quem estiver entre as primeiras ${FOUNDERS_LIMIT} assinaturas.`,
     perSeat: false,
     minSeats: 1,
     prices: {

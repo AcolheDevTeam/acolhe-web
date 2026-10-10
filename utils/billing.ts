@@ -116,7 +116,7 @@ export function billingErrorMessage(error: unknown, action: BillingAction): stri
   }
   return apiErrorMessage(error, {
     400: action === 'checkout' ? 'Este plano não está disponível para este tipo de conta.' : 'O pedido não foi aceito. Atualize a página e tente de novo.',
-    403: 'Só a responsável ou a administração da clínica pode assinar e gerenciar a cobrança.',
+    403: 'Só o(a) responsável ou a administração da clínica pode assinar e gerenciar a cobrança.',
     404: action === 'portal'
       ? 'Ainda não há cartão cadastrado para esta conta. Escolha um plano para cadastrar.'
       : action === 'details'

@@ -110,7 +110,7 @@ export const reviewRequestSchema = z.object({
   ).max(REVIEW_TAGS_MAX, 'Use no máximo 10 tags por atividade.').optional(),
   expectedUpdatedAt: z.string().datetime({ offset: true }).nullable().optional(),
 }).refine(body => !body.comment || !!body.visibility, {
-  message: 'Escolha se o comentário é compartilhado com a paciente ou interno.',
+  message: 'Escolha se o comentário é compartilhado com o(a) paciente ou interno.',
   path: ['visibility'],
 })
 

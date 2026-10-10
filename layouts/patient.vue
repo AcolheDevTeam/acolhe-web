@@ -35,7 +35,7 @@ function isActive(to: string) {
     <header class="hidden border-b bg-card md:block">
       <div class="mx-auto flex h-16 max-w-3xl items-center justify-between px-8">
         <NuxtLink to="/patient" aria-label="Ir para o início"><AppLogo /></NuxtLink>
-        <nav class="flex items-center gap-1" aria-label="Navegação da paciente">
+        <nav class="flex items-center gap-1" aria-label="Navegação do(a) paciente">
           <NuxtLink
             v-for="item in items"
             :key="item.to"
@@ -68,7 +68,7 @@ function isActive(to: string) {
       </div>
       <slot v-else />
     </main>
-    <nav class="fixed inset-x-0 bottom-0 z-20 border-t bg-card px-2 pb-[max(12px,env(safe-area-inset-bottom))] pt-1 md:hidden" aria-label="Navegação da paciente">
+    <nav class="fixed inset-x-0 bottom-0 z-20 border-t bg-card px-2 pb-[max(12px,env(safe-area-inset-bottom))] pt-1 md:hidden" aria-label="Navegação do(a) paciente">
       <div class="mx-auto flex max-w-md">
         <NuxtLink
           v-for="item in items"

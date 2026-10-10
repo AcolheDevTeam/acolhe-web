@@ -78,7 +78,7 @@ function focusForm() {
         </p>
         <template v-else-if="data">
           <EmptyState v-if="!data.items.length" compact>
-            {{ data.totalCount ? 'Nenhum caderno salvo nesta página.' : 'Você ainda não tem cadernos. Para começar, escolha a paciente e o tipo em Abrir caderno.' }}
+            {{ data.totalCount ? 'Nenhum caderno salvo nesta página.' : 'Você ainda não tem cadernos. Para começar, escolha o(a) paciente e o tipo em Abrir caderno.' }}
           </EmptyState>
           <ul v-else class="flex flex-col gap-2.5">
             <li v-for="patient in data.items" :key="patient.id">
@@ -124,7 +124,7 @@ function focusForm() {
             id="rd-paciente"
             v-model="patientId"
             :options="patientOptions"
-            placeholder="Escolha a paciente"
+            placeholder="Escolha o(a) paciente"
             search-placeholder="Buscar paciente"
             empty-text="Nenhum paciente encontrado."
             class="h-11 rounded-lg bg-card px-3.5 text-sm shadow-none hover:border-input-hover"

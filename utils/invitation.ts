@@ -33,7 +33,7 @@ export function invitationDeliveryMeta(status?: InvitationDeliveryStatus | strin
       return {
         title: 'Convite criado, mas o e-mail não saiu',
         description: (_patientName, email) =>
-          `Não conseguimos enviar o e-mail para ${email ?? 'o endereço cadastrado'}. Copie o link abaixo e envie por outro canal, ou gere um novo convite mais tarde pela ficha do paciente.`,
+          `Não conseguimos enviar o e-mail para ${email ?? 'o endereço cadastrado'}. Copie o link abaixo e envie por outro canal, ou gere um novo convite mais tarde pela ficha do(a) paciente.`,
         toast: 'Convite criado, mas o e-mail não foi enviado.',
         short: 'O e-mail não foi enviado.',
         showLink: true,
@@ -68,13 +68,13 @@ export function invitationLoadFailure(status?: number): InvitationLoadFailure {
     case 404:
       return {
         title: 'Convite não encontrado',
-        message: 'Não encontramos um convite para este link. Confira se ele foi copiado inteiro ou peça um novo à sua psicóloga.',
+        message: 'Não encontramos um convite para este link. Confira se ele foi copiado inteiro ou peça um novo a sua(seu) psicóloga(o).',
         canRetry: false,
       }
     case 410:
       return {
         title: 'Convite indisponível',
-        message: 'Este convite expirou, foi recusado ou já foi utilizado. Se ainda não criou sua conta, peça um novo convite à sua psicóloga.',
+        message: 'Este convite expirou, foi recusado ou já foi utilizado. Se ainda não criou sua conta, peça um novo convite a sua(seu) psicóloga(o).',
         canRetry: false,
       }
     default:

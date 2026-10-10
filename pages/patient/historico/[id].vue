@@ -43,7 +43,7 @@ const meta = computed(() => session.value ? historyDetailMeta(session.value) : '
             :conduct="session.conduct"
             :referral="session.referral"
             :notes="session.notes"
-            empty-text="Sua psicóloga não fez anotações nesta sessão."
+            empty-text="Sua(seu) psicóloga(o) não fez anotações nesta sessão."
           />
         </section>
         <p class="font-mono text-xs text-muted-foreground">{{ historyVersionLabel(session) }}</p>

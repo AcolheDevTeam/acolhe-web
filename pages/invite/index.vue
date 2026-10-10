@@ -39,7 +39,7 @@ function submit() {
           <p class="label-mono">Convite</p>
           <h1 class="mt-2 font-serif text-3xl">Entre pelo convite que você recebeu.</h1>
           <p class="mt-2 text-sm leading-relaxed text-muted-foreground">
-            Cole o link que a sua psicóloga enviou, ou só o código que aparece no final dele.
+            Cole o link que sua(seu) psicóloga(o) enviou, ou só o código que aparece no final dele.
             Não pedimos o seu e-mail nesta etapa.
           </p>
         </div>

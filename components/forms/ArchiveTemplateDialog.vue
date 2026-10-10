@@ -33,7 +33,7 @@ async function archive() {
     emit('archived', archived)
   } catch (error) {
     toast.error(apiErrorMessage(error, {
-      403: 'Só a autora pode arquivar este template.',
+      403: 'Só o(a) autor(a) pode arquivar este template.',
       404: 'Template não encontrado. Ele pode ter sido removido.',
       409: 'Este template já está arquivado.',
       default: 'Não foi possível arquivar o template agora.',
