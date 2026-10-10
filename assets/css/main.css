@@ -165,6 +165,16 @@
   .animate-fade {
     animation: fade .36s var(--ease-out) both;
   }
+
+  /* Entrada ao rolar da landing (composables/useReveal.ts). */
+  .reveal {
+    transition: opacity .7s var(--ease-out), transform .7s var(--ease-out);
+    transition-delay: var(--reveal-delay, 0ms);
+  }
+  .reveal-pending {
+    opacity: 0;
+    transform: translateY(16px);
+  }
 }
 
 /* Entrada dos diálogos (Dialog). Só opacidade e `scale`: o `transform` já
