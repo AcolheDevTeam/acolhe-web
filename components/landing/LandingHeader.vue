@@ -50,7 +50,7 @@ onBeforeUnmount(() => {
   >
     <div
       class="mx-auto flex max-w-[1200px] items-center gap-6 px-4 transition-[height] duration-300 ease-[cubic-bezier(.2,.7,.2,1)] md:px-8"
-      :class="scrolled ? 'h-14 md:h-[60px]' : 'h-16 md:h-[72px]'"
+      class="h-16 md:h-[72px]"
     >
       <NuxtLink to="/" aria-label="Acolhe, início" class="shrink-0 rounded-md">
         <AppLogo :size="26" />
