@@ -7,6 +7,8 @@ import {
   DOCUMENT_TYPE_FILTERS,
   DOCUMENT_TYPE_OPTIONS,
   GENERATE_DOCUMENT_ERRORS,
+  generateDocumentErrorMessage,
+  listPollDelay,
   brlToCents,
   documentLinkLabel,
   documentPreview,
@@ -168,8 +170,49 @@ describe('erros da API', () => {
     expect(apiErrorMessage(err(402), GENERATE_DOCUMENT_ERRORS)).toContain(READ_ONLY_MESSAGE)
   })
 
+  // O BFF repassa a frase da API em data.data.message (relayApiError).
+  const relayed = (statusCode: number, message: string) => ({ statusCode, data: { message: '', data: { message } } })
+
+  it('400 mostra a frase da API quando ela diz o campo', () => {
+    expect(generateDocumentErrorMessage(relayed(400, 'informe a cidade'))).toBe('Informe a cidade.')
+    expect(generateDocumentErrorMessage(relayed(400, 'A finalidade tem caracteres que não podem ir para o documento (quebra de linha, emoji ou símbolo especial)')))
+      .toBe('A finalidade tem caracteres que não podem ir para o documento (quebra de linha, emoji ou símbolo especial)')
+    expect(generateDocumentErrorMessage(relayed(400, 'CPF de quem pagou inválido'))).toBe('CPF de quem pagou inválido.')
+    // Texto técnico qualquer não vaza: cai no texto padrão do 400.
+    expect(generateDocumentErrorMessage(relayed(400, 'code=400, message=Syntax error'))).toBe(GENERATE_DOCUMENT_ERRORS[400])
+  })
+
+  it('403 separa perfil de psicóloga e vínculo', () => {
+    expect(generateDocumentErrorMessage(relayed(403, 'ação restrita a psicólogos'))).toContain('perfil de psicóloga')
+    expect(generateDocumentErrorMessage(relayed(403, 'vínculo com a paciente não está ativo'))).toContain('vínculo com esta paciente não está ativo')
+    expect(generateDocumentErrorMessage(err(403))).toBe(GENERATE_DOCUMENT_ERRORS[403])
+  })
+
   it('link: 409 diz que o PDF ainda não está pronto', () => {
     expect(apiErrorMessage(err(409), DOCUMENT_LINK_ERRORS)).toContain('ainda não está pronto')
     expect(apiErrorMessage(err(404), DOCUMENT_LINK_ERRORS)).not.toBe(apiErrorMessage(err(503), DOCUMENT_LINK_ERRORS))
+  })
+})
+
+describe('atualização da lista', () => {
+  it('desacelera até 15 s e para depois de 2 minutos', () => {
+    expect(listPollDelay(0, 0)).toBe(2000)
+    expect(listPollDelay(1, 2000)).toBe(3000)
+    expect(listPollDelay(10, 60_000)).toBe(15_000)
+    expect(listPollDelay(3, 120_000)).toBeNull()
+  })
+})
+
+describe('caracteres invisíveis', () => {
+  it('cidade, finalidade e pagador recusam quebra de linha e bidi', () => {
+    const base = { patientId: '7f1c1f0e-8a8b-4c0e-9a51-2a0d0c7d9b11', sessionIds: ['0b6d2c4e-2f7a-4f43-9c51-7d4b2b8e8a10'] }
+    const city = generateDocumentSchema.safeParse({ ...base, type: 'declaration', city: 'São\nPaulo' })
+    expect(city.success).toBe(false)
+    expect(JSON.stringify(city.error?.issues)).toContain('A cidade tem caracteres')
+    const purpose = generateDocumentSchema.safeParse({ ...base, type: 'declaration', city: 'Recife', purpose: 'RH\u202e' })
+    expect(JSON.stringify(purpose.error?.issues)).toContain('A finalidade tem caracteres')
+    const payer = generateDocumentSchema.safeParse({ ...base, type: 'receipt', city: 'Recife', amountCents: 100, payerName: 'Ana\u200b' })
+    expect(JSON.stringify(payer.error?.issues)).toContain('O nome tem caracteres')
+    expect(generateDocumentSchema.safeParse({ ...base, type: 'declaration', city: 'São Paulo', purpose: 'Apresentação ao RH' }).success).toBe(true)
   })
 })

@@ -140,7 +140,7 @@ async function submit() {
     void refreshNuxtData('documents-all')
   }
   catch (err) {
-    submitError.value = apiErrorMessage(err, GENERATE_DOCUMENT_ERRORS)
+    submitError.value = generateDocumentErrorMessage(err)
   }
   finally {
     submitting.value = false
@@ -165,7 +165,8 @@ async function copyLink() {
   copied.value = true
 }
 
-const crpLine = computed(() => (me.value?.crp ? `Psicóloga · CRP ${me.value.crp}` : 'Psicóloga'))
+// Igual ao cabeçalho do PDF: só o CRP, sem flexão de gênero.
+const crpLine = computed(() => (me.value?.crp ? `CRP ${me.value.crp}` : ''))
 </script>
 
 <template>
@@ -377,7 +378,7 @@ const crpLine = computed(() => (me.value?.crp ? `Psicóloga · CRP ${me.value.cr
         <header class="flex flex-wrap items-start justify-between gap-3 border-b pb-4">
           <span class="flex flex-col gap-0.5">
             <span class="font-semibold">{{ me?.name ?? 'Seu nome' }}</span>
-            <span class="font-mono text-[12px] text-muted-foreground">{{ crpLine }}</span>
+            <span v-if="crpLine" class="font-mono text-[12px] text-muted-foreground">{{ crpLine }}</span>
           </span>
           <span class="font-mono text-[12px] text-muted-foreground">{{ doc?.code ?? 'Código gerado na emissão' }}</span>
         </header>

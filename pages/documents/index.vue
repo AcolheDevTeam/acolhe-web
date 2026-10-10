@@ -44,12 +44,33 @@ function onIssued(doc: Pick<ClinicalDocument, 'id'>, link: ClinicalDocumentLink)
 }
 const { busyId, download, copy } = useDocumentLinkActions(onIssued)
 
-// Enquanto algum PDF estiver sendo gerado, a lista se atualiza sozinha.
+// Enquanto algum PDF estiver sendo gerado, a lista se atualiza sozinha, cada
+// vez mais devagar e só por um tempo (como o acompanhamento da emissão).
 const hasPending = computed(() => all.value.some(d => d.status === 'pending'))
 let timer: ReturnType<typeof setTimeout> | undefined
+let attempt = 0
+let pollStartedAt = 0
+const pollingStopped = ref(false)
 function schedule() {
   if (timer) clearTimeout(timer)
-  timer = hasPending.value ? setTimeout(async () => { await refresh(); schedule() }, 2000) : undefined
+  timer = undefined
+  if (!hasPending.value) {
+    attempt = 0
+    pollStartedAt = 0
+    pollingStopped.value = false
+    return
+  }
+  if (!pollStartedAt) pollStartedAt = Date.now()
+  const delay = listPollDelay(attempt, Date.now() - pollStartedAt)
+  if (delay == null) {
+    pollingStopped.value = true
+    return
+  }
+  timer = setTimeout(async () => {
+    attempt += 1
+    await refresh()
+    schedule()
+  }, delay)
 }
 onMounted(schedule)
 watch(hasPending, schedule)
@@ -116,6 +137,9 @@ const listError = computed(() => (error.value ? apiErrorMessage(error.value, DOC
     </div>
 
     <p v-if="listError" role="alert" class="text-sm text-destructive">{{ listError }}</p>
+    <p v-else-if="pollingStopped" role="status" class="text-sm text-muted-foreground">
+      Algum PDF ainda está sendo gerado. Recarregue a página para ver o andamento.
+    </p>
 
     <Card role="region" aria-label="Lista de documentos" class="animate-rise overflow-hidden [animation-delay:120ms]">
       <!-- Celular: uma linha por documento, ações embaixo. -->

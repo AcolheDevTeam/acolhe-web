@@ -2,7 +2,7 @@
 // pré-visualização. O texto espelha o que o worker da API imprime no PDF.
 import type { ClinicalDocument } from '~/types'
 import { isValidCpf } from '~/schemas/document'
-import type { ApiErrorOverrides } from './api-error'
+import { apiErrorInfo, apiErrorMessage, type ApiErrorOverrides } from './api-error'
 import { zonedParts } from './timezone'
 
 export const DOCUMENT_TYPE_LABELS: Record<string, string> = {
@@ -188,7 +188,8 @@ export function sessionChoiceLabel(iso: string): { date: string, hour: string } 
 
 export const GENERATE_DOCUMENT_ERRORS: ApiErrorOverrides = {
   400: 'A API recusou alguns dados do documento. Confira as sessões, a cidade e, no recibo, o valor e o CPF.',
-  403: 'Só quem tem vínculo ativo com a paciente pode emitir documentos para ela.',
+  // A API usa 403 para duas causas; sem a frase dela, o texto cobre as duas.
+  403: 'Para emitir documentos para esta paciente, é preciso ter perfil de psicóloga e vínculo ativo com ela.',
   404: 'Não encontramos esta paciente na sua lista. Ela pode ter sido removida.',
   422: 'Uma das sessões escolhidas não é desta paciente. Recarregue a página e selecione as sessões de novo.',
   503: 'A emissão de documentos está fora do ar agora. Tente de novo em alguns minutos.',
@@ -205,4 +206,34 @@ export const DOCUMENT_LINK_ERRORS: ApiErrorOverrides = {
 export const DOCUMENT_LIST_ERRORS: ApiErrorOverrides = {
   403: 'Só psicólogas podem ver documentos emitidos.',
   default: 'Não foi possível carregar os documentos. Recarregue a página.',
+}
+
+// Frases de validação da API que podem ir direto para a tela (dizem o campo).
+const DOCUMENT_FIELD_MESSAGE = /^(tipo de documento|selecione|lista de sessões|informe|a cidade|a finalidade|o nome de quem pagou|cpf de quem pagou)\b/i
+
+/**
+ * Erro da emissão: no 400 mostra a frase da API quando ela diz o campo; no 403
+ * separa "sem perfil de psicóloga" de "vínculo não ativo".
+ */
+export function generateDocumentErrorMessage(error: unknown): string {
+  const { status, technical } = apiErrorInfo(error)
+  const text = technical?.trim() ?? ''
+  if (status === 400 && DOCUMENT_FIELD_MESSAGE.test(text)) {
+    const sentence = `${text.charAt(0).toUpperCase()}${text.slice(1)}`
+    return /[.!?)]$/.test(sentence) ? sentence : `${sentence}.`
+  }
+  if (status === 403 && /restrita a psic/i.test(text))
+    return 'Só contas com perfil de psicóloga podem emitir documentos.'
+  if (status === 403 && /vínculo/i.test(text))
+    return 'O vínculo com esta paciente não está ativo. Reative o vínculo para emitir documentos.'
+  return apiErrorMessage(error, GENERATE_DOCUMENT_ERRORS)
+}
+
+/**
+ * Atraso da próxima atualização da lista enquanto há PDF pendente: começa em
+ * 2 s, cresce 1,5x até 15 s e para depois de 2 minutos (null).
+ */
+export function listPollDelay(attempt: number, elapsedMs: number, ceilingMs = 120_000): number | null {
+  if (elapsedMs >= ceilingMs) return null
+  return Math.min(15_000, Math.round(2000 * 1.5 ** attempt))
 }
