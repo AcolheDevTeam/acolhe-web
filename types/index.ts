@@ -138,7 +138,18 @@ export interface Session {
   modality?: SessionModality | string
   durationMin?: number
   status: SessionStatus | string
+  // Texto livre dos registros anteriores ao prontuário em seções (ACO-101).
+  // Só leitura; aparece como "Anotações".
   notes?: string
+  // Seções do prontuário (ACO-101). Vêm na leitura de uma sessão, não nas listas.
+  demand?: string
+  evolution?: string
+  conduct?: string
+  referral?: string
+  // Sessão concluída (ACO-101). Não trava: edições depois viram novas versões.
+  concluded?: boolean
+  concludedAt?: string | null
+  updatedAt?: string | null
 }
 
 export type ActivityType = 'record' | 'scale' | 'checklist' | 'checkin'
@@ -205,13 +216,32 @@ export interface Checkin {
   createdAt: string
 }
 
+// Documento emitido pela psicóloga (ACO-100). O PDF fica privado no
+// armazenamento; o download usa um link temporário pedido na hora.
+export type ClinicalDocumentType = 'declaration' | 'receipt'
+export type ClinicalDocumentStatus = 'pending' | 'ready' | 'failed'
+
 export interface ClinicalDocument {
   id: string
+  /** Código curto impresso no PDF, ex.: "DC-7K3M-9QX2". */
+  code: string
+  type: ClinicalDocumentType | string
+  status: ClinicalDocumentStatus | string
   patientId: string
-  psychologistId: string
-  type: string
-  pdfUrl?: string | null
+  patientName: string
+  sessionDates: string[]
+  city: string
+  /** SHA-256 do arquivo PDF, registrado na emissão. */
+  sha256: string | null
   createdAt: string
+  readyAt: string | null
+  /** Validade do último link de download gerado. */
+  linkExpiresAt: string | null
+}
+
+export interface ClinicalDocumentLink {
+  url: string
+  expiresAt: string
 }
 
 export interface ActivityResponse {

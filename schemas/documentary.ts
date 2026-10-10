@@ -44,6 +44,8 @@ export const notebookSchema = z.object({
   content: documentaryContentSchema,
   revision: z.number().int().positive(),
   updatedAt: z.string().datetime({ offset: true }),
+  // A versão atual não decifrou: vem sem texto e não pode ser sobrescrita (ACO-86).
+  unreadable: z.boolean().optional(),
 })
 export const notebooksSchema = z.object({
   patient: documentaryPatientSchema,
@@ -79,3 +81,14 @@ export const documentaryHistorySchema = z.object({
 export type Notebook = z.infer<typeof notebookSchema>
 export type NotebookVersion = z.infer<typeof versionSchema>
 export type DocumentaryHistory = z.infer<typeof documentaryHistorySchema>
+
+// Saída de clínica (ACO-96): prazo de 30 dias para baixar os próprios cadernos.
+export const departureSchema = z.object({
+  organizationId: z.string().uuid(),
+  organizationName: z.string(),
+  endedAt: z.string(),
+  exportUntil: z.string(),
+  notebooks: z.number().int().nonnegative(),
+})
+export const departuresSchema = z.array(departureSchema)
+export type Departure = z.infer<typeof departureSchema>

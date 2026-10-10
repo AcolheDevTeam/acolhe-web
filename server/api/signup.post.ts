@@ -34,6 +34,7 @@ export default defineEventHandler(async (event) => {
     const response = await $fetch<unknown>(`${config.apiUrl}/signup`, {
       method: 'POST',
       body: parsed.data,
+      headers: clientHeaders(event),
     })
     const result = signupResponseSchema.parse(response)
 

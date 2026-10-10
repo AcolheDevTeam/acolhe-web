@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { onBeforeRouteLeave, onBeforeRouteUpdate } from 'vue-router'
 import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
+import { Card } from '@/components/ui/card'
+import { ChoiceChips } from '@/components/ui/choice-chips'
+import { InlineNotice } from '@/components/ui/inline-notice'
+import { SaveStatus } from '@/components/ui/save-status'
 import { Textarea } from '@/components/ui/textarea'
 import {
   Dialog,
@@ -25,14 +28,17 @@ import {
   type DocumentaryHistory,
 } from '~/schemas/documentary'
 
-const props = defineProps<{ patientId: string }>()
+// initialCategory: categoria aberta primeiro (ex.: escolhida em "Abrir caderno").
+const props = defineProps<{ patientId: string, initialCategory?: DocumentaryCategory }>()
+// A página guarda a categoria na URL para o recarregamento abrir a mesma.
+const emit = defineEmits<{ categoryChange: [category: DocumentaryCategory] }>()
 const identity = useDocumentaryIdentity()
 const initialIdentity = identity.value
 const requestFetch = useRequestFetch()
 const { data, error, status, refresh, clear } = await useDocumentaryPatient(
   () => props.patientId,
 )
-const category = ref<DocumentaryCategory>('hypothesis')
+const category = ref<DocumentaryCategory>(props.initialCategory ?? 'hypothesis')
 const saved = ref<Notebook | null>(null)
 const draft = ref('')
 const initialized = ref(false)
@@ -58,9 +64,14 @@ const exitProtection = useNuxtApp().$protectedLogout
 const unregisterExit = exitProtection.register({ saving, confirm: confirmDiscard })
 onBeforeUnmount(unregisterExit)
 const dirty = computed(() => draft.value !== (saved.value?.content ?? ''))
+// Caderno que não decifrou (ACO-86): fica só leitura, sem texto, até a
+// chave voltar. Os outros cadernos da paciente seguem normais.
+const unreadable = computed(() => saved.value?.unreadable === true)
 const writable = computed(
   () =>
-    data.value?.patient.writable === true && identity.value === initialIdentity,
+    data.value?.patient.writable === true &&
+    identity.value === initialIdentity &&
+    !unreadable.value,
 )
 const contentValid = computed(
   () => documentaryContentSchema.safeParse(draft.value).success,
@@ -76,6 +87,18 @@ const canSave = computed(
 )
 const categoryLabel = computed(
   () => documentaryCategories.find((c) => c.value === category.value)?.label,
+)
+const categoryOptions = documentaryCategories.map((c) => ({ ...c }))
+const saveState = computed(() =>
+  saving.value
+    ? 'saving'
+    : failure.value
+      ? 'error'
+      : dirty.value
+        ? 'dirty'
+        : saved.value
+          ? 'saved'
+          : 'idle',
 )
 const errorText = documentaryErrorText
 function isCurrent() {
@@ -138,6 +161,7 @@ watch(
 async function changeCategory(next: DocumentaryCategory) {
   if (next === category.value || !(await confirmDiscard())) return
   category.value = next
+  emit('categoryChange', next)
   adopt(data.value?.items.find((item) => item.category === next) ?? null)
   selectedVersion.value = null
   comparedVersion.value = null
@@ -155,8 +179,8 @@ function updatePersisted(value: Notebook) {
         value,
       ],
     }
+  // "Salvo · versão N" sai pelo SaveStatus; sem segundo aviso igual.
   adopt(value)
-  message.value = `Versão ${value.revision} salva.`
 }
 async function inspectLatest() {
   failure.value = ''
@@ -291,6 +315,15 @@ async function restoreVersion() {
   if (!selectedVersion.value || !(await confirmDiscard())) return
   await persist(selectedVersion.value.revision)
 }
+// "Restaurar" na linha do histórico (protótipo) pede confirmação antes, já que
+// a pessoa não está vendo o texto daquela versão.
+const restoreTarget = ref<number | null>(null)
+async function decideRestore(confirmed: boolean) {
+  const revision = restoreTarget.value
+  restoreTarget.value = null
+  if (!confirmed || revision === null || !(await confirmDiscard())) return
+  await persist(revision)
+}
 function rebaseDraft() {
   // Explicit user decision only: preserve draft, acknowledge remote revision, require Save.
   saved.value = latest.value
@@ -361,7 +394,7 @@ watch(
 </script>
 
 <template>
-  <div class="mx-auto max-w-6xl space-y-6">
+  <div class="flex flex-col gap-6">
     <div v-if="error" role="alert" class="space-y-3">
       <p class="text-sm text-destructive">{{ errorText(error) }}</p>
       <p v-if="isSessionExpired(error)" class="text-sm text-muted-foreground">
@@ -377,96 +410,92 @@ watch(
       Carregando cadernos…
     </p>
     <template v-else-if="data">
-      <header class="space-y-3">
-        <div class="flex flex-wrap items-center gap-3">
-          <h2 class="font-serif text-2xl">{{ data.patient.fullName }}</h2>
-          <Badge v-if="!writable" variant="secondary">Somente leitura</Badge>
-        </div>
-        <p class="text-sm text-muted-foreground">
-          Espaço privado da autora. Salvamento manual, sem cópia de rascunho no
-          navegador.
-        </p>
-        <p v-if="!writable" class="text-sm">
-          Paciente ou vínculo clínico inativo. Você pode consultar os cadernos e
-          o histórico.
-        </p>
-      </header>
-      <nav aria-label="Categorias do caderno" class="flex flex-wrap gap-2">
-        <Button
-          v-for="item in documentaryCategories"
-          :key="item.value"
-          :variant="category === item.value ? 'default' : 'outline'"
-          size="sm"
-          :aria-pressed="category === item.value"
-          :disabled="saving || exitProtection.pending.value"
-          @click="changeCategory(item.value)"
-          >{{ item.label }}</Button
+      <InlineNotice v-if="unreadable" tone="warning">
+        <span class="font-medium">Não foi possível abrir este caderno.</span>
+        O texto continua guardado, mas não pôde ser lido agora. Enquanto isso,
+        ele não pode ser editado. Recarregue a página mais tarde para tentar
+        de novo.
+      </InlineNotice>
+      <InlineNotice v-else-if="!writable" tone="neutral">
+        <span class="font-medium text-foreground">Somente leitura.</span>
+        Paciente ou vínculo clínico inativo. Você pode consultar os cadernos e
+        o histórico.
+      </InlineNotice>
+      <ChoiceChips
+        variant="strong"
+        manual
+        label="Categorias do caderno"
+        :options="categoryOptions"
+        :model-value="category"
+        :disabled="saving || exitProtection.pending.value"
+        @update:model-value="changeCategory($event as DocumentaryCategory)"
+      />
+      <div class="flex flex-wrap items-start gap-6">
+        <Card
+          role="region"
+          aria-labelledby="documentary-content-label"
+          class="flex min-w-0 flex-[3_1_420px] flex-col gap-4 p-5 md:p-6"
         >
-      </nav>
-      <div class="grid gap-6 xl:grid-cols-[minmax(0,1fr)_280px]">
-        <section class="min-w-0 space-y-4 rounded-lg border bg-card p-4 md:p-6">
           <div class="flex flex-wrap items-center justify-between gap-2">
-            <label for="documentary-content" class="label-mono">{{
+            <label id="documentary-content-label" for="documentary-content" class="label-mono">{{
               categoryLabel
-            }}</label
-            ><span class="text-xs text-muted-foreground">{{
-              saved ? `Versão ${saved.revision}` : 'Caderno ainda não iniciado'
-            }}</span>
+            }}</label>
+            <span v-if="saveState === 'idle'" class="font-mono text-xs text-muted-foreground">Caderno ainda não iniciado</span>
+            <SaveStatus :state="saveState" :version="saved?.revision" />
           </div>
           <Textarea
             id="documentary-content"
             v-model="draft"
             :readonly="!writable || saving || exitProtection.pending.value"
-            class="min-h-[360px] resize-y whitespace-pre-wrap text-base leading-relaxed"
-            placeholder="Escreva suas anotações nesta categoria…"
+            class="min-h-[360px] resize-y whitespace-pre-wrap leading-[1.6]"
+            :placeholder="unreadable ? '' : 'Escreva suas anotações nesta categoria…'"
             spellcheck="false"
             autocomplete="off"
             autocorrect="off"
             autocapitalize="off"
             :aria-invalid="!contentValid"
           />
-          <p v-if="!contentValid" class="text-sm text-destructive">
+          <InlineNotice v-if="!contentValid" tone="danger">
             O texto excede o limite de 200.000 bytes. Reduza o conteúdo antes de
             salvar.
-          </p>
-          <p v-if="failure" role="alert" class="text-sm text-destructive">
-            {{ failure }}
-          </p>
-          <p v-if="sessionLost" class="text-sm text-muted-foreground">
+          </InlineNotice>
+          <InlineNotice v-if="failure" tone="danger">{{ failure }}</InlineNotice>
+          <InlineNotice v-if="sessionLost" tone="neutral">
             Seu texto continua aqui.
             <NuxtLink to="/login" target="_blank" class="underline underline-offset-4 hover:text-foreground">Entre novamente em outra aba</NuxtLink>
             e depois salve de novo.
-          </p>
-          <p v-if="message" role="status" class="text-sm text-muted-foreground">
-            {{ message }}
-          </p>
-          <div
+          </InlineNotice>
+          <InlineNotice v-if="message">{{ message }}</InlineNotice>
+          <InlineNotice
             v-if="conflicted"
-            class="space-y-2 rounded-lg border p-3 text-sm"
+            tone="warning"
+            class="flex flex-wrap items-center justify-between gap-3"
           >
-            <p>
+            <span>
               Seu texto foi preservado. Consulte a revisão atual antes de salvar
               novamente.
-            </p>
-            <Button variant="outline" @click="inspectLatest()"
+            </span>
+            <Button variant="outline" size="sm" @click="inspectLatest()"
               >Consultar versão mais recente</Button
             >
-          </div>
-          <div class="flex flex-wrap items-center justify-between gap-3">
-            <span class="text-xs text-muted-foreground">{{
-              dirty
-                ? 'Alterações não salvas'
-                : saved
-                  ? 'Conteúdo salvo'
-                  : 'Nenhum conteúdo salvo'
-            }}</span
-            ><Button :disabled="!canSave" @click="persist()">{{
+          </InlineNotice>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-2">
+            <Button :disabled="!canSave" @click="persist()">{{
               saving ? 'Salvando…' : 'Salvar'
             }}</Button>
+            <span class="text-[13px] text-muted-foreground">
+              Salvamento manual, sem cópia de rascunho no navegador.
+            </span>
           </div>
-        </section>
-        <aside class="min-w-0 space-y-4">
-          <h3 class="label-mono">Histórico de versões</h3>
+        </Card>
+        <Card
+          role="region"
+          aria-labelledby="documentary-history-title"
+          class="flex min-w-0 flex-[2_1_300px] flex-col gap-3 p-5 md:p-6"
+        >
+          <h3 id="documentary-history-title" class="label-mono">
+            Histórico{{ history ? ` · ${history.totalCount} ${history.totalCount === 1 ? 'versão' : 'versões'}` : '' }}
+          </h3>
           <p v-if="!saved" class="text-sm text-muted-foreground">
             O primeiro salvamento inicia o histórico.
           </p>
@@ -479,27 +508,43 @@ watch(
               >Tentar novamente</Button
             >
           </div>
-          <template v-if="history"
-            ><div class="divide-y rounded-lg border">
-              <Button
+          <template v-if="history">
+            <ol class="flex flex-col">
+              <li
                 v-for="version in history.items"
                 :key="version.id"
-                variant="ghost"
-                class="h-auto w-full flex-col items-start gap-1 rounded-none p-3 text-left font-normal"
-                :disabled="versionBusy || saving"
-                @click="openVersion(version.revision)"
+                class="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 border-t border-secondary py-2.5 first:border-t-0"
               >
-                <span class="font-medium">Versão {{ version.revision }}</span
-                ><span class="text-xs text-muted-foreground">{{
-                  new Date(version.createdAt).toLocaleString('pt-BR', { timeZone: APP_TIMEZONE })
-                }}</span
-                ><span
-                  v-if="version.restoredFrom"
-                  class="text-xs text-muted-foreground"
-                  >Restaurada da versão {{ version.restoredFrom }}</span
+                <span class="flex min-w-0 flex-col gap-0.5">
+                  <button
+                    type="button"
+                    class="w-fit rounded-sm text-left text-sm underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/15 disabled:opacity-45"
+                    :disabled="versionBusy || saving"
+                    :aria-label="`Ver a versão ${version.revision}`"
+                    @click="openVersion(version.revision)"
+                  >
+                    <span :class="version.revision === saved?.revision ? 'font-semibold' : ''">Versão {{ version.revision }}</span>
+                    <span v-if="version.revision === saved?.revision" class="text-muted-foreground"> · atual</span>
+                  </button>
+                  <span class="font-mono text-xs text-muted-foreground">{{ formatDateTime(version.createdAt) }}</span>
+                  <span
+                    v-if="version.restoredFrom"
+                    class="text-xs text-muted-foreground"
+                    >Restaurada da versão {{ version.restoredFrom }}</span
+                  >
+                </span>
+                <Button
+                  v-if="version.revision !== saved?.revision"
+                  variant="ghost"
+                  size="xs"
+                  class="text-primary hover:bg-accent hover:text-primary"
+                  :disabled="!writable || saving || conflicted || versionBusy || exitProtection.pending.value"
+                  :aria-label="`Restaurar a versão ${version.revision}`"
+                  @click="restoreTarget = version.revision"
+                  >Restaurar</Button
                 >
-              </Button>
-            </div>
+              </li>
+            </ol>
             <PaginationControls
               :page="history.page"
               :total-pages="history.totalPages"
@@ -507,7 +552,7 @@ watch(
               :busy="historyBusy"
               @change="loadHistory"
           /></template>
-        </aside>
+        </Card>
       </div>
     </template>
     <Dialog v-model:open="versionOpen"
@@ -559,24 +604,38 @@ watch(
             alteração foi reenviada.</DialogDescription
           ></DialogHeader
         >
-        <pre
-          class="max-h-64 overflow-auto whitespace-pre-wrap break-words rounded-lg border p-4 font-sans text-sm"
-          >{{ latest?.content || '(texto vazio)' }}</pre
-        >
-        <TextComparison
-          :before="latest?.content ?? ''"
-          :after="draft"
-          before-label="Na versão mais recente"
-          after-label="No seu texto"
-        /><DialogFooter
+        <InlineNotice v-if="latest?.unreadable" tone="warning">
+          A versão mais recente não pôde ser aberta agora, então não dá para
+          comparar nem gravar por cima dela. Copie seu texto se quiser guardá-lo
+          e recarregue a página mais tarde.
+        </InlineNotice>
+        <template v-else>
+          <pre
+            class="max-h-64 overflow-auto whitespace-pre-wrap break-words rounded-lg border p-4 font-sans text-sm"
+            >{{ latest?.content || '(texto vazio)' }}</pre
+          >
+          <TextComparison
+            :before="latest?.content ?? ''"
+            :after="draft"
+            before-label="Na versão mais recente"
+            after-label="No seu texto"
+          />
+        </template><DialogFooter
           ><Button variant="outline" @click="useLatest"
             >Usar versão mais recente</Button
-          ><Button :disabled="!writable" @click="rebaseDraft"
+          ><Button :disabled="!writable || latest?.unreadable === true" @click="rebaseDraft"
             >Manter meu texto para revisar</Button
           ></DialogFooter
         ></DialogContent
       ></Dialog
     >
     <UnsavedChangesDialog :open="confirmOpen" @decision="decide" />
+    <ConfirmDialog
+      :open="restoreTarget !== null"
+      :title="`Restaurar a versão ${restoreTarget}?`"
+      :description="`O texto da versão ${restoreTarget} vira a versão ${(saved?.revision ?? 0) + 1}, a atual. As versões anteriores continuam no histórico.`"
+      confirm-label="Restaurar"
+      @decision="decideRestore"
+    />
   </div>
 </template>

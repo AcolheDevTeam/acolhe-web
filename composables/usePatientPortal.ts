@@ -3,7 +3,6 @@ import type {
   PatientNextSession,
   PatientPendingActivity,
   PatientPortalContext,
-  PatientProcessSummary,
   User,
 } from '~/types'
 import { patientPortalCacheKey, sessionExpired } from '~/utils/patient-portal'
@@ -37,14 +36,8 @@ export function usePatientPortal() {
     immediate: false,
     watch: false,
   })
-  const summary = useFetch<PatientProcessSummary>('/api/patient/process-summary', {
-    key: () => `${cacheKey()}-summary`,
-    default: () => ({ sessionCount: 0, pendingActivityCount: 0, checkinCount: 0 }),
-    immediate: false,
-    watch: false,
-  })
 
-  const requests = [context, nextSession, activities, checkins, summary]
+  const requests = [context, nextSession, activities, checkins]
   const fetchedPatientId = ref<string | null>(null)
   watch(patientId, (id) => {
     if (!id || id === fetchedPatientId.value) return
@@ -66,5 +59,5 @@ export function usePatientPortal() {
     }
   })
 
-  return { me, context, nextSession, activities, checkins, summary, pending, error }
+  return { me, context, nextSession, activities, checkins, pending, error }
 }

@@ -76,7 +76,7 @@ const onSubmit = handleSubmit((formValues) => {
 })
 
 // Proteção contra sair com alterações não salvas (mesmo padrão de
-// SessionNotesForm): trocar de rota, "Descartar", logout e fechar a aba pedem
+// SessionRecordForm): trocar de rota, "Descartar", logout e fechar a aba pedem
 // confirmação. "Sujo" = valores diferentes do último estado salvo; texto vazio
 // conta como ausente para um campo apagado não parecer alteração.
 const snapshot = (v: unknown) => JSON.stringify(v, (_key, value) => (value === '' ? undefined : value))

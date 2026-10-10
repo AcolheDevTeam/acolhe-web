@@ -49,16 +49,23 @@ const { handleSubmit, isSubmitting, resetForm } = useForm({
   initialValues: { patientId: patientId ?? appointment?.patientId, durationMinutes: 50, modality: 'in_person' },
 })
 
-watch(open, (isOpen) => {
-  if (isOpen) resetForm({ values: {
+// Duração padrão do perfil (Ajustes › Perfil, ACO-98) como sugestão para
+// sessão nova; ao reagendar vale a duração da própria sessão.
+const { data: profile, execute: loadProfile } = useProfile({ immediate: false })
+const defaultDuration = computed(() => profile.value?.defaultSessionMinutes ?? 50)
+
+watch(open, async (isOpen) => {
+  if (!isOpen) return
+  if (!appointment && !profile.value) await loadProfile()
+  resetForm({ values: {
     patientId: patientId ?? appointment?.patientId,
     scheduledFor: appointment?.scheduledFor,
-    durationMinutes: appointment?.durationMinutes ?? 50,
+    durationMinutes: appointment?.durationMinutes ?? defaultDuration.value,
     modality: (appointment?.modality as 'in_person' | 'online' | undefined) ?? 'in_person',
   } })
 })
 
-const durationOptions = computed(() => [...new Set([15, 30, 45, 50, 60, 75, 90, 120, 180, 240, 480, appointment?.durationMinutes ?? 50])]
+const durationOptions = computed(() => [...new Set([15, 30, 45, 50, 60, 75, 90, 120, 180, 240, 480, appointment?.durationMinutes ?? defaultDuration.value])]
   .sort((a, b) => a - b).map(minutes => ({ value: String(minutes), label: `${minutes} minutos` })))
 const modalityOptions = [{ value: 'in_person', label: 'Presencial' }, { value: 'online', label: 'Online' }]
 

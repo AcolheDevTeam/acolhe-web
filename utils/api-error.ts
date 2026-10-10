@@ -44,12 +44,15 @@ export function apiErrorInfo(error: unknown): ApiErrorInfo {
     statusCode?: number
     status?: number
     response?: { status?: number, _data?: { message?: string, statusMessage?: string } }
-    data?: { message?: string, statusMessage?: string }
+    data?: { message?: string, statusMessage?: string, data?: { message?: unknown } }
     statusMessage?: string
     message?: string
   }
   const status = err.statusCode ?? err.status ?? err.response?.status
-  const technical = err.data?.message ?? err.response?._data?.message ?? err.data?.statusMessage ?? err.statusMessage ?? err.message
+  // A frase da API chega do BFF em data.data.message (relayApiError); o
+  // data.message do h3 vem vazio. Strings vazias não contam.
+  const relayed = typeof err.data?.data?.message === 'string' ? err.data.data.message : undefined
+  const technical = relayed || err.data?.message || err.response?._data?.message || err.data?.statusMessage || err.statusMessage || err.message
   return { status, technical }
 }
 
@@ -59,6 +62,13 @@ export function apiErrorMessage(error: unknown, overrides: ApiErrorOverrides = {
   if (overrides[status]) return overrides[status] as string
   if (status >= 500) return overrides.default ?? defaultMessages[status] ?? defaultMessages[500]
   return defaultMessages[status] ?? overrides.default ?? 'Não foi possível concluir a ação. Tente de novo.'
+}
+
+/** Campo recusado pela API num 400 (`data.field` repassado pelo BFF), se houver. */
+export function apiErrorField(error: unknown): string | undefined {
+  const err = error as { data?: { field?: unknown, data?: { field?: unknown } } } | null
+  const field = err?.data?.data?.field ?? err?.data?.field
+  return typeof field === 'string' ? field : undefined
 }
 
 /** Verdadeiro para 401: a sessão acabou e o usuário precisa entrar de novo. */
