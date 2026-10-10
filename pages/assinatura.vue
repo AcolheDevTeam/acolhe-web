@@ -241,7 +241,7 @@ onMounted(async () => {
       </InlineNotice>
 
       <InlineNotice v-if="canManage && paid && detailsError" tone="warning" class="flex flex-wrap items-center justify-between gap-3">
-        <span>{{ billingErrorMessage(detailsError, 'details') }} O plano acima está atualizado.</span>
+        <span>{{ billingErrorMessage(detailsError, 'details') }} O plano e a situação abaixo estão atualizados.</span>
         <Button variant="outline" size="sm" @click="refreshDetails()">Tentar novamente</Button>
       </InlineNotice>
 
@@ -284,10 +284,11 @@ onMounted(async () => {
               <span class="text-[13px] text-muted-foreground">{{ cardBrandLabel(card.brand) }} · vence {{ cardExpiry(card.expMonth, card.expYear) }}</span>
             </span>
           </div>
-          <p v-else-if="!detailsError" class="text-sm text-muted-foreground">Nenhum cartão cadastrado.</p>
+          <p v-else-if="detailsError" class="text-sm text-muted-foreground">Cartão indisponível no momento.</p>
+          <p v-else class="text-sm text-muted-foreground">Nenhum cartão cadastrado.</p>
           <div class="mt-auto pt-1">
             <Button variant="outline" :loading="busy === 'portal'" :disabled="!!busy" @click="updateCard">
-              {{ busy === 'portal' ? 'Abrindo…' : card ? 'Trocar cartão' : 'Cadastrar cartão' }}
+              {{ busy === 'portal' ? 'Abrindo…' : card || detailsError ? 'Trocar cartão' : 'Cadastrar cartão' }}
             </Button>
           </div>
         </Card>

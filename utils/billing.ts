@@ -119,7 +119,9 @@ export function billingErrorMessage(error: unknown, action: BillingAction): stri
     403: 'Só a responsável ou a administração da clínica pode assinar e gerenciar a cobrança.',
     404: action === 'portal'
       ? 'Ainda não há cartão cadastrado para esta conta. Escolha um plano para cadastrar.'
-      : 'Não encontramos a assinatura deste espaço de trabalho. Atualize a página.',
+      : action === 'details'
+        ? actionFallback.details
+        : 'Não encontramos a assinatura deste espaço de trabalho. Atualize a página.',
     500: `${actionFallback[action]} Tente de novo em instantes.`,
     502: 'O Stripe não respondeu. Tente de novo em instantes.',
     503: 'A cobrança está indisponível no momento. Tente de novo mais tarde.',

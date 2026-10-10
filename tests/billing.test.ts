@@ -190,5 +190,6 @@ describe('cartão e faturas', () => {
 
   it('cancelar sem assinatura paga tem mensagem própria', () => {
     expect(billingErrorMessage({ statusCode: 409 }, 'cancel')).toMatch(/Não há assinatura paga/)
+    expect(billingErrorMessage({ statusCode: 404 }, 'details')).toMatch(/cartão e as faturas/)
   })
 })
