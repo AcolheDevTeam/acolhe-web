@@ -19,14 +19,17 @@ export function isValidCpf(digits: string): boolean {
 }
 
 // Quebra de linha, tabulação, NUL e caracteres invisíveis (inversão bidi,
-// espaço de largura zero) não vão para o PDF; a API recusa o mesmo.
-const INVISIBLE = /[\p{Cc}\p{Cf}\u2028\u2029]/u
+// espaço de largura zero) não vão para o PDF. Mesma regra da API (docpdf.Printable): o espaço não separável vira espaço
+// comum; qualquer outro separador (tabulação, espaço fino, ideográfico...) é
+// recusado junto com os de controle e formatação.
+const INVISIBLE = /[\p{Cc}\p{Cf}\p{Zl}\p{Zp}]|(?! )\p{Zs}/u
 export const hasInvisibleChars = (value: string) => INVISIBLE.test(value)
+export const normalizeSpaces = (value: unknown) => (typeof value === 'string' ? value.replace(/\u00a0/g, ' ') : value)
 
 const optionalText = (max: number, message: string, invisible: string) =>
-  z.string().trim().max(max, message)
+  z.preprocess(normalizeSpaces, z.string().trim().max(max, message)
     .refine(value => !hasInvisibleChars(value), invisible)
-    .optional().transform(value => value || undefined)
+    .optional().transform(value => value || undefined))
 
 export const generateDocumentSchema = z.object({
   patientId: z.string({ required_error: 'Selecione a paciente' }).uuid('Selecione a paciente'),
@@ -34,10 +37,10 @@ export const generateDocumentSchema = z.object({
   sessionIds: z.array(z.string().uuid('Sessão inválida'), { required_error: 'Selecione pelo menos uma sessão' })
     .min(1, 'Selecione pelo menos uma sessão')
     .max(60, 'Selecione no máximo 60 sessões'),
-  city: z.string({ required_error: 'Informe a cidade' }).trim()
+  city: z.preprocess(normalizeSpaces, z.string({ required_error: 'Informe a cidade' }).trim()
     .min(1, 'Informe a cidade')
     .max(80, 'Use no máximo 80 caracteres na cidade')
-    .refine(value => !hasInvisibleChars(value), 'A cidade tem caracteres que não podem ir para o documento'),
+    .refine(value => !hasInvisibleChars(value), 'A cidade tem caracteres que não podem ir para o documento')),
   purpose: optionalText(200, 'Use no máximo 200 caracteres na finalidade', 'A finalidade tem caracteres que não podem ir para o documento'),
   amountCents: z.number().int('Informe o valor em reais')
     .positive('Informe o valor recebido')

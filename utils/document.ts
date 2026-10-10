@@ -222,6 +222,9 @@ export function generateDocumentErrorMessage(error: unknown): string {
     const sentence = `${text.charAt(0).toUpperCase()}${text.slice(1)}`
     return /[.!?)]$/.test(sentence) ? sentence : `${sentence}.`
   }
+  // Os sorteios de código se esgotaram: não é o serviço fora do ar.
+  if (status === 503 && /código do documento/i.test(text))
+    return 'Não foi possível gerar o código do documento. Tente de novo.'
   if (status === 403 && /restrita a psic/i.test(text))
     return 'Só contas com perfil de psicóloga podem emitir documentos.'
   if (status === 403 && /vínculo/i.test(text))

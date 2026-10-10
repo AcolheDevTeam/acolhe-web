@@ -182,6 +182,12 @@ describe('erros da API', () => {
     expect(generateDocumentErrorMessage(relayed(400, 'code=400, message=Syntax error'))).toBe(GENERATE_DOCUMENT_ERRORS[400])
   })
 
+  it('503 do código esgotado não vira "fora do ar"', () => {
+    expect(generateDocumentErrorMessage(relayed(503, 'não foi possível gerar o código do documento; tente de novo')))
+      .toBe('Não foi possível gerar o código do documento. Tente de novo.')
+    expect(generateDocumentErrorMessage(relayed(503, 'fila de tarefas indisponível'))).toBe(GENERATE_DOCUMENT_ERRORS[503])
+  })
+
   it('403 separa perfil de psicóloga e vínculo', () => {
     expect(generateDocumentErrorMessage(relayed(403, 'ação restrita a psicólogos'))).toContain('perfil de psicóloga')
     expect(generateDocumentErrorMessage(relayed(403, 'vínculo com a paciente não está ativo'))).toContain('vínculo com esta paciente não está ativo')
@@ -214,5 +220,10 @@ describe('caracteres invisíveis', () => {
     const payer = generateDocumentSchema.safeParse({ ...base, type: 'receipt', city: 'Recife', amountCents: 100, payerName: 'Ana\u200b' })
     expect(JSON.stringify(payer.error?.issues)).toContain('O nome tem caracteres')
     expect(generateDocumentSchema.safeParse({ ...base, type: 'declaration', city: 'São Paulo', purpose: 'Apresentação ao RH' }).success).toBe(true)
+    // Como na API: espaço não separável vira espaço; outros separadores, não.
+    const nbsp = generateDocumentSchema.safeParse({ ...base, type: 'declaration', city: 'São\u00a0Paulo' })
+    expect(nbsp.success && nbsp.data.city).toBe('São Paulo')
+    expect(generateDocumentSchema.safeParse({ ...base, type: 'declaration', city: 'São\u2009Paulo' }).success).toBe(false)
+    expect(generateDocumentSchema.safeParse({ ...base, type: 'declaration', city: 'São\tPaulo' }).success).toBe(false)
   })
 })
