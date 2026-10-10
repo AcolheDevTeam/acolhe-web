@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { appointmentSchema, createAppointmentSchema, rescheduleAppointmentSchema } from '~/schemas/appointment'
-import { updateSessionNotesSchema } from '~/schemas/session'
+import { updateSessionRecordSchema } from '~/schemas/session'
 
 describe('agendamento e evolução', () => {
   const schedule = { scheduledFor: '2027-01-01T12:00:00Z', durationMinutes: 50, modality: 'online' }
@@ -33,14 +33,20 @@ describe('agendamento e evolução', () => {
       ...schedule, scheduledFor: offset, createdAt: offset, status: 'scheduled' }).success).toBe(true)
   })
 
-  it('exige uma versão para editar e permite salvar evolução vazia', () => {
-    expect(updateSessionNotesSchema.parse({ version: 1 })).toEqual({ notes: '', version: 1 })
-    expect(updateSessionNotesSchema.safeParse({ notes: 'texto' }).success).toBe(false)
-    expect(updateSessionNotesSchema.safeParse({ notes: '', version: 0 }).success).toBe(false)
+  it('exige uma versão para editar e permite salvar o prontuário vazio', () => {
+    expect(updateSessionRecordSchema.parse({ version: 1 }))
+      .toEqual({ demand: '', evolution: '', conduct: '', referral: '', version: 1 })
+    expect(updateSessionRecordSchema.safeParse({ evolution: 'texto' }).success).toBe(false)
+    expect(updateSessionRecordSchema.safeParse({ version: 0 }).success).toBe(false)
   })
 
-  it('aplica o mesmo limite UTF-8 da API a textos acentuados', () => {
-    expect(updateSessionNotesSchema.safeParse({ notes: 'á'.repeat(5000), version: 1 }).success).toBe(true)
-    expect(updateSessionNotesSchema.safeParse({ notes: 'á'.repeat(5001), version: 1 }).success).toBe(false)
+  it('não apara o texto e limita cada seção a 10.000 caracteres, como a API', () => {
+    expect(updateSessionRecordSchema.parse({ demand: '  linha\n  recuada ', version: 1 }).demand).toBe('  linha\n  recuada ')
+    expect(updateSessionRecordSchema.safeParse({ evolution: 'á'.repeat(10000), version: 1 }).success).toBe(true)
+    const tooLong = updateSessionRecordSchema.safeParse({ evolution: 'á'.repeat(10001), version: 1 })
+    expect(tooLong.success).toBe(false)
+    expect(tooLong.error?.issues[0]?.message).toBe('Evolução: no máximo 10.000 caracteres.')
+    // Emoji conta como um caractere, como na API (não como dois do UTF-16).
+    expect(updateSessionRecordSchema.safeParse({ conduct: '🙂'.repeat(10000), version: 1 }).success).toBe(true)
   })
 })

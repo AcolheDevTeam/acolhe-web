@@ -53,9 +53,12 @@ const details = computed(() => {
           <Avatar tone="brand" class="h-[52px] w-[52px] text-lg text-highlight">
             <AvatarFallback>{{ initials(session.patientName) }}</AvatarFallback>
           </Avatar>
-          <h1 class="min-w-0 text-[28px] font-semibold leading-tight tracking-[-0.03em]">
-            {{ sessionTitle }}<template v-if="session.patientName"> · {{ session.patientName }}</template>
-          </h1>
+          <div class="min-w-0">
+            <h1 class="text-[28px] font-semibold leading-tight tracking-[-0.03em]">
+              {{ sessionTitle }}<template v-if="session.patientName"> · {{ session.patientName }}</template>
+            </h1>
+            <p class="mt-1 text-sm text-muted-foreground">Prontuário visível para a paciente</p>
+          </div>
         </div>
         <SaveStatus :state="saveState" :version="session.version" />
       </header>
@@ -80,9 +83,10 @@ const details = computed(() => {
         </div>
       </Card>
 
-      <SessionNotesForm
+      <SessionRecordForm
         :key="session.id"
         :session="session"
+        :title="sessionTitle"
         @saved="session = $event"
         @reload="refresh()"
         @status="saveState = $event"
@@ -121,7 +125,7 @@ const details = computed(() => {
             </AssignActivityDialog>
           </Card>
         </template>
-      </SessionNotesForm>
+      </SessionRecordForm>
     </template>
 
     <div v-else-if="error" class="text-sm">
