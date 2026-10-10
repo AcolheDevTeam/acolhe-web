@@ -118,6 +118,8 @@ const initials = computed(() =>
       <NuxtLink :to="home" aria-label="Acolhe, ir para o início">
         <AppLogo :with-wordmark="!collapsed" />
       </NuxtLink>
+      <!-- Sino só no desktop; no celular ele fica na barra superior (layout). -->
+      <NotificationBell v-if="collapsible" size="sm" :class="collapsed ? '' : 'ml-auto'" />
       <Button
         v-if="collapsible"
         variant="ghost"
