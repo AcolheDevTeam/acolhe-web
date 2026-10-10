@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { toTypedSchema } from '@vee-validate/zod'
 import { useForm } from 'vee-validate'
-import { createClinicPayloadSchema } from '~/schemas/clinic-signup'
+import { createClinicFormSchema } from '~/schemas/clinic-signup'
 import { crpRegions } from '~/utils/signup-steps'
 import { useWorkspaces } from '~/composables/useWorkspaces'
 import { Button } from '@/components/ui/button'
@@ -25,8 +25,9 @@ const { data: user } = await useFetch<User | null>('/api/me', { key: 'me' })
 if (user.value?.role === 'patient') await navigateTo(homeFor(user.value), { replace: true })
 
 const submitError = ref('')
+const hasPsychologistProfile = computed(() => user.value?.role === 'psychologist')
 const { defineField, errors, handleSubmit, isSubmitting } = useForm({
-  validationSchema: toTypedSchema(createClinicPayloadSchema),
+  validationSchema: computed(() => toTypedSchema(createClinicFormSchema(!hasPsychologistProfile.value))),
   initialValues: { ownerAttends: false },
 })
 const [name, nameAttrs] = defineField('name')
@@ -88,7 +89,7 @@ const onSubmit = handleSubmit(async (values) => {
         <p class="text-sm font-medium">Qual será sua atuação na clínica?</p>
         <RadioCardGroup v-model="ownerMode" :options="ownerOptions" label="Sua atuação na clínica" compact class="grid-cols-2" />
       </div>
-      <div v-if="ownerAttends" class="grid gap-4 sm:grid-cols-2">
+      <div v-if="ownerAttends && !hasPsychologistProfile" class="grid gap-4 sm:grid-cols-2">
         <div class="flex flex-col gap-2">
           <Label for="existing-clinic-crp">Número do CRP</Label>
           <Input id="existing-clinic-crp" v-model="crpNumber" v-bind="crpNumberAttrs" class="h-12" inputmode="numeric" autocomplete="off" placeholder="123456" :aria-invalid="!!errors.crpNumber" />

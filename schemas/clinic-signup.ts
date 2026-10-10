@@ -46,17 +46,25 @@ export const clinicSignupResponseSchema = z.object({
   token: z.string().min(1).optional(),
 }).strict()
 
-export const createClinicPayloadSchema = z.object({
+const createClinicBaseSchema = z.object({
   name: z.string().trim().min(2, 'Informe o nome da clínica.').max(200, 'Nome muito longo.'),
   cnpj: z.string().trim().refine(isValidCnpj, 'Informe um CNPJ válido.').transform(normalizeCnpj),
   ownerAttends: z.boolean(),
   crpNumber: z.string().trim().regex(/^\d{4,8}$/, 'Informe apenas os números do CRP.').optional(),
   crpState: z.string().trim().transform(value => value.toUpperCase().replace(/^CRP-/, '').padStart(2, '0')).refine(value => /^(0[1-9]|1\d|2[0-4])$/.test(value), 'Informe uma região de CRP válida (01 a 24).').optional(),
-}).strict().superRefine((values, context) => {
-  if (!values.ownerAttends) return
-  if (!values.crpNumber) context.addIssue({ code: z.ZodIssueCode.custom, path: ['crpNumber'], message: 'Informe o número do CRP.' })
-  if (!values.crpState) context.addIssue({ code: z.ZodIssueCode.custom, path: ['crpState'], message: 'Escolha a região do CRP.' })
-})
+}).strict()
+
+// O BFF aceita CRP ausente para reaproveitar o perfil existente do usuário.
+// A página aplica a regra condicional conforme o perfil carregado em /me.
+export const createClinicPayloadSchema = createClinicBaseSchema
+
+export function createClinicFormSchema(requireCrp: boolean) {
+  return createClinicBaseSchema.superRefine((values, context) => {
+    if (!requireCrp || !values.ownerAttends) return
+    if (!values.crpNumber) context.addIssue({ code: z.ZodIssueCode.custom, path: ['crpNumber'], message: 'Informe o número do CRP.' })
+    if (!values.crpState) context.addIssue({ code: z.ZodIssueCode.custom, path: ['crpState'], message: 'Escolha uma região do CRP.' })
+  })
+}
 
 export const createClinicResponseSchema = z.object({ organizationId: z.string().uuid() }).strict()
 export type ClinicSignupForm = z.infer<typeof clinicSignupFormSchema>

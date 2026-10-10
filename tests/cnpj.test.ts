@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { isValidCnpj, normalizeCnpj } from '~/utils/cnpj'
-import { clinicSignupPayloadSchema, createClinicPayloadSchema } from '~/schemas/clinic-signup'
+import { clinicSignupPayloadSchema, createClinicFormSchema, createClinicPayloadSchema } from '~/schemas/clinic-signup'
 
 describe('CNPJ numérico e alfanumérico', () => {
   it('valida exemplos oficiais nos dois formatos e normaliza em maiúsculas', () => {
@@ -22,5 +22,13 @@ describe('CNPJ numérico e alfanumérico', () => {
     expect(clinicSignupPayloadSchema.safeParse({ ...base, ownerAttends: true }).success).toBe(false)
     expect(clinicSignupPayloadSchema.safeParse({ ...base, ownerAttends: true, crpNumber: '123456', crpState: '05' }).success).toBe(true)
     expect(createClinicPayloadSchema.safeParse({ name: 'Clínica Travessia', cnpj: '12.abc.345/01de-35', ownerAttends: false }).success).toBe(true)
+  })
+
+  it('reutiliza CRP para psicóloga existente e exige CRP para quem ainda não tem perfil', () => {
+    const payload = { name: 'Clínica Travessia', cnpj: '12.abc.345/01de-35', ownerAttends: true }
+    expect(createClinicPayloadSchema.safeParse(payload).success).toBe(true)
+    expect(createClinicFormSchema(false).safeParse(payload).success).toBe(true)
+    expect(createClinicFormSchema(true).safeParse(payload).success).toBe(false)
+    expect(createClinicFormSchema(true).safeParse({ ...payload, crpNumber: '123456', crpState: '05' }).success).toBe(true)
   })
 })
