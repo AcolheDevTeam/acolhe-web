@@ -1,9 +1,6 @@
 <script setup lang="ts">
-import { ArrowLeft, ArrowRight, Check } from 'lucide-vue-next'
-import { toast } from 'vue-sonner'
-import { Badge } from '@/components/ui/badge'
+import { Check, ChevronLeft } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
 import type {
   FieldAnswer,
@@ -12,7 +9,10 @@ import type {
   SubmissionValue,
 } from '~/schemas/patient-activity'
 
-definePageMeta({ layout: 'patient', middleware: ['auth', 'patient-only'] })
+// Tela cheia, sem a tabbar (protótipo "Respondendo atividade"): cabeçalho com
+// progresso, uma pergunta por vez e o rodapé Voltar/Continuar fixo. O rascunho
+// não é guardado: as respostas são clínicas e não ficam no navegador.
+definePageMeta({ layout: false, middleware: ['auth', 'patient-only'] })
 
 const route = useRoute()
 const assignmentId = computed(() => route.params.id as string)
@@ -29,6 +29,8 @@ const answers = ref<Record<string, FieldAnswer>>({})
 const step = ref(0)
 const sending = ref(false)
 const submitError = ref('')
+const sent = ref(false)
+const direction = ref<'fwd' | 'back'>('fwd')
 
 const fields = computed(() => activity.value?.fields ?? [])
 const total = computed(() => fields.value.length)
@@ -80,6 +82,7 @@ function toSubmissionValue(field: PatientActivityField): SubmissionValue {
 function goBack() {
   submitError.value = ''
   if (step.value === 0) return navigateTo('/patient')
+  direction.value = 'back'
   step.value--
 }
 
@@ -93,6 +96,7 @@ async function goForward() {
     return
   }
   if (!isLast.value) {
+    direction.value = 'fwd'
     step.value++
     return
   }
@@ -112,8 +116,7 @@ async function send() {
         values: fields.value.map(toSubmissionValue),
       },
     })
-    toast.success('Resposta enviada. Sua psicóloga vai ver na próxima revisão.')
-    await navigateTo('/patient')
+    sent.value = true
   }
   catch (err) {
     const { status: code, technical } = apiErrorInfo(err)
@@ -132,97 +135,113 @@ async function send() {
 </script>
 
 <template>
-  <main class="mx-auto flex min-h-dvh w-full max-w-2xl flex-col px-4 pb-32 pt-6 md:px-8">
-    <div v-if="status === 'pending'" class="flex flex-col gap-4">
-      <div class="h-6 w-40 animate-pulse rounded bg-muted" />
-      <div class="h-40 animate-pulse rounded-xl bg-muted" />
-    </div>
-
-    <EmptyState v-else-if="error" compact>
-      {{ apiErrorMessage(error, { 404: 'Esta atividade não existe ou não é sua.' }) }}
-    </EmptyState>
-
-    <template v-else-if="activity">
-      <header class="flex items-start gap-3">
-        <Button variant="ghost" size="icon" aria-label="Voltar" @click="navigateTo('/patient')">
-          <ArrowLeft class="size-4" />
-        </Button>
-        <div class="min-w-0 flex-1">
-          <p class="label-mono">Atividade</p>
-          <h1 class="mt-1 text-xl font-medium">{{ activity.title }}</h1>
+  <div class="flex min-h-dvh flex-col bg-background text-foreground">
+    <header class="sticky top-0 z-20 border-b bg-background">
+      <div class="mx-auto flex w-full max-w-2xl flex-col gap-3.5 px-4 pb-4 pt-5 md:px-8">
+        <div class="flex items-center gap-2">
+          <Button variant="ghost" size="icon-lg" class="-ml-1 shrink-0 text-foreground" aria-label="Voltar para o início" @click="navigateTo('/patient')">
+            <ChevronLeft class="!size-5" />
+          </Button>
+          <div class="flex min-w-0 flex-1 flex-col">
+            <span class="label-mono">Atividade</span>
+            <h1 class="truncate text-base font-semibold">{{ activity?.title ?? 'Carregando…' }}</h1>
+          </div>
         </div>
-        <Badge variant="secondary" class="shrink-0 font-normal">
-          {{ activity.canRespond ? 'Em andamento' : 'Respondida' }}
-        </Badge>
-      </header>
+        <div v-if="activity?.canRespond && total && !sent" class="flex flex-col gap-2">
+          <div class="flex justify-between text-[13px] text-secondary-foreground">
+            <span aria-live="polite">Pergunta {{ step + 1 }} de {{ total }}</span>
+            <span class="font-mono text-xs text-muted-foreground">{{ percent }}%</span>
+          </div>
+          <Progress :model-value="percent" class="bg-accent" aria-label="Progresso" />
+        </div>
+      </div>
+    </header>
 
-      <!-- Já respondida, expirada ou cancelada: não há formulário a mostrar. -->
-      <Card v-if="!activity.canRespond" class="mt-8">
-        <CardContent class="flex flex-col items-center gap-3 py-10 text-center">
-          <Check class="size-6 text-muted-foreground" />
-          <p class="text-sm text-muted-foreground">
+    <main :class="['mx-auto flex w-full max-w-2xl flex-1 flex-col overflow-x-hidden px-5 py-6 md:px-8', activity?.canRespond && total && !sent ? 'pb-36' : '']">
+      <div v-if="status === 'pending'" class="flex flex-col gap-4">
+        <Skeleton class="h-4 w-32" />
+        <Skeleton class="h-8 w-3/4" />
+        <Skeleton class="h-40 rounded-xl" />
+      </div>
+
+      <EmptyState v-else-if="error" compact>
+        {{ apiErrorMessage(error, { 404: 'Esta atividade não existe ou não é sua.' }) }}
+        <template #action>
+          <Button variant="outline" @click="navigateTo('/patient')">Voltar para o início</Button>
+        </template>
+      </EmptyState>
+
+      <template v-else-if="activity">
+        <!-- Enviada agora: confirmação no lugar, como no protótipo. -->
+        <div v-if="sent" class="animate-fade flex flex-col items-center gap-4 pt-16 text-center" aria-live="polite">
+          <span aria-hidden="true" class="flex size-[72px] items-center justify-center rounded-full bg-accent text-primary">
+            <Check class="size-8" :stroke-width="2.2" />
+          </span>
+          <h2 class="text-[22px] font-semibold tracking-[-0.02em]">Resposta enviada</h2>
+          <p class="max-w-[300px] text-[15px] leading-normal text-secondary-foreground">Sua psicóloga vê a resposta na revisão dela.</p>
+          <Button size="xl" class="mt-4 w-full max-w-sm" @click="navigateTo('/patient')">Voltar para o início</Button>
+        </div>
+
+        <!-- Já respondida, expirada ou cancelada: não há formulário a mostrar. -->
+        <div v-else-if="!activity.canRespond" class="flex flex-col items-center gap-4 pt-16 text-center">
+          <span aria-hidden="true" class="flex size-[72px] items-center justify-center rounded-full bg-secondary text-muted-foreground">
+            <Check class="size-8" :stroke-width="2.2" />
+          </span>
+          <p class="max-w-[320px] text-[15px] leading-normal text-secondary-foreground">
             {{ activity.submittedAt
               ? 'Você já respondeu esta atividade. Sua psicóloga vê a resposta na revisão dela.'
               : 'Esta atividade não está mais aberta para resposta.' }}
           </p>
-          <Button variant="outline" @click="navigateTo('/patient')">Voltar para o início</Button>
-        </CardContent>
-      </Card>
-
-      <EmptyState v-else-if="!total" class="mt-8" compact>
-        Esta atividade ainda não tem perguntas. Fale com sua psicóloga.
-      </EmptyState>
-
-      <template v-else-if="currentField">
-        <div class="mt-6 flex flex-col gap-2">
-          <div class="flex items-baseline justify-between text-sm">
-            <span class="text-muted-foreground">Pergunta {{ step + 1 }} de {{ total }}</span>
-            <span class="tabular-nums text-muted-foreground">{{ percent }}%</span>
-          </div>
-          <Progress :model-value="percent" />
+          <Button variant="outline" size="xl" class="mt-2 w-full max-w-sm" @click="navigateTo('/patient')">Voltar para o início</Button>
         </div>
 
-        <section class="mt-8 flex flex-col gap-4">
-          <p class="label-mono">
-            {{ String(step + 1).padStart(2, '0') }} · {{ fieldTypeLabel(currentField.fieldType) }}
-          </p>
-          <h2 class="text-2xl font-medium leading-snug">{{ currentField.label }}</h2>
-          <p v-if="currentField.config.helpText" class="text-sm text-muted-foreground">
-            {{ currentField.config.helpText }}
-          </p>
-          <p v-if="step === 0 && activity.instructions" class="rounded-xl bg-muted px-5 py-4 text-sm">
-            {{ activity.instructions }}
-          </p>
+        <EmptyState v-else-if="!total" compact>
+          Esta atividade ainda não tem perguntas. Fale com sua psicóloga.
+        </EmptyState>
 
-          <!-- ~/components é registrado com pathPrefix: false, então o nome não
-               leva a pasta: components/patient/ActivityFieldInput.vue é
-               <ActivityFieldInput>. -->
-          <ActivityFieldInput
-            :key="currentField.code"
-            :field="currentField"
-            :model-value="answerFor(currentField)"
-            @update:model-value="(value: FieldAnswer) => setAnswer(currentField!, value)"
-          />
+        <template v-else-if="currentField">
+          <section :key="currentField.code" :class="['flex flex-col gap-3.5', direction === 'fwd' ? 'question-fwd' : 'question-back']">
+            <p class="label-mono">
+              {{ String(step + 1).padStart(2, '0') }} · {{ fieldTypeLabel(currentField.fieldType) }}
+            </p>
+            <h2 class="text-[22px] font-semibold leading-tight tracking-[-0.02em]">{{ currentField.label }}</h2>
+            <p v-if="currentField.config.helpText" class="text-sm text-secondary-foreground">
+              {{ currentField.config.helpText }}
+            </p>
+            <p v-if="step === 0 && activity.instructions" class="rounded-xl bg-secondary px-4 py-3.5 text-sm leading-relaxed text-secondary-foreground">
+              {{ activity.instructions }}
+            </p>
 
-          <p v-if="submitError" class="text-sm text-destructive">{{ submitError }}</p>
-        </section>
+            <!-- ~/components é registrado com pathPrefix: false, então o nome não
+                 leva a pasta: components/patient/ActivityFieldInput.vue é
+                 <ActivityFieldInput>. -->
+            <ActivityFieldInput
+              :field="currentField"
+              :model-value="answerFor(currentField)"
+              @update:model-value="(value: FieldAnswer) => setAnswer(currentField!, value)"
+            />
 
-        <!-- Rodapé fixo, como na tela 19: a ação principal fica sempre alcançável.
-             z-30 fica acima da navegação inferior do layout da paciente (z-20):
-             durante a resposta a barra de ação é a única coisa fixa embaixo, como
-             no design, e "Sair" é o caminho de volta. -->
-        <div class="fixed inset-x-0 bottom-0 z-30 border-t bg-background/95 backdrop-blur">
-          <div class="mx-auto flex w-full max-w-2xl items-center justify-between gap-3 px-4 py-4 md:px-8">
-            <Button variant="outline" :disabled="sending" @click="goBack">
-              {{ step === 0 ? 'Sair' : 'Voltar' }}
-            </Button>
-            <Button :disabled="sending" @click="goForward">
-              {{ isLast ? (sending ? 'Enviando…' : 'Enviar resposta') : 'Continuar' }}
-              <ArrowRight v-if="!isLast" class="ml-2 size-4" />
-            </Button>
-          </div>
-        </div>
+            <p v-if="submitError" class="text-sm text-destructive" role="alert">{{ submitError }}</p>
+          </section>
+        </template>
       </template>
-    </template>
-  </main>
+    </main>
+
+    <!-- Rodapé fixo: a ação principal fica sempre ao alcance do polegar. -->
+    <footer v-if="activity?.canRespond && total && !sent && currentField" class="fixed inset-x-0 bottom-0 z-30 border-t bg-card">
+      <div class="mx-auto flex w-full max-w-2xl gap-2.5 px-4 pb-[max(20px,env(safe-area-inset-bottom))] pt-3 md:px-8">
+        <Button v-if="step > 0" variant="outline" size="xl" class="w-24 shrink-0" :disabled="sending" @click="goBack">Voltar</Button>
+        <Button size="xl" class="flex-1" :loading="sending" @click="goForward">
+          {{ isLast ? (sending ? 'Enviando…' : 'Enviar resposta') : 'Continuar' }}
+        </Button>
+      </div>
+    </footer>
+  </div>
 </template>
+
+<style scoped>
+.question-fwd { animation: question-fwd .45s cubic-bezier(.2, .7, .2, 1) both; }
+.question-back { animation: question-back .45s cubic-bezier(.2, .7, .2, 1) both; }
+@keyframes question-fwd { from { opacity: 0; transform: translateX(32px); } }
+@keyframes question-back { from { opacity: 0; transform: translateX(-32px); } }
+</style>
