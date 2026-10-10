@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { contactHref, maxAnnualDiscount, planDisplay, revealDelay } from '../utils/landing'
+import { activeSectionId, contactHref, countUpValue, maxAnnualDiscount, planDisplay, revealDelay } from '../utils/landing'
 import { PLANS, planByCode } from '../utils/plans'
 
 const plain = (s: string) => s.replace(/\s/g, ' ')
@@ -50,5 +50,22 @@ describe('landing: utilidades', () => {
     expect(contactHref('', 'Plano Clínica')).toBe('')
     expect(contactHref('  ', 'x')).toBe('')
     expect(contactHref('oi@exemplo.com', 'Plano Clínica')).toBe('mailto:oi@exemplo.com?subject=Plano%20Cl%C3%ADnica')
+  })
+})
+
+describe('landing: movimento', () => {
+  it('contagem vai de 0 ao alvo e para no alvo', () => {
+    expect(countUpValue(124, 0)).toBe(0)
+    expect(countUpValue(124, 1)).toBe(124)
+    expect(countUpValue(124, 2)).toBe(124)
+    expect(countUpValue(124, 0.5)).toBeGreaterThan(62)
+    expect(countUpValue(124, Number.NaN)).toBe(124)
+  })
+
+  it('seção ativa é a última que passou da linha', () => {
+    const sections = [{ id: 'recursos', top: 300 }, { id: 'planos', top: 900 }]
+    expect(activeSectionId(sections, 100)).toBeUndefined()
+    expect(activeSectionId(sections, 300)).toBe('recursos')
+    expect(activeSectionId(sections, 1200)).toBe('planos')
   })
 })

@@ -46,3 +46,21 @@ export function contactHref(email: string | undefined, subject: string): string 
   if (!address) return ''
   return `mailto:${address}?subject=${encodeURIComponent(subject)}`
 }
+
+/** Valor da contagem no instante `progress` (0–1), com desaceleração no fim. */
+export function countUpValue(target: number, progress: number): number {
+  const t = Math.min(1, Math.max(0, Number.isFinite(progress) ? progress : 1))
+  return Math.round(target * (1 - (1 - t) ** 3))
+}
+
+/**
+ * Seção ativa do menu: a última cujo topo já passou da linha de leitura
+ * (`line`, em px a partir do topo da janela). Antes da primeira, nenhuma.
+ */
+export function activeSectionId(sections: { id: string, top: number }[], line: number): string | undefined {
+  let active: string | undefined
+  for (const section of sections) {
+    if (section.top <= line) active = section.id
+  }
+  return active
+}

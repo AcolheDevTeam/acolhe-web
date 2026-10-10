@@ -1,17 +1,5 @@
 <script setup lang="ts">
-import {
-  ArrowRight,
-  Building2,
-  CalendarCheck,
-  EyeOff,
-  FileLock2,
-  ListChecks,
-  NotebookPen,
-  ShieldCheck,
-  Smartphone,
-  Smile,
-  Users,
-} from 'lucide-vue-next'
+import { ArrowRight, EyeOff, FileLock2, ShieldCheck, Users } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
 import type { User } from '~/types'
@@ -45,16 +33,6 @@ const links = [
   { href: '#seguranca', label: 'Segurança' },
   { href: '#planos', label: 'Planos' },
   { href: '#perguntas', label: 'Perguntas' },
-]
-
-const features = [
-  { icon: CalendarCheck, title: 'Agenda com confirmação', text: 'Marque as sessões da semana. A paciente confirma o horário pela área dela, e você vê quem já confirmou.' },
-  { icon: NotebookPen, title: 'Prontuário por sessão', text: 'Registre a evolução de cada atendimento. A ficha da paciente reúne as sessões em ordem.' },
-  { icon: ListChecks, title: 'Atividades entre sessões', text: 'Envie tarefas e questionários a partir dos seus templates. As respostas chegam para você revisar.' },
-  { icon: Smile, title: 'Check-in diário de humor', text: 'A paciente marca como está em poucos segundos. Você acompanha os últimos dias na ficha.' },
-  { icon: Smartphone, title: 'Área da paciente no celular', text: 'Nada para instalar. A paciente entra pelo navegador e vê sessões, atividades e o check-in do dia.' },
-  { icon: FileLock2, title: 'Registro Documental cifrado', text: 'Suas anotações pessoais ficam guardadas com criptografia e só você lê. Nem a clínica tem acesso.' },
-  { icon: Building2, title: 'Clínicas e equipes', text: 'Convide a equipe e acompanhe números agregados no painel. Cada psicóloga cuida dos próprios pacientes.' },
 ]
 
 const steps = [
@@ -113,17 +91,32 @@ const year = new Date().getFullYear()
 
     <main id="conteudo">
       <!-- Hero -->
-      <section class="relative" aria-labelledby="hero-title">
-        <div class="relative mx-auto grid max-w-[1200px] items-center gap-12 px-4 pb-20 pt-10 md:px-8 md:pt-16 lg:grid-cols-[1.05fr_1fr] lg:gap-10 lg:pb-28">
-          <div class="flex flex-col gap-7">
-            <p class="animate-rise label-mono text-xs">Para psicólogas no Brasil</p>
-            <h1 id="hero-title" class="animate-rise text-[40px] font-semibold leading-[1.04] tracking-[-0.035em] [animation-delay:.08s] sm:text-[52px] lg:text-[60px]">
-              Agenda, prontuário e o cuidado entre as sessões.
+      <section class="hero relative isolate overflow-hidden" aria-labelledby="hero-title">
+        <div class="hero-wash pointer-events-none absolute inset-0 -z-10" aria-hidden="true" />
+        <svg
+          class="hero-arcs pointer-events-none absolute -z-10"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke-linecap="round"
+          aria-hidden="true"
+        >
+          <path pathLength="1" d="M22 17a10 10 0 0 0-20 0" stroke="hsl(var(--primary))" />
+          <path pathLength="1" d="M18 17a6 6 0 0 0-12 0" stroke="#FF7A5C" />
+          <path pathLength="1" d="M14 17a2 2 0 0 0-4 0" stroke="hsl(var(--brand))" />
+        </svg>
+        <div class="mx-auto grid max-w-[1200px] items-center gap-12 px-4 pb-16 pt-8 md:px-8 md:pt-12 lg:min-h-[min(700px,calc(100svh-72px))] lg:grid-cols-[1.05fr_1fr] lg:gap-10 lg:pb-16 lg:pt-6">
+          <div class="flex flex-col gap-6">
+            <p class="animate-rise inline-flex w-fit items-center gap-2 rounded-full border bg-card/70 px-3 py-1.5 font-mono text-[11px] uppercase tracking-[.14em] text-muted-foreground backdrop-blur">
+              <span class="size-1.5 rounded-full bg-highlight" aria-hidden="true" />
+              Para psicólogas no Brasil
+            </p>
+            <h1 id="hero-title" class="animate-rise text-[40px] font-semibold leading-[1.04] tracking-[-0.035em] [animation-delay:.08s] sm:text-[52px] lg:text-[58px]">
+              Agenda, prontuário e o cuidado <span class="text-primary">entre as sessões.</span>
             </h1>
             <p class="animate-rise max-w-[520px] text-[17px] leading-relaxed text-secondary-foreground [animation-delay:.16s] md:text-lg">
               No Acolhe você marca as sessões, registra a evolução e envia atividades. A paciente confirma horários, responde e faz o check-in do dia pelo celular.
             </p>
-            <div class="animate-rise flex flex-col gap-3 [animation-delay:.24s] sm:flex-row">
+            <div class="animate-rise flex flex-col gap-3 pt-1 [animation-delay:.24s] sm:flex-row">
               <Button as-child size="xl">
                 <NuxtLink to="/signup">Começar teste grátis <ArrowRight /></NuxtLink>
               </Button>
@@ -131,8 +124,9 @@ const year = new Date().getFullYear()
                 <a href="#planos">Ver planos</a>
               </Button>
             </div>
-            <div class="animate-rise flex flex-col gap-1.5 [animation-delay:.32s]">
+            <div class="animate-rise flex flex-wrap items-center gap-x-4 gap-y-1.5 [animation-delay:.32s]">
               <p class="text-sm text-muted-foreground">{{ TRIAL_DAYS }} dias grátis, sem cartão.</p>
+              <span class="hidden h-3 w-px bg-input sm:block" aria-hidden="true" />
               <p class="font-mono text-xs tracking-[.06em] text-muted-foreground">LGPD · CFP 01/2009 · Lei 13.787/2018</p>
             </div>
           </div>
@@ -141,41 +135,22 @@ const year = new Date().getFullYear()
       </section>
 
       <!-- Recursos -->
-      <section id="recursos" class="scroll-mt-20 border-t bg-card py-20 md:py-28" aria-labelledby="recursos-title">
+      <LandingCurve class="-mb-px text-card" />
+      <section id="recursos" class="scroll-mt-16 bg-card pb-20 pt-12 md:pb-24 md:pt-16" aria-labelledby="recursos-title">
         <div class="mx-auto flex max-w-[1200px] flex-col gap-12 px-4 md:px-8">
           <LandingSectionHeading
             id="recursos-title"
             eyebrow="Recursos"
             title="O que você usa no dia a dia do consultório"
-            support="Ferramentas simples, pensadas para a rotina de quem atende. Sem curva de aprendizado longa."
+            support="Ferramentas simples, pensadas para a rotina de quem atende. Tudo o que está aqui já funciona hoje."
           />
-          <ul class="grid gap-px overflow-hidden rounded-2xl border bg-border sm:grid-cols-2 lg:grid-cols-4">
-            <li
-              v-for="(feature, index) in features"
-              :key="feature.title"
-              :data-reveal="index % 4"
-              class="feature flex flex-col gap-3 bg-card p-6 md:p-7"
-              :class="index === features.length - 1 && 'sm:col-span-2 lg:col-span-1'"
-            >
-              <span class="flex size-10 items-center justify-center rounded-xl bg-accent text-primary">
-                <component :is="feature.icon" class="size-5" :stroke-width="1.8" aria-hidden="true" />
-              </span>
-              <h3 class="text-base font-semibold tracking-[-0.01em]">{{ feature.title }}</h3>
-              <p class="text-sm leading-relaxed text-secondary-foreground">{{ feature.text }}</p>
-            </li>
-            <li data-reveal="3" class="hidden flex-col justify-between gap-4 bg-brand p-6 text-brand-foreground md:p-7 lg:flex">
-              <p class="label-mono !text-highlight">Teste grátis</p>
-              <p class="text-lg font-semibold leading-snug tracking-[-0.01em] text-white">Use tudo isso por {{ TRIAL_DAYS }} dias, sem cartão.</p>
-              <NuxtLink to="/signup" class="inline-flex items-center gap-1.5 text-sm font-semibold text-white underline-offset-4 hover:underline">
-                Criar conta <ArrowRight class="size-4" aria-hidden="true" />
-              </NuxtLink>
-            </li>
-          </ul>
+          <LandingFeatures />
         </div>
       </section>
+      <div class="h-24 bg-gradient-to-b from-card to-background md:h-32" aria-hidden="true" />
 
       <!-- Entre as sessões -->
-      <section class="py-20 md:py-28" aria-labelledby="entre-title">
+      <section class="pb-20 pt-4 md:pb-28" aria-labelledby="entre-title">
         <div class="mx-auto grid max-w-[1200px] items-center gap-12 px-4 md:px-8 lg:grid-cols-2 lg:gap-16">
           <div class="flex flex-col gap-10">
             <LandingSectionHeading
@@ -209,7 +184,8 @@ const year = new Date().getFullYear()
       </section>
 
       <!-- Segurança -->
-      <section id="seguranca" class="dark-surface scroll-mt-20 bg-brand py-20 text-brand-foreground md:py-28" aria-labelledby="seguranca-title">
+      <LandingCurve class="-mb-px text-brand" />
+      <section id="seguranca" class="dark-surface scroll-mt-16 bg-brand pb-16 pt-12 text-brand-foreground md:pb-24 md:pt-16" aria-labelledby="seguranca-title">
         <div class="mx-auto flex max-w-[1200px] flex-col gap-12 px-4 md:px-8">
           <LandingSectionHeading
             id="seguranca-title"
@@ -235,8 +211,10 @@ const year = new Date().getFullYear()
         </div>
       </section>
 
+      <LandingCurve flip class="-mt-px text-brand" />
+
       <!-- Para clínicas -->
-      <section id="clinicas" class="scroll-mt-20 py-20 md:py-28" aria-labelledby="clinicas-title">
+      <section id="clinicas" class="scroll-mt-16 py-20 md:py-28" aria-labelledby="clinicas-title">
         <div class="mx-auto grid max-w-[1200px] items-center gap-12 px-4 md:px-8 lg:grid-cols-2 lg:gap-16">
           <div class="flex flex-col gap-8 lg:order-2">
             <LandingSectionHeading
@@ -259,15 +237,15 @@ const year = new Date().getFullYear()
             <div class="mt-6 grid grid-cols-3 gap-3">
               <div class="rounded-xl bg-surface-subtle p-3">
                 <p class="label-mono text-[10px]">Sessões</p>
-                <p class="mt-1 font-mono text-xl font-medium">124</p>
+                <p class="mt-1 font-mono text-xl font-medium"><LandingCountUp :value="124" /></p>
               </div>
               <div class="rounded-xl bg-surface-subtle p-3">
                 <p class="label-mono text-[10px]">Pacientes</p>
-                <p class="mt-1 font-mono text-xl font-medium">38</p>
+                <p class="mt-1 font-mono text-xl font-medium"><LandingCountUp :value="38" /></p>
               </div>
               <div class="rounded-xl bg-surface-subtle p-3">
                 <p class="label-mono text-[10px]">Próximas</p>
-                <p class="mt-1 font-mono text-xl font-medium">21</p>
+                <p class="mt-1 font-mono text-xl font-medium"><LandingCountUp :value="21" /></p>
               </div>
             </div>
             <ul class="mt-6 flex flex-col gap-3.5">
@@ -277,7 +255,7 @@ const year = new Date().getFullYear()
                 <span class="h-2 flex-1 overflow-hidden rounded-full bg-secondary">
                   <span class="clinic-bar block h-full rounded-full bg-primary" :style="{ width: `${row.sessions / 42 * 100}%` }" />
                 </span>
-                <span class="w-7 text-right font-mono text-[13px] text-muted-foreground">{{ row.sessions }}</span>
+                <span class="w-7 text-right font-mono text-[13px] text-muted-foreground"><LandingCountUp :value="row.sessions" /></span>
               </li>
             </ul>
           </div>
@@ -285,7 +263,8 @@ const year = new Date().getFullYear()
       </section>
 
       <!-- Planos -->
-      <section id="planos" class="scroll-mt-20 border-t bg-card py-20 md:py-28" aria-labelledby="planos-title">
+      <LandingCurve class="-mb-px text-card" />
+      <section id="planos" class="scroll-mt-16 bg-card pb-12 pt-12 md:pb-16 md:pt-16" aria-labelledby="planos-title">
         <div class="mx-auto flex max-w-[1200px] flex-col gap-10 px-4 md:px-8">
           <LandingSectionHeading
             id="planos-title"
@@ -298,8 +277,10 @@ const year = new Date().getFullYear()
         </div>
       </section>
 
+      <div class="h-24 bg-gradient-to-b from-card to-background md:h-32" aria-hidden="true" />
+
       <!-- Perguntas -->
-      <section id="perguntas" class="scroll-mt-20 py-20 md:py-28" aria-labelledby="perguntas-title">
+      <section id="perguntas" class="scroll-mt-16 pb-20 pt-4 md:pb-28" aria-labelledby="perguntas-title">
         <div class="mx-auto grid max-w-[1200px] gap-10 px-4 md:px-8 lg:grid-cols-[1fr_1.4fr] lg:gap-16">
           <LandingSectionHeading
             id="perguntas-title"
@@ -369,6 +350,31 @@ const year = new Date().getFullYear()
 </template>
 
 <style scoped>
+/* Fundo do hero: névoa com um véu índigo e um toque de salmão, e os três arcos
+   do logo em traço fino, bem apagados, desenhados na carga (arcdraw). */
+.hero-wash {
+  background:
+    radial-gradient(55% 60% at 80% 35%, hsl(var(--accent)) 0%, transparent 70%),
+    radial-gradient(30% 30% at 95% 0%, rgba(255, 138, 112, .12) 0%, transparent 70%),
+    radial-gradient(40% 50% at 0% 100%, hsl(var(--accent) / .6) 0%, transparent 70%);
+}
+.hero-arcs {
+  width: min(1100px, 150vw);
+  right: -18%;
+  top: 4%;
+  opacity: .14;
+  stroke-width: .12;
+}
+.hero-arcs path {
+  stroke-dasharray: 1;
+  animation: arcdraw 1.8s cubic-bezier(.65, 0, .35, 1) backwards;
+}
+.hero-arcs path:nth-child(1) { animation-delay: .1s; }
+.hero-arcs path:nth-child(2) { animation-delay: .35s; }
+.hero-arcs path:nth-child(3) { animation-delay: .6s; }
+@media (max-width: 1023px) {
+  .hero-arcs { right: -40%; top: auto; bottom: -8%; opacity: .08; }
+}
 .feature {
   transition: background-color .25s ease;
 }
