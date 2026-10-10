@@ -4,7 +4,8 @@ import type { User } from '~/types'
 // Moldura das telas de Ajustes (protótipos "Perfil" e "Segurança", ACO-98):
 // cabeçalho "Ajustes" + título e a sub-navegação à esquerda (no celular, em
 // linha acima do conteúdo). Só aparecem as seções que existem: Perfil para
-// quem atende, Segurança para todos e Assinatura para quem tem cobrança.
+// quem atende, Segurança para todos, Notificações para quem atende (ACO-99) e
+// Assinatura para quem tem cobrança.
 defineProps<{ title: string }>()
 
 const { data: me } = useNuxtData<User | null>('me')
@@ -13,6 +14,7 @@ const route = useRoute()
 const links = computed(() => [
   ...(me.value?.role === 'psychologist' ? [{ label: 'Perfil', to: '/ajustes/perfil' }] : []),
   { label: 'Segurança', to: '/ajustes/seguranca' },
+  ...(me.value?.role === 'psychologist' ? [{ label: 'Notificações', to: '/ajustes/notificacoes' }] : []),
   ...(hasBilling(me.value) ? [{ label: 'Assinatura', to: BILLING_PATH }] : []),
 ])
 </script>

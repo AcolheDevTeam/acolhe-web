@@ -60,13 +60,8 @@ function toggle(kind: NotificationKind, channel: NotificationChannel, value: boo
 </script>
 
 <template>
-  <PageHeader eyebrow="Ajustes" title="Notificações">
-    <template #actions>
-      <SaveStatus v-if="rows.length" :state="saveState" saved-text="Salvo automaticamente" />
-    </template>
-  </PageHeader>
-
-  <div class="flex w-full max-w-[808px] flex-col gap-6 px-4 pb-14 pt-6 md:px-8 lg:px-12">
+  <SettingsShell title="Notificações">
+    <SaveStatus v-if="rows.length" class="self-end" :state="saveState" saved-text="Salvo automaticamente" />
     <InlineNotice class="animate-rise flex gap-3 [animation-delay:80ms]">
       <Lock class="mt-0.5 size-[18px] shrink-0" :stroke-width="1.8" aria-hidden="true" />
       <p>Os e-mails avisam que algo aconteceu e trazem um link para o Acolhe. Nunca incluem respostas, anotações ou outro conteúdo clínico.</p>
@@ -116,5 +111,5 @@ function toggle(kind: NotificationKind, channel: NotificationChannel, value: boo
     <NuxtLink to="/notificacoes" class="self-start text-sm font-medium text-primary underline-offset-4 hover:underline">
       Ver notificações
     </NuxtLink>
-  </div>
+  </SettingsShell>
 </template>
