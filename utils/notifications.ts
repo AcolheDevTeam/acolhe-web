@@ -18,17 +18,17 @@ export const notificationKindMeta: Record<NotificationKind, KindMeta> = {
   activity_submitted: {
     label: 'Resposta enviada',
     action: 'enviou a resposta de uma atividade.',
-    description: 'Uma paciente respondeu uma atividade',
+    description: 'Um(a) paciente respondeu uma atividade',
   },
   appointment_confirmed: {
     label: 'Presença confirmada',
     action: 'confirmou presença na sessão.',
-    description: 'A paciente confirmou a próxima sessão',
+    description: 'O(A) paciente confirmou a próxima sessão',
   },
   invitation_accepted: {
     label: 'Convite aceito',
     action: 'aceitou o convite e criou a conta.',
-    description: 'Uma paciente criou a conta pelo seu convite',
+    description: 'Um(a) paciente criou a conta pelo seu convite',
   },
 }
 

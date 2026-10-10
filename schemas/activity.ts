@@ -8,7 +8,7 @@ import {
 
 export const assignActivitySchema = z.object({
   templateId: z.string({ required_error: 'Selecione um template' }).uuid('Selecione um template'),
-  patientId: z.string({ required_error: 'Selecione um paciente' }).uuid('Selecione um paciente'),
+  patientId: z.string({ required_error: 'Selecione o(a) paciente' }).uuid('Selecione o(a) paciente'),
   dueAt: z.string().datetime({ message: 'Informe a data e a hora do prazo' }).optional(),
 })
 
@@ -110,7 +110,7 @@ export const reviewRequestSchema = z.object({
   ).max(REVIEW_TAGS_MAX, 'Use no máximo 10 tags por atividade.').optional(),
   expectedUpdatedAt: z.string().datetime({ offset: true }).nullable().optional(),
 }).refine(body => !body.comment || !!body.visibility, {
-  message: 'Escolha se o comentário é compartilhado com a paciente ou interno.',
+  message: 'Escolha se o comentário é compartilhado com o(a) paciente ou interno.',
   path: ['visibility'],
 })
 

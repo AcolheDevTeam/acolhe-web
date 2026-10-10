@@ -29,7 +29,7 @@ const validity = computed(() => preview.value ? formatDateTime(preview.value.exp
           <template v-if="preview">
             <CardTitle class="display-serif mt-2 text-3xl">{{ preview.organizationName }}</CardTitle>
             <CardDescription class="mt-2">
-              Você foi convidada para atuar como <span class="font-medium text-foreground">{{ roles }}</span>
+              Você foi convidada(o) para atuar como <span class="font-medium text-foreground">{{ roles }}</span>
               com o e-mail <span class="font-medium text-foreground">{{ preview.email }}</span>.
               O convite vale até {{ validity }}.
             </CardDescription>

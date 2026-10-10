@@ -20,7 +20,7 @@ export function documentaryErrorText(error: unknown): string {
   if (status === 403) {
     return documentaryForbiddenReason(error) === 'read_only'
       ? 'Paciente ou vínculo clínico inativo. O caderno está disponível somente para leitura.'
-      : 'Este caderno é privado da psicóloga autora e não está disponível para a sua conta.'
+      : 'Este caderno é privado da(o) psicóloga(o) autor(a) e não está disponível para a sua conta.'
   }
   return apiErrorMessage(error, {
     400: 'Confira a revisão, a categoria e o limite de 200.000 bytes do texto.',

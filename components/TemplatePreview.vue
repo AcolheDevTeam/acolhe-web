@@ -44,7 +44,7 @@ const rows = computed(() => props.fields.map((field, i) => ({
   <!-- Fixa na coluna ao rolar o builder; o formulário rola por dentro, com
        altura máxima, para não crescer junto com a quantidade de perguntas. -->
   <section aria-labelledby="preview-title" class="flex flex-col gap-3.5 rounded-2xl bg-brand p-5 text-brand-foreground lg:sticky lg:top-6">
-    <h2 id="preview-title" class="font-mono text-[11px] font-medium uppercase tracking-[0.14em] text-brand-muted">Como a paciente vê</h2>
+    <h2 id="preview-title" class="font-mono text-[11px] font-medium uppercase tracking-[0.14em] text-brand-muted">Como o(a) paciente vê</h2>
     <div
       tabindex="0"
       aria-label="Prévia do formulário"

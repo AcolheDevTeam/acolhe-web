@@ -21,7 +21,7 @@ describe('landing: preços dos planos', () => {
 
   it('Clínica é por psicóloga', () => {
     const view = planDisplay(planByCode('clinica'), 'annual')
-    expect(view.unit).toBe('/mês por psicóloga')
+    expect(view.unit).toBe('/mês por psicóloga(o)')
     expect(plain(view.caption)).toContain('R$ 348 por ano por psicóloga')
   })
 

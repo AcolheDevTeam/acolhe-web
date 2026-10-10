@@ -72,8 +72,8 @@ async function accept() {
   } catch (error) {
     actionError.value = apiErrorMessage(error, {
       400: 'Confira a senha e os consentimentos marcados.',
-      404: 'Este convite não foi encontrado. Peça um novo link à sua psicóloga.',
-      410: 'Este convite expirou ou foi cancelado. Peça um novo link à sua psicóloga.',
+      404: 'Este convite não foi encontrado. Peça um novo link a sua(seu) psicóloga(o).',
+      410: 'Este convite expirou ou foi cancelado. Peça um novo link a sua(seu) psicóloga(o).',
       409: 'Este convite já foi utilizado ou já existe uma conta com este e-mail. Tente entrar pela tela de login.',
       default: 'Não foi possível concluir o aceite agora. Tente novamente em instantes.',
     })
@@ -145,7 +145,7 @@ async function decline() {
       <div v-else-if="completed === 'declined'" class="animate-fade flex flex-1 flex-col justify-center gap-[18px]" aria-live="polite">
         <h1 class="text-[26px] font-semibold tracking-[-0.025em]">Convite recusado</h1>
         <p class="text-[15px] leading-normal text-secondary-foreground">
-          Nenhuma conta foi criada e o vínculo foi encerrado. Se mudar de ideia, peça um novo convite à sua psicóloga.
+          Nenhuma conta foi criada e o vínculo foi encerrado. Se mudar de ideia, peça um novo convite a sua(seu) psicóloga(o).
         </p>
       </div>
 
@@ -155,7 +155,7 @@ async function decline() {
           <span class="flex min-w-0 flex-col gap-0.5">
             <span class="font-mono text-[11px] uppercase tracking-[0.12em] text-brand-muted">Convite de</span>
             <span class="text-[17px] font-semibold text-white">{{ invitation.psychologistName }}</span>
-            <span class="text-[13px] text-[#C3CAF0]">Psicóloga · CRP {{ invitation.psychologistCrp }}</span>
+            <span class="text-[13px] text-[#C3CAF0]">Psicóloga(o) · CRP {{ invitation.psychologistCrp }}</span>
           </span>
         </section>
 
@@ -229,7 +229,7 @@ async function decline() {
     <ConfirmDialog
       :open="declineConfirmOpen"
       title="Recusar o convite?"
-      description="O link deixa de funcionar e nenhuma conta é criada. Para entrar depois, você vai precisar de um novo convite da sua psicóloga."
+      description="O link deixa de funcionar e nenhuma conta é criada. Para entrar depois, você vai precisar de um novo convite de sua(seu) psicóloga(o)."
       confirm-label="Recusar convite"
       destructive
       @decision="onDeclineDecision"

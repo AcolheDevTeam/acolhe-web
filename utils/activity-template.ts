@@ -190,7 +190,7 @@ export function templateApiErrorMessage(error: unknown, fallback: string): strin
   if (status === 400 && technical && !/^corpo inválido/i.test(technical) && !/^[[{]/.test(technical.trim())) return technical
   return apiErrorMessage(error, {
     400: 'Confira os campos do template e tente de novo.',
-    403: 'Só a autora pode editar este template. Templates da Acolhe são somente leitura.',
+    403: 'Só o(a) autor(a) pode editar este template. Templates da Acolhe são somente leitura.',
     404: 'Template não encontrado. Ele pode ter sido removido.',
     409: 'Este template foi arquivado ou já tem uma versão mais nova. Atualize a página.',
     default: fallback,

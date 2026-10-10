@@ -29,7 +29,7 @@ const totals = computed(() => professionals.value.reduce((sum, p) => ({
 }), { patients: 0, sessions: 0, upcoming: 0 }))
 
 const eyebrow = computed(() => {
-  const count = `${activeCount.value} ${activeCount.value === 1 ? 'psicóloga' : 'psicólogas'}`
+  const count = `${activeCount.value} ${activeCount.value === 1 ? 'psicóloga(o)' : 'psicólogas(os)'}`
   if (status.value === 'pending' || error.value) return clinicName.value ?? 'Clínica'
   return clinicName.value ? `${clinicName.value} · ${count}` : count
 })
@@ -39,7 +39,7 @@ const maxSessions = computed(() => Math.max(1, ...professionals.value.map(p => p
 function barHeight(value: number) {
   return Math.max(4, Math.round(value / maxSessions.value * 180))
 }
-const chartLabel = computed(() => `Sessões nos últimos 30 dias por psicóloga: ${professionals.value.map(p => `${p.fullName} ${p.sessionsLast30Days}`).join('; ')}`)
+const chartLabel = computed(() => `Sessões nos últimos 30 dias por psicóloga(o): ${professionals.value.map(p => `${p.fullName} ${p.sessionsLast30Days}`).join('; ')}`)
 </script>
 
 <template>
@@ -67,14 +67,14 @@ const chartLabel = computed(() => `Sessões nos últimos 30 dias por psicóloga:
       </section>
 
       <EmptyState v-if="!professionals.length" title="Ainda não há profissionais atendendo">
-        Convide a equipe para ver os números por psicóloga aqui.
+        Convide a equipe para ver os números por psicóloga(o) aqui.
         <template #action>
           <Button variant="outline" as-child><NuxtLink to="/clinica/equipe">Gerenciar equipe</NuxtLink></Button>
         </template>
       </EmptyState>
       <template v-else>
         <Card role="region" aria-labelledby="t-chart" class="flex animate-rise flex-col gap-5 p-6 [animation-delay:.16s]">
-          <h2 id="t-chart" class="text-lg font-semibold tracking-[-0.01em]">Sessões por psicóloga</h2>
+          <h2 id="t-chart" class="text-lg font-semibold tracking-[-0.01em]">Sessões por psicóloga(o)</h2>
           <div class="overflow-x-auto">
             <div
               role="img"
@@ -92,11 +92,11 @@ const chartLabel = computed(() => `Sessões nos últimos 30 dias por psicóloga:
         </Card>
 
         <Card role="region" aria-labelledby="t-tab" class="animate-rise overflow-hidden pt-2 [animation-delay:.22s]">
-          <h2 id="t-tab" class="px-4 pb-2 pt-3.5 text-lg font-semibold tracking-[-0.01em]">Por psicóloga</h2>
+          <h2 id="t-tab" class="px-4 pb-2 pt-3.5 text-lg font-semibold tracking-[-0.01em]">Por psicóloga(o)</h2>
           <Table class="min-w-[560px]">
             <TableHeader>
               <TableRow class="border-border hover:bg-transparent">
-                <TableHead>Psicóloga</TableHead>
+                <TableHead>Psicóloga(o)</TableHead>
                 <TableHead class="whitespace-nowrap">Sessões em 30 dias</TableHead>
                 <TableHead>Agendadas</TableHead>
                 <TableHead class="whitespace-nowrap">Pacientes ativos</TableHead>

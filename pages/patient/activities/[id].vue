@@ -216,7 +216,7 @@ onBeforeUnmount(() => {
             <Check class="size-8" :stroke-width="2.2" />
           </span>
           <h2 class="text-[22px] font-semibold tracking-[-0.02em]">Resposta enviada</h2>
-          <p class="max-w-[300px] text-[15px] leading-normal text-secondary-foreground">Sua psicóloga vê a resposta na revisão dela.</p>
+          <p class="max-w-[300px] text-[15px] leading-normal text-secondary-foreground">Sua(seu) psicóloga(o) vê a resposta na revisão.</p>
           <Button size="xl" class="mt-4 w-full max-w-sm" @click="navigateTo('/patient')">Voltar para o início</Button>
         </div>
 
@@ -228,18 +228,18 @@ onBeforeUnmount(() => {
             <span class="text-[13px] text-muted-foreground">Enviada em {{ formatDayMonth(activity.submittedAt) }}</span>
           </div>
           <section v-if="activity.comment" aria-labelledby="t-comentario" class="flex flex-col gap-1.5 rounded-[14px] bg-accent px-4 py-3.5">
-            <h2 id="t-comentario" class="label-mono">Comentário da sua psicóloga · {{ formatDayMonth(activity.comment.updatedAt) }}</h2>
+            <h2 id="t-comentario" class="label-mono">Comentário de sua(seu) psicóloga(o) · {{ formatDayMonth(activity.comment.updatedAt) }}</h2>
             <p class="whitespace-pre-line break-words text-[15px] leading-relaxed">{{ activity.comment.text }}</p>
           </section>
           <p v-else-if="activity.status !== 'reviewed'" class="text-sm text-secondary-foreground">
-            Sua psicóloga ainda não revisou esta atividade.
+            Sua(seu) psicóloga(o) ainda não revisou esta atividade.
           </p>
           <section aria-labelledby="t-respostas" class="flex flex-col gap-3">
             <h2 id="t-respostas" class="label-mono">Suas respostas</h2>
             <ActivityAnswerList v-if="activity.answers.length" :fields="activity.answers" />
             <EmptyState v-else compact>Não foi possível mostrar suas respostas agora.</EmptyState>
           </section>
-          <p class="text-xs text-muted-foreground">Só você e sua psicóloga veem suas respostas.</p>
+          <p class="text-xs text-muted-foreground">Só você e sua(seu) psicóloga(o) veem suas respostas.</p>
           <Button variant="outline" size="xl" class="w-full" @click="navigateTo('/patient/activities?tab=enviadas')">Voltar para as atividades</Button>
         </div>
 
@@ -255,7 +255,7 @@ onBeforeUnmount(() => {
         </div>
 
         <EmptyState v-else-if="!total" compact>
-          Esta atividade ainda não tem perguntas. Fale com sua psicóloga.
+          Esta atividade ainda não tem perguntas. Fale com sua(seu) psicóloga(o).
         </EmptyState>
 
         <template v-else-if="currentField">

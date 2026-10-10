@@ -12,8 +12,8 @@ const supportHref = contactHref(useRuntimeConfig().public.contactEmail as string
 // para o app" no topo; as rotas privadas continuam mandando ao /login.
 definePageMeta({ layout: 'auth' })
 
-const title = 'Acolhe · Agenda, prontuário e acompanhamento para psicólogas'
-const description = 'Agenda com confirmação da paciente, prontuário por sessão, atividades e check-in de humor entre as sessões. Feito para psicólogas no Brasil, com LGPD. Teste grátis por 7 dias, sem cartão.'
+const title = 'Acolhe · Agenda, prontuário e acompanhamento para psicólogas(os)'
+const description = 'Agenda com confirmação do(a) paciente, prontuário por sessão, atividades e check-in de humor entre as sessões. Feito para psicólogas(os) no Brasil, com LGPD. Teste grátis por 7 dias, sem cartão.'
 useSeoMeta({
   title,
   description,
@@ -40,14 +40,14 @@ const links = [
 
 const steps = [
   { title: 'Você envia uma atividade', text: 'Escolha um template ou escreva uma tarefa nova, com prazo.' },
-  { title: 'A paciente responde no celular', text: 'Ela vê o que tem para fazer e faz o check-in do dia na mesma área.' },
+  { title: 'O(A) paciente responde no celular', text: 'Vê o que tem para fazer e faz o check-in do dia na mesma área.' },
   { title: 'Você revisa antes da sessão', text: 'Respostas e humor dos últimos dias ficam na ficha, prontos para a conversa.' },
 ]
 
 const security = [
-  { icon: ShieldCheck, title: 'Consentimento antes dos dados', text: 'Os dados clínicos só ficam disponíveis depois que a paciente aceita o convite e o termo de consentimento (LGPD, art. 11).' },
+  { icon: ShieldCheck, title: 'Consentimento antes dos dados', text: 'Os dados clínicos só ficam disponíveis depois que o(a) paciente aceita o convite e o termo de consentimento (LGPD, art. 11).' },
   { icon: FileLock2, title: 'Registro Documental cifrado', text: 'O que você escreve ali é guardado com criptografia e só aparece para você.' },
-  { icon: Users, title: 'Cada psicóloga vê só os seus pacientes', text: 'Na clínica, a administração vê números agregados. Nunca prontuários ou nomes de pacientes.' },
+  { icon: Users, title: 'Cada psicóloga(o) vê só os seus pacientes', text: 'Na clínica, a administração vê números agregados. Nunca prontuários ou nomes de pacientes.' },
   { icon: EyeOff, title: 'Nenhuma IA lendo prontuário', text: 'O conteúdo clínico não é enviado a ferramentas de inteligência artificial.' },
 ]
 
@@ -73,11 +73,11 @@ const faq = [
   },
   {
     q: 'Onde ficam os dados das minhas pacientes?',
-    a: 'Nos servidores do Acolhe, com acesso restrito à psicóloga responsável. Os dados clínicos só são tratados depois do consentimento da paciente, e o Registro Documental é cifrado.',
+    a: 'Nos servidores do Acolhe, com acesso restrito à(ao) psicóloga(o) responsável. Os dados clínicos só são tratados depois do consentimento do(a) paciente, e o Registro Documental é cifrado.',
   },
   {
     q: 'Como funciona a cobrança da clínica?',
-    a: 'Por psicóloga ativa, com mínimo de 2. Quem só administra a clínica, sem atender, não paga.',
+    a: 'Por psicóloga(o) ativa(o), com mínimo de 2.',
   },
 ]
 
@@ -111,13 +111,13 @@ const year = new Date().getFullYear()
           <div class="flex flex-col gap-6">
             <p class="animate-rise inline-flex w-fit items-center gap-2 rounded-full border bg-card/70 px-3 py-1.5 font-mono text-[11px] uppercase tracking-[.14em] text-muted-foreground backdrop-blur">
               <span class="size-1.5 rounded-full bg-highlight" aria-hidden="true" />
-              Para psicólogas no Brasil
+              Para psicólogas(os) no Brasil
             </p>
             <h1 id="hero-title" class="animate-rise text-[40px] font-semibold leading-[1.04] tracking-[-0.035em] [animation-delay:.08s] sm:text-[52px] lg:text-[58px]">
               Agenda, prontuário e o cuidado <span class="text-primary">entre as sessões.</span>
             </h1>
             <p class="animate-rise max-w-[520px] text-[17px] leading-relaxed text-secondary-foreground [animation-delay:.16s] md:text-lg">
-              No Acolhe você marca as sessões, registra a evolução e envia atividades. A paciente confirma horários, responde e faz o check-in do dia pelo celular.
+              No Acolhe você marca as sessões, registra a evolução e envia atividades. O(A) paciente confirma horários, responde e faz o check-in do dia pelo celular.
             </p>
             <div class="animate-rise flex flex-col gap-3 pt-1 [animation-delay:.24s] sm:flex-row">
               <Button as-child size="xl">
@@ -160,7 +160,7 @@ const year = new Date().getFullYear()
               id="entre-title"
               eyebrow="Entre as sessões"
               title="O acompanhamento não para quando a sessão termina"
-              support="As atividades e o check-in ajudam a paciente a manter o que foi combinado. E chegam organizados para você."
+              support="As atividades e o check-in ajudam o(a) paciente a manter o que foi combinado. E chegam organizados para você."
             />
             <ol class="flex flex-col">
               <li v-for="(step, index) in steps" :key="step.title" :data-reveal="index + 1" class="flex gap-5 border-t py-5 last:border-b">
@@ -175,7 +175,7 @@ const year = new Date().getFullYear()
           <div data-reveal="2" class="overflow-hidden rounded-[20px] bg-secondary p-6 md:p-10">
             <img
               src="/images/login-ilustracao.jpg"
-              alt="Ilustração de uma sessão de psicologia: paciente e psicóloga conversando em frente a uma ficha clínica"
+              alt="Ilustração de uma sessão de psicologia: paciente e psicóloga(o) conversando em frente a uma ficha clínica"
               width="1400"
               height="1400"
               loading="lazy"
@@ -223,13 +223,13 @@ const year = new Date().getFullYear()
             <LandingSectionHeading
               id="clinicas-title"
               eyebrow="Para clínicas"
-              title="Uma conta para a equipe, cada psicóloga com a sua agenda"
+              title="Uma conta para a equipe, cada psicóloga(o) com a sua agenda"
               support="A clínica convida as profissionais e acompanha o movimento no painel. O conteúdo clínico continua com quem atende."
             />
             <ul data-reveal="1" class="flex flex-col gap-3 text-[15px] text-secondary-foreground">
               <li class="flex gap-3"><span class="mt-2 size-1.5 shrink-0 rounded-full bg-primary" />Convites para a equipe entrar e gestão de quem está ativa.</li>
               <li class="flex gap-3"><span class="mt-2 size-1.5 shrink-0 rounded-full bg-primary" />Painel com sessões, pacientes ativos e próximos horários por profissional.</li>
-              <li class="flex gap-3"><span class="mt-2 size-1.5 shrink-0 rounded-full bg-primary" />Cobrança por psicóloga ativa. Quem só administra não paga.</li>
+              <li class="flex gap-3"><span class="mt-2 size-1.5 shrink-0 rounded-full bg-primary" />Cobrança por psicóloga(o) ativa(o).</li>
             </ul>
           </div>
           <div data-reveal="2" aria-hidden="true" class="rounded-[20px] border bg-card p-6 md:p-8 lg:order-1">
@@ -273,7 +273,7 @@ const year = new Date().getFullYear()
             id="planos-title"
             align="center"
             eyebrow="Planos"
-            title="Planos para psicólogas autônomas e clínicas"
+            title="Planos para psicólogas(os) autônomas(os) e clínicas"
             support="Todos os planos têm os mesmos recursos clínicos. Muda o tamanho da equipe."
           />
           <LandingPlans />
@@ -311,7 +311,7 @@ const year = new Date().getFullYear()
           <h2 id="cta-title" class="relative max-w-[640px] text-[30px] font-semibold leading-[1.1] tracking-[-0.03em] text-white md:text-[44px]">
             Comece hoje, com {{ TRIAL_DAYS }} dias grátis.
           </h2>
-          <p class="relative max-w-[480px] text-base leading-relaxed text-[#C3CAF0] md:text-[17px]">Crie a conta, cadastre a primeira paciente e veja se o Acolhe cabe na sua rotina. Sem cartão.</p>
+          <p class="relative max-w-[480px] text-base leading-relaxed text-[#C3CAF0] md:text-[17px]">Crie a conta, cadastre o(a) primeiro(a) paciente e veja se o Acolhe cabe na sua rotina. Sem cartão.</p>
           <div class="relative flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
             <Button as-child size="xl" variant="on-brand">
               <NuxtLink to="/signup">Começar teste grátis</NuxtLink>
@@ -328,7 +328,7 @@ const year = new Date().getFullYear()
       <div class="mx-auto flex max-w-[1200px] flex-col gap-10 px-4 py-12 md:flex-row md:justify-between md:px-8">
         <div class="flex max-w-[320px] flex-col gap-3">
           <AppLogo :size="24" />
-          <p class="text-sm leading-relaxed text-muted-foreground">Agenda, prontuário e acompanhamento entre sessões para psicólogas no Brasil.</p>
+          <p class="text-sm leading-relaxed text-muted-foreground">Agenda, prontuário e acompanhamento entre sessões para psicólogas(os) no Brasil.</p>
         </div>
         <div class="grid grid-cols-2 gap-10 sm:gap-16">
           <nav aria-label="Seções" class="flex flex-col gap-2.5 text-sm">

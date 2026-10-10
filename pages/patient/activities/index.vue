@@ -21,7 +21,7 @@ const tab = computed({
 
 <template>
   <div class="flex flex-col gap-5">
-    <PatientPageHeader eyebrow="Enviadas pela sua psicóloga" title="Atividades" />
+    <PatientPageHeader eyebrow="Enviadas por sua(seu) psicóloga(o)" title="Atividades" />
     <PortalLoadState :pending="pending" :error="error">
       <Tabs v-model="tab" class="animate-rise flex flex-col gap-4 [animation-delay:60ms]">
         <TabsList aria-label="Filtrar atividades" class="grid w-full grid-cols-2">
@@ -46,7 +46,7 @@ const tab = computed({
           <PatientSubmittedList v-else :activities="submitted.data.value" />
         </TabsContent>
       </Tabs>
-      <p class="text-xs text-muted-foreground">Só você e sua psicóloga veem suas respostas.</p>
+      <p class="text-xs text-muted-foreground">Só você e sua(seu) psicóloga(o) veem suas respostas.</p>
     </PortalLoadState>
   </div>
 </template>

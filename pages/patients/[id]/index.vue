@@ -55,7 +55,7 @@ async function reissueInvitation() {
   }
   catch (error) {
     toast.error(apiErrorMessage(error, {
-      404: 'Não há convite pendente para esta paciente. Ela pode já ter aceitado.',
+      404: 'Não há convite pendente para este(a) paciente. O convite pode já ter sido aceito.',
       default: 'Não foi possível gerar um novo convite agora.',
     }))
   }
@@ -112,12 +112,12 @@ const consentLabel = computed(() => {
           />
           <p v-else-if="checkinsStatus === 'pending' || checkinsStatus === 'idle'" class="text-sm text-muted-foreground" role="status">Carregando check-ins…</p>
           <p v-else-if="checkinsError" class="text-sm">
-            {{ apiErrorMessage(checkinsError, { 403: 'Seu vínculo precisa estar ativo para consultar o humor.', default: 'Não foi possível carregar os check-ins desta paciente.' }) }}
+            {{ apiErrorMessage(checkinsError, { 403: 'Seu vínculo precisa estar ativo para consultar o humor.', default: 'Não foi possível carregar os check-ins deste(a) paciente.' }) }}
           </p>
           <EmptyState v-else compact>
             {{ mood.count ? 'Só um check-in nos últimos 30 dias. O gráfico aparece a partir de dois.' : 'Nenhum check-in nos últimos 30 dias.' }}
           </EmptyState>
-          <p class="text-xs text-muted-foreground">Média dos check-ins diários feitos pela paciente.</p>
+          <p class="text-xs text-muted-foreground">Média dos check-ins diários feitos pelo(a) paciente.</p>
         </Card>
 
         <NuxtIsland name="PatientTimeline" lazy :props="{ patientId }">
@@ -135,7 +135,7 @@ const consentLabel = computed(() => {
         class="animate-fade"
         :title="isPending ? 'Aguardando aceite' : 'Vínculo não está ativo'"
         :description="isPending
-          ? 'Os dados clínicos ficam indisponíveis até a paciente aceitar o convite e o consentimento.'
+          ? 'Os dados clínicos ficam indisponíveis até o(a) paciente aceitar o convite e o consentimento.'
           : 'Os dados clínicos ficam indisponíveis enquanto o vínculo não estiver ativo.'"
       >
         <template v-if="isPending" #action>

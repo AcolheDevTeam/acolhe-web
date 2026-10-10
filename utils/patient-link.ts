@@ -9,15 +9,15 @@ export function inactiveLinkReason(patient?: Pick<PatientContext, 'relationshipS
   switch (patient.relationshipStatus) {
     case 'ended':
     case 'transferred':
-      return 'Seu acompanhamento com a psicóloga foi encerrado.'
+      return 'Seu acompanhamento com a(o) psicóloga(o) foi encerrado.'
     case 'paused':
       // Hoje o vínculo só pausa quando a paciente revoga o consentimento de
       // dados de saúde em Ajustes (ACO-102).
       return patient.consented
-        ? 'Seu acompanhamento com a psicóloga está pausado.'
+        ? 'Seu acompanhamento com a(o) psicóloga(o) está pausado.'
         : 'Seu acompanhamento pelo app está pausado porque o consentimento de dados de saúde foi revogado.'
     default:
-      return 'Seu acompanhamento com a psicóloga ainda não foi confirmado.'
+      return 'Seu acompanhamento com a(o) psicóloga(o) ainda não foi confirmado.'
   }
 }
 

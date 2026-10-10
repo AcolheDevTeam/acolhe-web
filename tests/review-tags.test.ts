@@ -43,7 +43,7 @@ describe('corpo da revisão (BFF)', () => {
   it('comentário exige visibilidade', () => {
     const result = reviewRequestSchema.safeParse({ comment: 'Bom trabalho', tags: [] })
     expect(result.success).toBe(false)
-    expect(result.error?.issues[0]?.message).toBe('Escolha se o comentário é compartilhado com a paciente ou interno.')
+    expect(result.error?.issues[0]?.message).toBe('Escolha se o comentário é compartilhado com o(a) paciente ou interno.')
   })
 
   it('sem corpo continua vazio (a API só marca como revisada e mantém o que existe)', () => {

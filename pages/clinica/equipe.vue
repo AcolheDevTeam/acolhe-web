@@ -121,7 +121,7 @@ async function decideRevoke(confirmed: boolean) {
   <PageHeader :eyebrow="clinicName" title="Equipe">
     <template #actions>
       <InviteMemberDialog :can-invite-owner="isOwner" @invited="refresh()">
-        <Button><Plus />Convidar psicóloga</Button>
+        <Button><Plus />Convidar psicóloga(o)</Button>
       </InviteMemberDialog>
     </template>
   </PageHeader>
@@ -132,7 +132,7 @@ async function decideRevoke(confirmed: boolean) {
     </div>
     <p v-else-if="status === 'pending'" class="text-sm text-muted-foreground">Carregando equipe…</p>
     <Card v-else role="region" aria-labelledby="t-membros" class="animate-rise overflow-hidden [animation-delay:.1s]">
-      <h2 id="t-membros" class="px-[22px] pb-2 pt-5 text-lg font-semibold">Psicólogas</h2>
+      <h2 id="t-membros" class="px-[22px] pb-2 pt-5 text-lg font-semibold">Psicólogas(os)</h2>
       <!-- Celular: lista com as ações embaixo de cada pessoa (padrão de Pacientes). -->
       <ul class="flex flex-col divide-y divide-secondary md:hidden">
         <li v-for="member in members" :key="member.userId" class="flex animate-fade flex-col gap-3 px-[22px] py-3.5">

@@ -29,7 +29,7 @@ const readonlyReason = computed(() => {
   if (t.isArchived) return 'Este template está arquivado. Ele não pode ser editado nem atribuído.'
   if (t.superseded) return `Esta é a versão ${t.version}, já substituída por uma mais nova. Edite a versão atual na biblioteca.`
   if (t.isGlobal) return 'Template da biblioteca Acolhe: somente leitura para todas as clínicas.'
-  return 'Este template foi criado por outra pessoa da organização e só a autora pode editá-lo.'
+  return 'Este template foi criado por outra pessoa da organização e só o(a) autor(a) pode editá-lo.'
 })
 
 const willCreateVersion = computed(() => (template.value?.assignmentCount ?? 0) > 0)

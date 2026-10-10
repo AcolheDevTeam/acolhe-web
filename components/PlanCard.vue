@@ -18,8 +18,8 @@ const totals = computed(() => planTotals(plan, cycle, seats))
 const onlyMonthly = computed(() => cycle === 'annual' && effectiveCycle.value === 'monthly')
 const priceNote = computed(() => {
   if (onlyMonthly.value) return 'por mês · só mensal'
-  if (effectiveCycle.value === 'annual') return plan.perSeat ? 'por psicóloga por mês, cobrado por ano' : 'por mês, cobrado por ano'
-  return plan.perSeat ? 'por psicóloga por mês' : 'por mês'
+  if (effectiveCycle.value === 'annual') return plan.perSeat ? 'por psicóloga(o) por mês, cobrado por ano' : 'por mês, cobrado por ano'
+  return plan.perSeat ? 'por psicóloga(o) por mês' : 'por mês'
 })
 const titleId = useId()
 </script>
@@ -43,7 +43,7 @@ const titleId = useId()
         <span :class="['text-sm', dark ? 'text-brand-muted' : 'text-muted-foreground']">{{ priceNote }}</span>
       </p>
       <p v-if="plan.perSeat" :class="['font-mono text-[13px]', dark ? 'text-brand-foreground' : 'text-secondary-foreground']">
-        {{ seats }} psicólogas × {{ formatBRL(unit) }} = {{ formatBRL(totals.monthlyCents) }} por mês
+        {{ seats }} psicólogas(os) × {{ formatBRL(unit) }} = {{ formatBRL(totals.monthlyCents) }} por mês
       </p>
       <p
         v-if="effectiveCycle === 'annual' && totals.annualTotalCents !== undefined"
