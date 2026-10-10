@@ -165,6 +165,31 @@
   .animate-fade {
     animation: fade .36s var(--ease-out) both;
   }
+
+  /* Entrada ao rolar da landing (composables/useReveal.ts). */
+  .reveal {
+    transition: opacity .7s var(--ease-out), transform .7s var(--ease-out);
+    transition-delay: var(--reveal-delay, 0ms);
+  }
+  .reveal-pending {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+}
+
+/* Entrada dos diálogos (Dialog). Só opacidade e `scale`: o `transform` já
+   centraliza o conteúdo, então animar transform faria o diálogo saltar. */
+.dialog-overlay[data-state='open'] {
+  animation: dialog-overlay-in 160ms var(--ease-out);
+}
+.dialog-content[data-state='open'] {
+  animation: dialog-content-in 200ms var(--ease-out);
+}
+@keyframes dialog-overlay-in {
+  from { opacity: 0; }
+}
+@keyframes dialog-content-in {
+  from { opacity: 0; scale: 0.97; }
 }
 
 @keyframes rise {

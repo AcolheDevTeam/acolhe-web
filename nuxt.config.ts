@@ -54,6 +54,8 @@ export default defineNuxtConfig({
     apiUrl: process.env.API_URL || 'http://localhost:8080',
     public: {
       lgpdExportEnabled: process.env.NUXT_PUBLIC_LGPD_EXPORT_ENABLED === 'true',
+      // E-mail do "Fale com a gente" da landing (plano Clínica). Vazio = botão "Em breve".
+      contactEmail: process.env.NUXT_PUBLIC_CONTACT_EMAIL || '',
     },
   },
 })

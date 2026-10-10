@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { newPasswordSchema } from './password'
 
 export const invitationTokenSchema = z.object({
   token: z.string().regex(/^[A-Za-z0-9_-]{43}$/),
@@ -25,6 +26,6 @@ export const invitationSchema = z.object({
 })
 
 export const acceptInvitationSchema = z.object({
-  password: z.string().min(8).max(72),
+  password: newPasswordSchema,
   acceptedDocumentIds: z.string().uuid().array().min(1),
 })

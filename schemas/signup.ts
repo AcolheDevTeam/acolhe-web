@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { newPasswordSchema } from './password'
 
 // Contrato de POST /signup (ver acolhe-api/docs/api/psychologist-signup.md).
 // É o que a página envia e o que o BFF valida — sem campos de UI.
@@ -10,7 +11,7 @@ export const signupPayloadSchema = z.object({
     const [local, domain] = value.split('@')
     return !!domain && !value.includes('..') && !local.startsWith('.') && !local.endsWith('.') && domain.includes('.')
   }, 'Informe um e-mail válido.').transform((value) => value.toLowerCase()),
-  password: z.string().min(8, 'Mínimo de 8 caracteres.').max(128, 'Máximo de 128 caracteres.'),
+  password: newPasswordSchema,
   fullName: z.string().trim().min(2, 'Informe seu nome completo.').max(200, 'Nome muito longo.'),
   crpNumber: z.string().trim().regex(/^\d{4,8}$/, 'Informe apenas os números do CRP.'),
   crpState: z.string().trim().transform((value) => value.toUpperCase().replace(/^CRP-/, '').padStart(2, '0')).refine((value) => /^(0[1-9]|1\d|2[0-4])$/.test(value), 'Informe uma região de CRP válida (01 a 24).'),

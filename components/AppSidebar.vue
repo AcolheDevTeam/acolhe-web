@@ -3,6 +3,7 @@ import type { Component } from 'vue'
 import {
   BarChart3,
   CalendarDays,
+  CreditCard,
   FileLock2,
   FileText,
   Home,
@@ -48,11 +49,13 @@ type NavSection = { label?: string, items: NavItem[] }
 
 // Seções do protótipo: Principal, "Só você" e "Clínica" (só admin). Quem só
 // administra a clínica não tem área clínica (ADR 0002 da API). "Assinatura"
-// fica de fora até a cobrança ser decidida.
+// fica em "Clínica" para quem administra; no consultório individual, numa
+// seção "Conta" (protótipos "Assinatura" e "Bloqueio").
 const adminOnly = computed(() => user?.role === 'org_admin')
 const clinicItems: NavItem[] = [
   { label: 'Painel', to: '/clinica', icon: BarChart3 },
   { label: 'Equipe', to: '/clinica/equipe', icon: UsersRound },
+  { label: 'Assinatura', to: BILLING_PATH, icon: CreditCard },
 ]
 const home = computed(() => homeFor(user as never))
 
@@ -77,6 +80,7 @@ const sections = computed<NavSection[]>(() => {
     { label: 'Só você', items: [{ label: 'Registro Documental', to: '/registry', icon: FileLock2 }] },
   ]
   if (isClinicAdmin(user as never)) list.push({ label: 'Clínica', items: clinicItems })
+  else if (user?.workspace?.type === 'individual') list.push({ label: 'Conta', items: [{ label: 'Assinatura', to: BILLING_PATH, icon: CreditCard }] })
   return list
 })
 
