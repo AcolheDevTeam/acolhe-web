@@ -5,6 +5,7 @@ import type {
   PatientPortalContext,
   User,
 } from '~/types'
+import type { PatientSubmittedActivity } from '~/schemas/patient-activity'
 import { patientPortalCacheKey, sessionExpired } from '~/utils/patient-portal'
 
 export function usePatientPortal() {
@@ -60,4 +61,21 @@ export function usePatientPortal() {
   })
 
   return { me, context, nextSession, activities, checkins, pending, error }
+}
+
+// Aba "Enviadas" (ACO-104): só na tela de atividades, para não pesar o Início.
+// Chave por paciente, como o resto do portal (LGPD).
+export function usePatientSubmittedActivities() {
+  const { data: me } = useFetch<User | null>('/api/me', { key: 'me' })
+  const patientId = computed(() => me.value?.patient?.id ?? null)
+  const submitted = useFetch<PatientSubmittedActivity[]>('/api/patient/submitted-activities', {
+    key: () => `${patientPortalCacheKey(patientId.value)}-submitted`,
+    default: () => [],
+    immediate: false,
+    watch: false,
+  })
+  watch(patientId, (id) => {
+    if (id) void submitted.execute()
+  }, { immediate: true })
+  return submitted
 }

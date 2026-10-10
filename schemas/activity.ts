@@ -66,8 +66,40 @@ export const activityReviewDetailSchema = z.discriminatedUnion('state', [
     state: z.literal('reviewed'),
     submission: submissionSchema,
     reviewedAt: z.string().datetime(),
+    // Revisão da psicóloga (ACO-104). Opcional enquanto a API não devolve.
+    review: z.lazy(() => reviewNoteSchema).optional(),
   }),
 ])
 
+// Revisão (ACO-104): comentário compartilhado (a paciente vê) ou interno
+// ("private" na API: só a psicóloga) e tags que só a psicóloga vê.
+export const REVIEW_COMMENT_MAX = 2000
+export const REVIEW_TAG_MAX = 32
+export const REVIEW_TAGS_MAX = 10
+export const commentVisibilitySchema = z.enum(['shared', 'private'])
+
+export const reviewNoteSchema = z.object({
+  comment: z.string().nullable(),
+  visibility: commentVisibilitySchema.nullable(),
+  commentUpdatedAt: z.string().datetime().nullable(),
+  tags: z.array(z.string()),
+})
+
+// Corpo do PUT: o estado completo da revisão. Comentário vazio remove.
+export const reviewRequestSchema = z.object({
+  comment: z.string().trim().max(REVIEW_COMMENT_MAX, 'O comentário pode ter até 2000 caracteres.').optional(),
+  visibility: commentVisibilitySchema.optional(),
+  tags: z.array(
+    z.string().trim().min(1, 'A tag não pode ficar em branco.').max(REVIEW_TAG_MAX, 'Cada tag pode ter até 32 caracteres.'),
+  ).max(REVIEW_TAGS_MAX, 'Use no máximo 10 tags por atividade.').default([]),
+}).refine(body => !body.comment || !!body.visibility, {
+  message: 'Escolha se o comentário é compartilhado com a paciente ou interno.',
+  path: ['visibility'],
+})
+
 export type AssignActivityInput = z.infer<typeof assignActivitySchema>
 export type ActivityReviewDetail = z.infer<typeof activityReviewDetailSchema>
+export type ActivityReviewField = z.infer<typeof activityReviewFieldSchema>
+export type ReviewNote = z.infer<typeof reviewNoteSchema>
+export type ReviewRequest = z.infer<typeof reviewRequestSchema>
+export type CommentVisibility = z.infer<typeof commentVisibilitySchema>

@@ -1,21 +1,30 @@
 <script setup lang="ts">
-import { Check, ChevronLeft, ChevronRight, FileText } from 'lucide-vue-next'
+import { Check, ChevronLeft, ChevronRight } from 'lucide-vue-next'
 import { toast } from 'vue-sonner'
-import type { ActivityReviewDetail } from '~/schemas/activity'
+import {
+  REVIEW_COMMENT_MAX,
+  reviewRequestSchema,
+  type ActivityReviewDetail,
+  type CommentVisibility,
+  type ReviewNote,
+} from '~/schemas/activity'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { EmptyState } from '@/components/ui/empty-state'
 import { InlineNotice } from '@/components/ui/inline-notice'
-
-type ReviewField = Extract<ActivityReviewDetail, { state: 'submitted' }>['submission']['fields'][number]
+import { Label } from '@/components/ui/label'
+import { SegmentedControl } from '@/components/ui/segmented-control'
+import { Textarea } from '@/components/ui/textarea'
 
 definePageMeta({ middleware: ['auth', 'psychologist-only'] })
 
-// Revisar resposta (protótipo "Revisar"): respostas por campo em cards e a
-// ação de marcar como revisada ao lado. Comentário da paciente, comentários
-// da psicóloga e tags dependem de API que ainda não existe e ficam de fora.
+// Revisar resposta (protótipo "Revisar"): respostas por campo em cards e, ao
+// lado, a revisão: um comentário compartilhado (a paciente vê) ou interno (só a
+// psicóloga), tags que só a psicóloga vê e "Marcar como revisada", que grava
+// tudo de uma vez (ACO-104). Depois de revisada, comentário e tags continuam
+// editáveis. O comentário da paciente ainda não existe na API e fica de fora.
 const route = useRoute()
 const activityId = computed(() => route.params.id as string)
 const { data: activity, status, error } = useActivity(activityId)
@@ -88,72 +97,86 @@ const metaLine = computed(() => {
   return parts.join(' · ')
 })
 
-function fieldTypeLabel(type: string) {
-  const labels: Record<string, string> = {
-    long_text: 'Texto longo',
-    short_text: 'Texto curto',
-    text: 'Texto',
-    scale: 'Escala',
-    number: 'Número',
-    boolean: 'Sim ou não',
-    datetime: 'Data e hora',
-    date: 'Data',
-    multiple_choice: 'Múltipla escolha',
-    single_choice: 'Escolha única',
-    choice: 'Escolha',
-    file: 'Arquivo',
+// Rascunho da revisão. Recomeça do que está salvo sempre que a atividade
+// carrega ou é salva.
+const EMPTY_REVIEW: ReviewNote = { comment: null, visibility: null, commentUpdatedAt: null, tags: [] }
+const savedReview = computed<ReviewNote>(() =>
+  activity.value?.state === 'reviewed' ? activity.value.review ?? EMPTY_REVIEW : EMPTY_REVIEW)
+const visibility = ref<CommentVisibility>('shared')
+const comment = ref('')
+const tags = ref<string[]>([])
+const reviewError = ref('')
+function resetDraft() {
+  const saved = savedReview.value
+  visibility.value = saved.visibility ?? 'shared'
+  comment.value = saved.comment ?? ''
+  tags.value = [...saved.tags]
+  reviewError.value = ''
+}
+watch(() => [activity.value?.id, activity.value?.state, savedReview.value], resetDraft, { immediate: true })
+
+const visibilityOptions: { value: CommentVisibility, label: string }[] = [
+  { value: 'shared', label: 'Compartilhado' },
+  { value: 'private', label: 'Interno' },
+]
+const visibilityHelp = computed(() => visibility.value === 'shared'
+  ? 'A paciente vê este comentário junto da resposta.'
+  : 'Só você vê. Não aparece para a paciente nem na exportação dela.')
+const commentPlaceholder = computed(() => visibility.value === 'shared'
+  ? 'Escreva um retorno para a paciente'
+  : 'Anotação para você')
+const savedLine = computed(() => {
+  const saved = savedReview.value
+  if (!saved.comment || !saved.commentUpdatedAt) return ''
+  const label = saved.visibility === 'shared' ? 'Compartilhado com a paciente' : 'Interno'
+  return `${label} · salvo em ${formatDateTime(saved.commentUpdatedAt)}`
+})
+// Um comentário interno já salvo que vira compartilhado passa a aparecer para a
+// paciente: avisa antes de salvar.
+const becomingShared = computed(() =>
+  savedReview.value.visibility === 'private'
+  && visibility.value === 'shared'
+  && !!comment.value.trim())
+const dirty = computed(() => {
+  const saved = savedReview.value
+  const text = comment.value.trim()
+  if (text !== (saved.comment ?? '')) return true
+  if (text && visibility.value !== saved.visibility) return true
+  return !sameTags(tags.value, saved.tags)
+})
+
+async function saveReview() {
+  const text = comment.value.trim()
+  const parsed = reviewRequestSchema.safeParse({
+    comment: text || undefined,
+    visibility: text ? visibility.value : undefined,
+    tags: tags.value,
+  })
+  if (!parsed.success) {
+    reviewError.value = parsed.error.issues[0]?.message ?? 'Confira o comentário e as tags.'
+    return
   }
-  return labels[type] ?? type
-}
-
-function jsonValues(value: unknown) {
-  if (Array.isArray(value)) return value.map(String)
-  if (value && typeof value === 'object') return [JSON.stringify(value)]
-  return [String(value)]
-}
-
-// Escolhas: mostra todas as opções do template e destaca as marcadas, como no
-// protótipo. Sem opções na config, só as marcadas aparecem.
-function choiceOptions(config: Record<string, unknown>, value: unknown) {
-  const marked = jsonValues(value)
-  const options = Array.isArray(config.options) ? config.options.map(String) : []
-  const list = options.length ? [...options, ...marked.filter(m => !options.includes(m))] : marked
-  return list.map(label => ({ label, on: marked.includes(label) }))
-}
-
-// Escolha única chega como texto; com opções na config, vira pílulas também.
-function choicePills(field: ReviewField) {
-  if (field.kind === 'json') return choiceOptions(field.config, field.value)
-  if (field.kind === 'text' && field.fieldType === 'single_choice' && Array.isArray(field.config.options)) {
-    return choiceOptions(field.config, field.value)
-  }
-  return null
-}
-
-// Escala vira a fileira de valores com o escolhido destacado.
-function scaleSteps(config: Record<string, unknown>) {
-  const min = typeof config.min === 'number' ? config.min : 1
-  const max = typeof config.max === 'number' ? config.max : 10
-  if (max < min || max - min > 20) return []
-  return Array.from({ length: max - min + 1 }, (_, i) => min + i)
-}
-
-async function markReviewed() {
+  reviewError.value = ''
+  const firstTime = activity.value?.state === 'submitted'
   reviewing.value = true
   try {
     await $fetch(`/api/activities/${activityId.value}/review`, {
       method: 'PUT',
+      body: parsed.data,
     })
     await Promise.all([
       refreshNuxtData(`activity-${activityId.value}`),
       refreshNuxtData('activities-all'),
     ])
+    if (!firstTime) toast.success('Revisão atualizada.')
   } catch (error) {
-    toast.error(apiErrorMessage(error, {
+    reviewError.value = apiErrorMessage(error, {
+      400: 'Confira o comentário e as tags: algum passou do limite.',
+      403: 'Só a psicóloga responsável pode revisar esta atividade.',
       404: 'Esta atividade ainda não tem uma resposta completa para revisar.',
-      409: 'Esta atividade já foi revisada.',
-      default: 'Não foi possível concluir a revisão agora.',
-    }))
+      409: 'Esta atividade não está mais aguardando revisão. Recarregue a página.',
+      default: 'Não foi possível salvar a revisão agora. Tente de novo.',
+    })
   } finally {
     reviewing.value = false
   }
@@ -223,71 +246,7 @@ async function markReviewed() {
           </Badge>
         </header>
 
-        <ol v-if="submission" class="flex flex-col gap-3.5">
-          <li v-for="(field, index) in submission.fields" :key="field.fieldId">
-            <Card
-              class="animate-fade flex flex-col gap-2.5 p-5"
-              :style="{ animationDelay: `${index * 60}ms` }"
-            >
-              <span class="label-mono tracking-[0.1em]">
-                {{ String(index + 1).padStart(2, '0') }} · {{ fieldTypeLabel(field.fieldType) }}
-              </span>
-              <h2 class="text-base font-semibold">{{ field.label }}</h2>
-
-              <ul
-                v-if="choicePills(field)"
-                class="flex flex-wrap gap-2"
-              >
-                <li
-                  v-for="option in choicePills(field)"
-                  :key="option.label"
-                  class="inline-flex h-8 items-center gap-1.5 rounded-full px-3 text-[13px]"
-                  :class="option.on ? 'bg-primary text-primary-foreground' : 'border border-border bg-card text-muted-foreground'"
-                >
-                  <Check v-if="option.on" class="size-3.5" aria-hidden="true" />
-                  {{ option.label }}
-                  <span class="sr-only">{{ option.on ? '(marcada)' : '(não marcada)' }}</span>
-                </li>
-              </ul>
-              <p v-else-if="field.kind === 'text'" class="whitespace-pre-line text-[15px] leading-relaxed">
-                {{ field.value }}
-              </p>
-              <template v-else-if="field.kind === 'number'">
-                <div
-                  v-if="field.fieldType === 'scale' && scaleSteps(field.config).length"
-                  role="img"
-                  :aria-label="`Valor ${field.value}${typeof field.config.max === 'number' ? ` de ${field.config.max}` : ''}`"
-                  class="flex gap-1"
-                >
-                  <span
-                    v-for="n in scaleSteps(field.config)"
-                    :key="n"
-                    class="flex h-10 min-w-0 flex-1 items-center justify-center rounded-[9px] text-sm"
-                    :class="n === field.value ? 'bg-primary font-semibold text-primary-foreground' : 'bg-secondary text-muted-foreground'"
-                  >
-                    {{ n }}
-                  </span>
-                </div>
-                <p v-else class="text-[26px] font-semibold tracking-[-0.02em]">
-                  {{ field.value }}
-                  <span v-if="typeof field.config.max === 'number'" class="text-base font-normal text-muted-foreground">
-                    / {{ field.config.max }}
-                  </span>
-                </p>
-              </template>
-              <p v-else-if="field.kind === 'boolean'" class="text-[15px]">
-                {{ field.value ? 'Sim' : 'Não' }}
-              </p>
-              <p v-else-if="field.kind === 'datetime'" class="text-[15px]">
-                {{ formatDateTime(field.value) }}
-              </p>
-              <div v-else-if="field.kind === 'attachment'" class="flex w-fit items-center gap-2 rounded-lg border px-3 py-2 text-sm">
-                <FileText class="size-4" />
-                {{ field.value.mimeType }} · {{ field.value.sizeBytes }} bytes
-              </div>
-            </Card>
-          </li>
-        </ol>
+        <ActivityAnswerList v-if="submission" :fields="submission.fields" />
 
         <InlineNotice v-else-if="activity.state === 'submission_invalid'" tone="danger">
           A resposta está incompleta ou incompatível com a versão do template.
@@ -305,23 +264,71 @@ async function markReviewed() {
         aria-label="Sua revisão"
         class="flex min-w-0 flex-[1_1_320px] flex-col gap-4 lg:sticky lg:top-6"
       >
-        <div aria-live="polite">
-          <InlineNotice v-if="incomplete" tone="danger">
-            A resposta está incompleta ou incompatível com a versão do template.
-            A revisão permanece bloqueada.
-          </InlineNotice>
+        <InlineNotice v-if="incomplete" tone="danger">
+          A resposta está incompleta ou incompatível com a versão do template.
+          A revisão permanece bloqueada.
+        </InlineNotice>
+
+        <template v-if="canReview || activity.state === 'reviewed'">
+          <Card class="flex flex-col gap-3.5 p-5">
+            <h2 class="text-base font-semibold">Sua revisão</h2>
+            <SegmentedControl
+              v-model="visibility"
+              :options="visibilityOptions"
+              label="Visibilidade do comentário"
+              :class="reviewing ? 'pointer-events-none opacity-60' : ''"
+            />
+            <p class="text-[13px] leading-relaxed text-muted-foreground">{{ visibilityHelp }}</p>
+            <InlineNotice v-if="becomingShared" tone="warning">
+              Este comentário era interno. Ao salvar, a paciente passa a vê-lo.
+            </InlineNotice>
+            <div class="flex flex-col gap-1.5">
+              <Label for="review-comment">Comentário</Label>
+              <Textarea
+                id="review-comment"
+                v-model="comment"
+                :placeholder="commentPlaceholder"
+                :maxlength="REVIEW_COMMENT_MAX"
+                :disabled="reviewing"
+                class="min-h-[120px]"
+                @update:model-value="reviewError = ''"
+              />
+              <p v-if="savedLine" class="font-mono text-[11px] text-muted-foreground">{{ savedLine }}</p>
+            </div>
+          </Card>
+
+          <Card class="flex flex-col gap-3 p-5">
+            <h2 class="flex items-baseline gap-2 text-base font-semibold">
+              Tags <span class="label-mono font-normal">só você vê</span>
+            </h2>
+            <TagInput v-model="tags" label="Nova tag" :disabled="reviewing" @update:model-value="reviewError = ''" />
+          </Card>
+        </template>
+
+        <div aria-live="polite" class="flex flex-col gap-2.5">
+          <p v-if="reviewError" class="text-sm text-destructive" role="alert">{{ reviewError }}</p>
           <Button
-            v-else-if="canReview"
+            v-if="canReview"
             size="xl"
             class="w-full"
             :loading="reviewing"
-            @click="markReviewed"
+            @click="saveReview"
           >
             Marcar como revisada
           </Button>
-          <div v-else-if="activity.state === 'reviewed'" class="animate-fade flex flex-col gap-2.5">
+          <template v-else-if="activity.state === 'reviewed'">
+            <Button
+              v-if="dirty"
+              size="xl"
+              class="w-full"
+              :loading="reviewing"
+              @click="saveReview"
+            >
+              Salvar alterações
+            </Button>
             <span
-              class="inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-positive-soft text-[15px] font-semibold text-positive"
+              v-else
+              class="animate-fade inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-positive-soft text-[15px] font-semibold text-positive"
             >
               <Check class="size-4" aria-hidden="true" />
               Revisada
@@ -331,7 +338,7 @@ async function markReviewed() {
                 <span class="truncate">Ir para a próxima: {{ nextAfterReview.patientName ?? nextAfterReview.title }}</span>
               </NuxtLink>
             </Button>
-          </div>
+          </template>
         </div>
       </aside>
     </div>

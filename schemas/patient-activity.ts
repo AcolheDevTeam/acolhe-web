@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { FIELD_TYPES } from './activity-template'
+import { activityReviewFieldSchema } from './activity'
 
 // Paciente responde atividade (ACO-68).
 // Contrato em acolhe-api/docs/api/activity-submission.md.
@@ -39,6 +40,26 @@ export const patientActivityDetailSchema = z.object({
   submittedAt: z.string().nullable(),
   canRespond: z.boolean(),
   fields: z.array(patientActivityFieldSchema),
+  // Depois de enviada (ACO-104): as respostas dela e só o comentário
+  // compartilhado. Defaults para conviver com a API anterior.
+  reviewedAt: z.string().nullable().default(null),
+  answers: z.array(activityReviewFieldSchema).default([]),
+  comment: z.lazy(() => sharedCommentSchema).nullable().default(null),
+})
+
+export const sharedCommentSchema = z.object({
+  text: z.string(),
+  updatedAt: z.string(),
+})
+
+// Aba "Enviadas" do portal.
+export const patientSubmittedActivitySchema = z.object({
+  id: z.string().uuid(),
+  title: z.string(),
+  status: z.string(),
+  submittedAt: z.string().nullable(),
+  reviewedAt: z.string().nullable(),
+  comment: sharedCommentSchema.nullable(),
 })
 
 // Valor enviado por campo. `kind` repete o fieldType: a API recusa divergência,
@@ -71,6 +92,7 @@ export const submissionResponseSchema = z.object({
 export type PatientActivityField = z.infer<typeof patientActivityFieldSchema>
 export type PatientActivityFieldConfig = z.infer<typeof patientActivityFieldConfigSchema>
 export type PatientActivityDetail = z.infer<typeof patientActivityDetailSchema>
+export type PatientSubmittedActivity = z.infer<typeof patientSubmittedActivitySchema>
 export type SubmissionValue = z.infer<typeof submissionValueSchema>
 export type SubmissionRequest = z.infer<typeof submissionRequestSchema>
 
