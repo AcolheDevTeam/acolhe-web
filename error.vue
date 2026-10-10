@@ -9,10 +9,13 @@ const props = defineProps<{ error: NuxtError }>()
 
 const status = computed(() => props.error.statusCode ?? 500)
 
-// Sem conexão: o navegador diz que está offline ou o fetch nem chegou ao
-// servidor. Só acontece no cliente (no SSR a página veio da rede).
-const NETWORK_FAILURE = /failed to fetch|networkerror|load failed|network request failed/i
-const offline = ref(import.meta.client && (!navigator.onLine || NETWORK_FAILURE.test(props.error.message ?? '')))
+// Sem conexão só quando o navegador diz que está offline: um fetch que falha
+// com a internet ok é o Acolhe fora do ar, e cai em "algo deu errado" com
+// código. Decidido depois de montar, para não divergir da página do SSR.
+const offline = ref(false)
+onMounted(() => {
+  offline.value = !navigator.onLine
+})
 
 const kind = computed(() => {
   if (offline.value) return 'offline'
@@ -30,8 +33,8 @@ useHead({
   })[kind.value]),
 })
 
-// Código para o suporte: status + data/hora UTC do erro. Não há ID de requisição
-// na API, então é isso que permite achar o erro nos logs. O `useState` mantém o
+// Código para o suporte: status + data/hora UTC do erro. Sem ID de requisição
+// na API, ajuda a localizar o momento nos logs, não a requisição exata. O `useState` mantém o
 // mesmo valor do SSR na hidratação; ao sair da tela ele é descartado.
 const occurredAt = useState('error-occurred-at', () => new Date().toISOString())
 onBeforeUnmount(() => clearNuxtState('error-occurred-at'))
