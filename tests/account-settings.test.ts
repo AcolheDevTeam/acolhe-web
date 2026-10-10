@@ -73,3 +73,20 @@ describe('sessões ativas (ACO-98)', () => {
     expect(sessionsKey('a')).not.toBe(sessionsKey('b'))
   })
 })
+
+describe('encerrar as outras sessões (ACO-98)', () => {
+  it('exige a senha atual', async () => {
+    const { endOtherSessionsSchema } = await import('../schemas/account-settings')
+    expect(endOtherSessionsSchema.safeParse({ currentPassword: '' }).error?.issues[0]?.message).toBe('Informe a senha atual.')
+    expect(endOtherSessionsSchema.safeParse({ currentPassword: 'senha' }).success).toBe(true)
+  })
+})
+
+describe('campo recusado pela API (ACO-98)', () => {
+  it('lê o campo repassado pelo BFF', async () => {
+    const { apiErrorField } = await import('../utils/api-error')
+    expect(apiErrorField({ statusCode: 400, data: { statusCode: 400, data: { field: 'phone' } } })).toBe('phone')
+    expect(apiErrorField({ statusCode: 400, data: { field: 'fullName' } })).toBe('fullName')
+    expect(apiErrorField({ statusCode: 500 })).toBeUndefined()
+  })
+})

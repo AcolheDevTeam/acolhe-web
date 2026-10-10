@@ -8,6 +8,7 @@ import { describeDevice, sessionMeta } from '~/utils/account-sessions'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Label } from '@/components/ui/label'
 import { Skeleton } from '@/components/ui/skeleton'
 
@@ -98,16 +99,32 @@ async function endSession(id: string) {
   }
 }
 
+// "Encerrar todas as outras" pede a senha atual num diálogo.
+const endOthersOpen = ref(false)
+const endOthersPassword = ref('')
+const endOthersError = ref('')
+function openEndOthers() {
+  endOthersPassword.value = ''
+  endOthersError.value = ''
+  endOthersOpen.value = true
+}
+
 async function endOthers() {
-  if (ending.value) return
+  if (ending.value || !endOthersPassword.value) return
   ending.value = 'others'
+  endOthersError.value = ''
   try {
-    await $fetch('/api/me/sessions/end-others', { method: 'POST' })
+    await $fetch('/api/me/sessions/end-others', { method: 'POST', body: { currentPassword: endOthersPassword.value } })
+    endOthersOpen.value = false
+    endOthersPassword.value = ''
     toast.success('As outras sessões foram encerradas.')
   } catch (err) {
-    toast.error(apiErrorMessage(err, {
+    endOthersError.value = apiErrorMessage(err, {
+      400: 'Informe a senha atual.',
+      422: 'A senha atual não confere. Confira e tente de novo.',
+      429: 'Muitas tentativas com a senha atual. Aguarde 15 minutos e tente de novo.',
       default: 'Não foi possível encerrar as outras sessões agora. Tente novamente em instantes.',
-    }))
+    })
   } finally {
     ending.value = null
     now.value = new Date()
@@ -156,7 +173,7 @@ async function endOthers() {
     <Card class="animate-rise flex flex-col gap-2 p-6 [animation-delay:.05s]">
       <div class="flex flex-wrap items-center justify-between gap-3 pb-2">
         <h2 class="text-lg font-semibold">Sessões ativas</h2>
-        <Button v-if="hasOthers" variant="outline" size="lg" :loading="ending === 'others'" :disabled="!!ending" @click="endOthers">
+        <Button v-if="hasOthers" variant="outline" size="lg" :disabled="!!ending" @click="openEndOthers">
           Encerrar todas as outras
         </Button>
       </div>
@@ -201,4 +218,31 @@ async function endOthers() {
       </ul>
     </Card>
   </SettingsShell>
+
+  <Dialog v-model:open="endOthersOpen">
+    <DialogContent>
+      <form class="flex flex-col gap-5" novalidate @submit.prevent="endOthers">
+        <DialogHeader>
+          <DialogTitle>Encerrar as outras sessões?</DialogTitle>
+          <DialogDescription>Os outros aparelhos vão precisar entrar de novo. Este continua conectado. Para confirmar, digite sua senha atual.</DialogDescription>
+        </DialogHeader>
+        <div class="flex flex-col gap-2">
+          <Label for="end-others-password">Senha atual</Label>
+          <PasswordInput
+            id="end-others-password"
+            v-model="endOthersPassword"
+            autocomplete="current-password"
+            :aria-invalid="!!endOthersError || undefined"
+            :aria-describedby="endOthersError ? 'end-others-error' : undefined"
+            :disabled="ending === 'others'"
+          />
+          <p v-if="endOthersError" id="end-others-error" class="text-sm text-destructive" role="alert">{{ endOthersError }}</p>
+        </div>
+        <DialogFooter>
+          <Button type="button" variant="outline" @click="endOthersOpen = false">Voltar</Button>
+          <Button type="submit" :disabled="!endOthersPassword" :loading="ending === 'others'">Encerrar as outras</Button>
+        </DialogFooter>
+      </form>
+    </DialogContent>
+  </Dialog>
 </template>

@@ -68,10 +68,29 @@ const crpBadge = computed(() => {
 })
 
 const errors = ref<Partial<Record<keyof ProfileUpdate, string>>>({})
+// Texto de cada campo quando a própria API recusa (a validação local já pega
+// quase tudo antes).
+const fieldMessages: Record<keyof ProfileUpdate, string> = {
+  fullName: 'Informe o nome completo, com até 200 caracteres.',
+  socialName: 'O nome social pode ter até 200 caracteres.',
+  phone: 'Informe um telefone válido, com DDD.',
+  approach: 'A abordagem pode ter até 100 caracteres.',
+  defaultSessionMinutes: 'Escolha uma duração entre 15 e 480 minutos.',
+}
 const saving = ref(false)
 const savedNotice = ref(false)
 let noticeTimer: ReturnType<typeof setTimeout> | undefined
 onBeforeUnmount(() => clearTimeout(noticeTimer))
+
+// Leva o foco ao primeiro campo com erro (os de texto têm id próprio).
+const fieldIds: Partial<Record<keyof ProfileUpdate, string>> = {
+  fullName: 'profile-name', socialName: 'profile-social', phone: 'profile-phone',
+}
+async function focusFirstError() {
+  await nextTick()
+  const first = (Object.keys(fieldIds) as (keyof ProfileUpdate)[]).find(field => errors.value[field])
+  if (first) document.getElementById(fieldIds[first]!)?.focus()
+}
 
 function discard() {
   Object.assign(form, saved.value)
@@ -94,6 +113,7 @@ async function save() {
       next[field] ??= issue.message
     }
     errors.value = next
+    void focusFirstError()
     return
   }
   errors.value = {}
@@ -106,15 +126,33 @@ async function save() {
     // O nome no rodapé do menu vem do /me.
     void refreshNuxtData('me')
   } catch (err) {
+    // 400 com o campo recusado: a mensagem vai para o campo certo.
+    const field = apiErrorField(err) as keyof ProfileUpdate | undefined
+    if (apiErrorInfo(err).status === 400 && field && field in fieldMessages) {
+      errors.value = { [field]: fieldMessages[field] }
+      void focusFirstError()
+      return
+    }
     toast.error(apiErrorMessage(err, {
       400: 'Alguns dados não foram aceitos. Revise os campos e tente de novo.',
       404: 'Não encontramos seu perfil de psicóloga. Recarregue a página.',
+      // O único 503 próprio do perfil é o telefone sem a chave de cifra.
+      503: 'Não foi possível salvar agora. Se você preencheu o telefone, tente de novo mais tarde ou deixe o campo em branco.',
       default: 'Não foi possível salvar o perfil agora. Tente novamente em instantes.',
     }))
   } finally {
     saving.value = false
   }
 }
+
+// Fechar ou recarregar a aba com alterações pendentes: aviso do navegador.
+function guardUnload(event: BeforeUnloadEvent) {
+  if (!dirty.value) return
+  event.preventDefault()
+  event.returnValue = ''
+}
+onMounted(() => window.addEventListener('beforeunload', guardUnload))
+onBeforeUnmount(() => window.removeEventListener('beforeunload', guardUnload))
 
 // Sair da página com alterações pendentes pede confirmação.
 const confirmOpen = ref(false)

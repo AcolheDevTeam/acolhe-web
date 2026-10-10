@@ -29,14 +29,19 @@ export async function apiFetch<T>(
 // Em produção o Nitro troca por "Server Error" a mensagem de qualquer erro que
 // não seja H3Error, e o cliente perdia o motivo do 4xx (ex.: qual 409 da agenda,
 // ACO-83). Aqui o status segue e, só em 4xx, a mensagem curta da API vai em
-// `data.message`, para o front reconhecer o caso (nunca para exibi-la). 5xx e
-// falhas de rede não levam detalhe nenhum.
+// `data.message`, para o front reconhecer o caso (nunca para exibi-la). Quando
+// a API aponta o campo recusado (`field`, ex.: perfil em Ajustes, ACO-98), ele
+// segue em `data.field` se for um nome de campo simples. 5xx e falhas de rede
+// não levam detalhe nenhum.
 export function relayApiError(error: unknown): unknown {
   const status = (error as { response?: { status?: number } })?.response?.status
   if (!status) return error
-  const apiMessage = (error as { data?: { message?: unknown } }).data?.message
+  const body = (error as { data?: { message?: unknown, field?: unknown } }).data
+  const data: { message?: string, field?: string } = {}
+  if (status < 500 && typeof body?.message === 'string') data.message = body.message
+  if (status < 500 && typeof body?.field === 'string' && /^[A-Za-z]{1,40}$/.test(body.field)) data.field = body.field
   return createError({
     statusCode: status,
-    data: status < 500 && typeof apiMessage === 'string' ? { message: apiMessage } : undefined,
+    data: Object.keys(data).length ? data : undefined,
   })
 }

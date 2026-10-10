@@ -43,6 +43,11 @@ export const changePasswordSchema = z.object({
   newPassword: newPasswordSchema,
 })
 
+// "Encerrar todas as outras" pede a senha atual, como a troca de senha.
+export const endOtherSessionsSchema = z.object({
+  currentPassword: z.string().min(1, 'Informe a senha atual.').max(1024, 'Senha atual inválida.'),
+})
+
 export const activeSessionSchema = z.object({
   id: z.string().uuid(),
   userAgent: z.string(),
