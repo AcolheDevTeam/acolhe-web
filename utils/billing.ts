@@ -1,10 +1,10 @@
 // Regras de apresentação da cobrança (ACO-95). Preços só de utils/plans.ts;
 // datas no fuso do app (utils/timezone.ts), igual no SSR e no browser.
-import type { Subscription, SubscriptionStatus } from '~/schemas/billing'
+import type { InvoiceStatus, Subscription, SubscriptionStatus } from '~/schemas/billing'
 import type { UserRole, WorkspaceContext } from '~/types'
 import { apiErrorInfo, apiErrorMessage } from './api-error'
 import { PLANS, type BillingCycle, type Plan } from './plans'
-import { addCalendarDays, zonedDay } from './timezone'
+import { APP_TIMEZONE, zonedDay } from './timezone'
 
 export const BILLING_PATH = '/assinatura'
 /** Dias de aviso antes do fim do teste. */
@@ -41,9 +41,9 @@ export function trialDaysLeft(trialEndsAt: string, now: Date | string = new Date
   return dayDiff(zonedDay(now), zonedDay(trialEndsAt))
 }
 
-/** Dia (`YYYY-MM-DD`) em que o atraso passa a bloquear a escrita. */
+/** Instante (ISO) em que o atraso passa a bloquear a escrita: a API bloqueia 7 × 24 h depois. */
 export function pastDueDeadline(pastDueSince: string): string {
-  return addCalendarDays(zonedDay(pastDueSince), PAST_DUE_GRACE_DAYS)
+  return new Date(Date.parse(pastDueSince) + PAST_DUE_GRACE_DAYS * 86_400_000).toISOString()
 }
 
 /** Planos que o tipo de workspace pode assinar (mesma regra da API). */
@@ -96,22 +96,76 @@ export function trialBannerText(sub: Subscription | null | undefined, now: Date 
   return `Seu teste termina em ${days} ${days === 1 ? 'dia' : 'dias'}`
 }
 
-/** Erros do checkout e do portal, por motivo (regra A6). */
-export function billingErrorMessage(error: unknown, action: 'checkout' | 'portal'): string {
+export type BillingAction = 'checkout' | 'portal' | 'details' | 'cancel' | 'reactivate'
+
+const actionFallback: Record<BillingAction, string> = {
+  checkout: 'Não foi possível abrir o pagamento.',
+  portal: 'Não foi possível abrir a página do cartão.',
+  details: 'Não foi possível carregar o cartão e as faturas agora.',
+  cancel: 'Não foi possível cancelar a assinatura agora.',
+  reactivate: 'Não foi possível reativar a assinatura agora.',
+}
+
+/** Erros das ações de cobrança, por motivo (regra A6). */
+export function billingErrorMessage(error: unknown, action: BillingAction): string {
   const { status, technical } = apiErrorInfo(error)
   if (status === 409) {
     if (technical && /fundadores/i.test(technical)) return 'As vagas do plano Fundadores acabaram. Escolha o plano Autônomo.'
-    return 'Esta conta já tem uma assinatura. Use "Gerenciar assinatura" para mudar de plano.'
+    if (action === 'cancel' || action === 'reactivate') return 'Não há assinatura paga para alterar. Atualize a página.'
+    return 'Esta conta já tem uma assinatura. Atualize a página para ver os detalhes.'
   }
   return apiErrorMessage(error, {
-    400: 'Este plano não está disponível para este tipo de conta.',
+    400: action === 'checkout' ? 'Este plano não está disponível para este tipo de conta.' : 'O pedido não foi aceito. Atualize a página e tente de novo.',
     403: 'Só a responsável ou a administração da clínica pode assinar e gerenciar a cobrança.',
     404: action === 'portal'
-      ? 'Ainda não há assinatura paga para gerenciar. Escolha um plano abaixo.'
-      : 'Não encontramos a assinatura deste espaço de trabalho. Atualize a página.',
-    500: 'Não conseguimos abrir o pagamento agora. Tente de novo em instantes.',
+      ? 'Ainda não há cartão cadastrado para esta conta. Escolha um plano para cadastrar.'
+      : action === 'details'
+        ? actionFallback.details
+        : 'Não encontramos a assinatura deste espaço de trabalho. Atualize a página.',
+    500: `${actionFallback[action]} Tente de novo em instantes.`,
     502: 'O Stripe não respondeu. Tente de novo em instantes.',
     503: 'A cobrança está indisponível no momento. Tente de novo mais tarde.',
-    default: action === 'portal' ? 'Não foi possível abrir o portal de cobrança.' : 'Não foi possível abrir o pagamento.',
+    default: actionFallback[action],
   })
+}
+
+/** Situação da fatura no chip (Paga / Em aberto / Recusada / Cancelada). */
+export function invoiceStatusMeta(status: InvoiceStatus): { label: string, variant: 'positive' | 'warning' | 'danger' | 'neutral' } {
+  return ({
+    paid: { label: 'Paga', variant: 'positive' },
+    open: { label: 'Em aberto', variant: 'warning' },
+    uncollectible: { label: 'Recusada', variant: 'danger' },
+    void: { label: 'Cancelada', variant: 'neutral' },
+  } as const)[status]
+}
+
+const monthYear = new Intl.DateTimeFormat('pt-BR', { month: 'long', year: 'numeric', timeZone: APP_TIMEZONE })
+const dayMonth = new Intl.DateTimeFormat('pt-BR', { day: 'numeric', month: 'long', timeZone: APP_TIMEZONE })
+const dayMonthYear = new Intl.DateTimeFormat('pt-BR', { day: 'numeric', month: 'long', year: 'numeric', timeZone: APP_TIMEZONE })
+
+/** "Outubro 2026", no fuso do app. */
+export function invoicePeriodLabel(periodStart?: string | null): string {
+  if (!periodStart) return '—'
+  const label = monthYear.format(new Date(periodStart)).replace(' de ', ' ')
+  return label.charAt(0).toUpperCase() + label.slice(1)
+}
+
+/** "9 de novembro" (com o ano quando não for o ano corrente), no fuso do app. */
+export function longDate(value: string, now: Date | string = new Date()): string {
+  const sameYear = zonedDay(value).slice(0, 4) === zonedDay(now).slice(0, 4)
+  return (sameYear ? dayMonth : dayMonthYear).format(new Date(value))
+}
+
+/** Dia (`YYYY-MM-DD`) do calendário de São Paulo, para datas de calendário puras. */
+export function longCalendarDate(day: string, now: Date | string = new Date()): string {
+  return longDate(`${day}T15:00:00Z`, now)
+}
+
+/** "08/28". */
+export function cardExpiry(month: number, year: number): string {
+  return `${String(month).padStart(2, '0')}/${String(year % 100).padStart(2, '0')}`
+}
+
+export function cardBrandLabel(brand: string): string {
+  return ({ visa: 'Visa', mastercard: 'Mastercard', amex: 'American Express', elo: 'Elo', hipercard: 'Hipercard', discover: 'Discover', diners: 'Diners' } as Record<string, string>)[brand.toLowerCase()] ?? 'Cartão'
 }

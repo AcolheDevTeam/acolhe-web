@@ -1,5 +1,6 @@
-import { stripeRedirectSchema } from '~/schemas/billing'
+import { portalBodySchema, stripeRedirectSchema } from '~/schemas/billing'
 
 export default defineEventHandler(async (event) => {
-  return stripeRedirectSchema.parse(await apiFetch<unknown>(event, '/billing/portal', { method: 'POST' }))
+  const body = await readValidatedBody(event, value => portalBodySchema.parse(value ?? {}))
+  return stripeRedirectSchema.parse(await apiFetch<unknown>(event, '/billing/portal', { method: 'POST', body }))
 })

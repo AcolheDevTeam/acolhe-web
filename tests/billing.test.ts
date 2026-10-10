@@ -1,8 +1,12 @@
 import { describe, expect, it } from 'vitest'
-import { checkoutBodySchema, stripeRedirectSchema, subscriptionSchema } from '~/schemas/billing'
+import { billingDetailsSchema, checkoutBodySchema, portalBodySchema, stripeRedirectSchema, subscriptionSchema } from '~/schemas/billing'
 import { apiErrorMessage, READ_ONLY_MESSAGE } from '~/utils/api-error'
 import {
   billedSeats,
+  cardExpiry,
+  invoicePeriodLabel,
+  invoiceStatusMeta,
+  longDate,
   billingErrorMessage,
   canManageBilling,
   cycleFor,
@@ -48,8 +52,11 @@ describe('dias de teste no fuso de São Paulo', () => {
     expect(trialBannerText({ ...trial, status: 'active' }, '2026-10-12T12:00:00Z')).toBeNull()
   })
 
-  it('prazo do atraso: 7 dias depois do primeiro dia em atraso', () => {
-    expect(pastDueDeadline('2026-10-02T02:00:00Z')).toBe('2026-10-08')
+  it('prazo do atraso: o instante exato 7 × 24 h depois, exibido no fuso do app', () => {
+    const deadline = pastDueDeadline('2026-10-02T02:00:00Z')
+    expect(deadline).toBe('2026-10-09T02:00:00.000Z')
+    // 02:00 UTC ainda é o dia 8 às 23:00 em São Paulo: o texto não pode prometer o dia 9.
+    expect(longDate(deadline, '2026-10-02T12:00:00Z')).toBe('8 de outubro')
   })
 })
 
@@ -130,11 +137,60 @@ describe('erros da cobrança em português', () => {
     const messages = [400, 403, 503, 502].map(s => billingErrorMessage(err(s), 'checkout'))
     expect(new Set(messages).size).toBe(4)
     expect(billingErrorMessage(err(409, 'as vagas do plano Fundadores acabaram'), 'checkout')).toMatch(/Fundadores acabaram/)
-    expect(billingErrorMessage(err(409, 'esta conta já tem uma assinatura'), 'checkout')).toMatch(/Gerenciar assinatura/)
+    expect(billingErrorMessage(err(409, 'esta conta já tem uma assinatura'), 'checkout')).toMatch(/já tem uma assinatura/)
     expect(billingErrorMessage(err(404), 'portal')).toMatch(/Escolha um plano/)
   })
 
   it('402 em qualquer tela explica o modo só leitura', () => {
     expect(apiErrorMessage(err(402), { default: 'outro texto' })).toContain(READ_ONLY_MESSAGE)
+  })
+})
+
+describe('cartão e faturas', () => {
+  it('rótulos da situação da fatura', () => {
+    expect(invoiceStatusMeta('paid')).toEqual({ label: 'Paga', variant: 'positive' })
+    expect(invoiceStatusMeta('open').label).toBe('Em aberto')
+    expect(invoiceStatusMeta('uncollectible').label).toBe('Recusada')
+    expect(invoiceStatusMeta('void').label).toBe('Cancelada')
+  })
+
+  it('período da fatura no mês de São Paulo', () => {
+    // 1/11 01:00 UTC ainda é 31/10 em São Paulo.
+    expect(invoicePeriodLabel('2026-11-01T01:00:00Z')).toBe('Outubro 2026')
+    expect(invoicePeriodLabel('2026-11-01T12:00:00Z')).toBe('Novembro 2026')
+    expect(invoicePeriodLabel(null)).toBe('—')
+  })
+
+  it('datas por extenso no fuso do app, com ano só quando muda', () => {
+    expect(longDate('2026-11-10T00:54:43Z', '2026-10-09T12:00:00Z')).toBe('9 de novembro')
+    expect(longDate('2027-01-01T12:00:00Z', '2026-10-09T12:00:00Z')).toBe('1 de janeiro de 2027')
+  })
+
+  it('validade do cartão', () => {
+    expect(cardExpiry(8, 2028)).toBe('08/28')
+    expect(cardExpiry(12, 2030)).toBe('12/30')
+  })
+
+  it('contrato dos detalhes: links fora do Stripe são descartados', () => {
+    const parsed = billingDetailsSchema.parse({
+      card: { brand: 'visa', last4: '4242', expMonth: 8, expYear: 2028 },
+      invoices: [{ id: 'in_1', number: 'A-1', periodStart: '2026-10-10T00:00:00Z', periodEnd: null, amountCents: 4900, status: 'paid', pdfUrl: 'https://pay.stripe.com/invoice/x/pdf', hostedUrl: 'https://evil.example/x' }],
+      cancelAtPeriodEnd: false,
+      cancelAt: null,
+    })
+    expect(parsed.invoices[0]!.pdfUrl).toBe('https://pay.stripe.com/invoice/x/pdf')
+    expect(parsed.invoices[0]!.hostedUrl).toBe('')
+    expect(billingDetailsSchema.safeParse({ card: null, invoices: [], cancelAtPeriodEnd: true, cancelAt: '2026-11-10T00:00:00Z' }).success).toBe(true)
+  })
+
+  it('portal aceita só o fluxo de troca de cartão', () => {
+    expect(portalBodySchema.safeParse({}).success).toBe(true)
+    expect(portalBodySchema.safeParse({ flow: 'payment_method_update' }).success).toBe(true)
+    expect(portalBodySchema.safeParse({ flow: 'subscription_cancel' }).success).toBe(false)
+  })
+
+  it('cancelar sem assinatura paga tem mensagem própria', () => {
+    expect(billingErrorMessage({ statusCode: 409 }, 'cancel')).toMatch(/Não há assinatura paga/)
+    expect(billingErrorMessage({ statusCode: 404 }, 'details')).toMatch(/cartão e as faturas/)
   })
 })

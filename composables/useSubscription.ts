@@ -1,4 +1,4 @@
-import type { Subscription } from '~/schemas/billing'
+import type { BillingDetails, Subscription } from '~/schemas/billing'
 import type { User } from '~/types'
 
 // Assinatura do workspace ativo (ACO-95). A chave inclui a organização: a troca
@@ -14,4 +14,20 @@ export function useSubscription() {
     immediate: enabled.value,
   })
   return { subscription, status, error, refresh, enabled, key }
+}
+
+// Cartão, faturas e cancelamento agendado; só para quem gerencia a cobrança
+// e tem assinatura paga. Falha aqui não derruba a página.
+export function useBillingDetails(enabled: MaybeRefOrGetter<boolean>) {
+  const { data: me } = useNuxtData<User | null>('me')
+  const key = `billing-details-${me.value?.workspace?.organizationId ?? 'none'}`
+  const result = useFetch<BillingDetails | null>('/api/billing/details', {
+    key,
+    default: () => null,
+    immediate: toValue(enabled),
+    watch: false,
+  })
+  // Assinatura que vira paga depois (retorno do checkout) passa a buscar.
+  watch(() => toValue(enabled), (on) => { if (on && !result.data.value) void result.refresh() })
+  return result
 }
