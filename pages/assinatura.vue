@@ -172,14 +172,11 @@ onMounted(async () => {
         Você e suas pacientes continuam podendo ver e exportar os dados. Para voltar a criar e editar, assine de novo.
       </InlineNotice>
 
-      <div class="grid gap-5 [grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr))]">
+      <div class="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
         <section aria-labelledby="t-plano" class="flex animate-rise flex-col gap-3.5 rounded-2xl bg-brand p-6 text-brand-foreground">
           <h2 id="t-plano" class="label-mono text-[11px] !text-brand-muted">{{ sub.status === 'trialing' ? 'Período de teste' : 'Plano atual' }}</h2>
           <p class="text-[26px] font-semibold tracking-[-0.02em] text-white">{{ summary?.title }}</p>
           <p v-for="line in summary?.lines" :key="line" class="text-sm text-brand-foreground/80">{{ line }}</p>
-          <div v-if="canManage && sub.status !== 'trialing'" class="mt-auto pt-2">
-            <Button variant="on-brand" :loading="busy === 'portal'" :disabled="!!busy" @click="openPortal">{{ busy === 'portal' ? 'Abrindo…' : 'Gerenciar assinatura' }}</Button>
-          </div>
         </section>
 
         <Card v-if="isClinic" role="region" aria-labelledby="t-vagas" class="flex animate-rise flex-col gap-3.5 p-6 [animation-delay:.06s]">
@@ -189,6 +186,14 @@ onMounted(async () => {
             <span class="text-[15px] font-normal text-muted-foreground">{{ sub.seats ? 'na assinatura' : 'a cobrar' }}</span>
           </p>
           <p class="text-sm leading-relaxed text-muted-foreground">{{ planByCode('clinica').note }} As vagas acompanham a equipe ativa.</p>
+        </Card>
+
+        <Card v-if="canManage && sub.status !== 'trialing'" role="region" aria-labelledby="t-pagamento" class="flex animate-rise flex-col gap-3.5 p-6 [animation-delay:.12s]">
+          <h2 id="t-pagamento" class="label-mono text-[11px]">Pagamento e faturas</h2>
+          <p class="text-sm leading-relaxed text-secondary-foreground">Cartão, faturas, troca de plano e cancelamento ficam no portal de cobrança do Stripe.</p>
+          <div class="mt-auto pt-1">
+            <Button variant="outline" :loading="busy === 'portal'" :disabled="!!busy" @click="openPortal">{{ busy === 'portal' ? 'Abrindo…' : 'Gerenciar assinatura' }}</Button>
+          </div>
         </Card>
       </div>
 
