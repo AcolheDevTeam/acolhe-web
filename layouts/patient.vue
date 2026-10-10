@@ -1,16 +1,28 @@
 <script setup lang="ts">
-import { CircleDot, Home, ListChecks } from 'lucide-vue-next'
+import { CircleDot, History, Home, ListChecks } from 'lucide-vue-next'
+import { Button } from '@/components/ui/button'
+import { InlineNotice } from '@/components/ui/inline-notice'
+import type { User } from '~/types'
 
 // Shell da paciente: no celular, tabbar fixa embaixo (protótipo); a partir de
-// `md`, a mesma navegação vai para uma barra no topo. "Histórico" (prontuário
-// da paciente) entra quando o endpoint do portal existir. Responder uma
-// atividade usa tela própria, sem este layout (pages/patient/activities/[id]).
+// `md`, a mesma navegação vai para uma barra no topo. "Histórico" é o "Meu
+// prontuário" (ACO-88). Responder uma atividade usa tela própria, sem este
+// layout (pages/patient/activities/[id]).
 const route = useRoute()
 const items = [
   { label: 'Início', to: '/patient', icon: Home },
   { label: 'Atividades', to: '/patient/activities', icon: ListChecks },
   { label: 'Check-in', to: '/patient/check-in', icon: CircleDot },
+  { label: 'Histórico', to: '/patient/historico', icon: History },
 ]
+// Sem vínculo ativo, Início, Atividades e Check-in não têm dados para ela; em
+// vez do erro genérico, a tela diz o motivo e leva ao Histórico, que continua
+// aberto (CFP 01/2009, art. 5º, II).
+const { data: me } = useNuxtData<User | null>('me')
+const linkReason = computed(() => inactiveLinkReason(me.value?.patient))
+const blocked = computed(() => linkReason.value !== null && !openWithoutLink(route.path))
+// "Sair" fica no Início, que aqui não abre: o aviso oferece a saída.
+const { logout, isLoggingOut } = useLogout()
 function isActive(to: string) {
   if (to === '/patient') return route.path === to
   return route.path === to || route.path.startsWith(`${to}/`)
@@ -39,7 +51,18 @@ function isActive(to: string) {
       </div>
     </header>
     <main class="mx-auto flex max-w-3xl flex-col px-5 pb-6 pt-7 md:px-8 md:py-10">
-      <slot />
+      <div v-if="blocked" class="flex flex-col items-start gap-4">
+        <InlineNotice tone="neutral" class="w-full">
+          {{ linkReason }} Você ainda pode ler o registro das suas sessões.
+        </InlineNotice>
+        <div class="flex flex-wrap gap-2">
+          <Button as-child>
+            <NuxtLink to="/patient/historico">Ver meu histórico</NuxtLink>
+          </Button>
+          <Button variant="ghost" :disabled="isLoggingOut" @click="logout">{{ isLoggingOut ? 'Saindo…' : 'Sair' }}</Button>
+        </div>
+      </div>
+      <slot v-else />
     </main>
     <nav class="fixed inset-x-0 bottom-0 z-20 border-t bg-card px-2 pb-[max(12px,env(safe-area-inset-bottom))] pt-1 md:hidden" aria-label="Navegação da paciente">
       <div class="mx-auto flex max-w-md">
