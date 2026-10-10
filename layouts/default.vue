@@ -36,6 +36,7 @@ watch(() => route.fullPath, () => { menuOpen.value = false })
         </Sheet>
       </header>
 
+      <SubscriptionBanner />
       <slot />
     </div>
   </div>

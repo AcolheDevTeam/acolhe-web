@@ -14,9 +14,15 @@ export interface ApiErrorInfo {
   technical?: string
 }
 
+// Workspace só leitura (teste vencido, atraso além da tolerância, cancelada):
+// a API recusa escritas com 402. O shell mostra a faixa com o link para
+// /assinatura (plugins/billing-readonly.client.ts).
+export const READ_ONLY_MESSAGE = 'Assinatura inativa: você pode ver os dados, mas não criar nem editar.'
+
 const defaultMessages: Record<number, string> = {
   400: 'Alguns dados não foram aceitos. Revise o formulário e tente de novo.',
   401: 'Sua sessão expirou. Entre novamente para continuar.',
+  402: `${READ_ONLY_MESSAGE} Para voltar a editar, abra Assinatura no menu.`,
   403: 'Você não tem permissão para esta ação.',
   404: 'Não encontramos o registro. Ele pode ter sido removido.',
   409: 'Esta ação conflita com um registro existente.',
