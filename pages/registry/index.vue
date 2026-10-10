@@ -58,7 +58,7 @@ function focusForm() {
       <p>
         Só você vê estas anotações. Elas não são compartilhadas com pacientes
         nem com outras profissionais e não entram na exportação de dados da
-        paciente (LGPD). Podem ser requisitadas por ordem judicial.
+        paciente.
       </p>
     </div>
 

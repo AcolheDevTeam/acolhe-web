@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { categorySchema } from '~/schemas/documentary'
+import { categorySchema, type DocumentaryCategory } from '~/schemas/documentary'
 
 definePageMeta({ middleware: ['auth', 'psychologist-only'] })
 const route = useRoute()
@@ -12,6 +12,10 @@ const initialCategory = computed(() => {
   const parsed = categorySchema.safeParse(route.query.categoria)
   return parsed.success ? parsed.data : undefined
 })
+// Troca de categoria no caderno atualiza a URL: recarregar abre a mesma.
+function keepCategory(categoria: DocumentaryCategory) {
+  void navigateTo({ query: { ...route.query, categoria } }, { replace: true })
+}
 const crumbs = computed(() => [
   { label: 'Registro Documental', to: '/registry' },
   { label: data.value?.patient.fullName ?? 'Caderno' },
@@ -28,6 +32,7 @@ const crumbs = computed(() => [
       :key="`${identity}:${patientId}`"
       :patient-id="patientId"
       :initial-category="initialCategory"
+      @category-change="keepCategory"
       class="animate-rise [animation-delay:60ms]"
     />
   </div>

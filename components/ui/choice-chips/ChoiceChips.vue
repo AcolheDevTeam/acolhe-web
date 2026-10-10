@@ -11,11 +11,16 @@ import { cn } from "@/lib/utils"
 // - `multiple`: cada chip é um `checkbox` independente; o modelo é uma lista.
 // - `variant="strong"`: filtro forte do protótipo (pílula de 36px, ativo em
 //   Noite com texto branco), como os tipos do Registro Documental.
+// - `manual`: as setas só movem o foco; Enter/Espaço seleciona. Para quando
+//   trocar de opção tem custo (ex.: confirmar descarte de rascunho).
+// - `disabled` usa aria-disabled: o chip continua focável e o foco não cai
+//   para o body enquanto, por exemplo, um salvamento está em andamento.
 const props = defineProps<{
   options: { value: T, label: string }[]
   label: string
   multiple?: boolean
   variant?: "soft" | "strong"
+  manual?: boolean
   disabled?: boolean
   class?: HTMLAttributes["class"]
 }>()
@@ -39,7 +44,7 @@ const activeIndex = computed(() => Math.max(0, props.options.findIndex(o => sele
 const buttons = ref<HTMLButtonElement[]>([])
 
 function onKeydown(event: KeyboardEvent, index: number) {
-  if (props.multiple || props.disabled) return
+  if (props.multiple) return
   const last = props.options.length - 1
   const next = {
     ArrowRight: index === last ? 0 : index + 1,
@@ -51,7 +56,7 @@ function onKeydown(event: KeyboardEvent, index: number) {
   }[event.key]
   if (next === undefined) return
   event.preventDefault()
-  model.value = props.options[next]!.value
+  if (!props.manual && !props.disabled) model.value = props.options[next]!.value
   buttons.value[next]?.focus()
 }
 </script>
@@ -70,9 +75,9 @@ function onKeydown(event: KeyboardEvent, index: number) {
       :role="multiple ? 'checkbox' : 'radio'"
       :aria-checked="selected(option.value)"
       :tabindex="multiple || index === activeIndex ? 0 : -1"
-      :disabled="disabled"
+      :aria-disabled="disabled || undefined"
       :class="cn(
-        'rounded-full border transition-[background-color,border-color,color] duration-200 ease-out focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/15 disabled:pointer-events-none disabled:opacity-45',
+        'rounded-full border transition-[background-color,border-color,color] duration-200 ease-out focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/15 aria-disabled:cursor-not-allowed aria-disabled:opacity-45',
         variant === 'strong' ? 'h-9 px-3.5 text-sm font-medium' : 'h-8 px-3 text-[13px]',
         selected(option.value)
           ? (variant === 'strong' ? 'border-brand bg-brand text-primary-foreground' : 'border-selected-border bg-accent text-success')

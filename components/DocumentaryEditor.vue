@@ -30,6 +30,8 @@ import {
 
 // initialCategory: categoria aberta primeiro (ex.: escolhida em "Abrir caderno").
 const props = defineProps<{ patientId: string, initialCategory?: DocumentaryCategory }>()
+// A página guarda a categoria na URL para o recarregamento abrir a mesma.
+const emit = defineEmits<{ categoryChange: [category: DocumentaryCategory] }>()
 const identity = useDocumentaryIdentity()
 const initialIdentity = identity.value
 const requestFetch = useRequestFetch()
@@ -154,6 +156,7 @@ watch(
 async function changeCategory(next: DocumentaryCategory) {
   if (next === category.value || !(await confirmDiscard())) return
   category.value = next
+  emit('categoryChange', next)
   adopt(data.value?.items.find((item) => item.category === next) ?? null)
   selectedVersion.value = null
   comparedVersion.value = null
@@ -171,8 +174,8 @@ function updatePersisted(value: Notebook) {
         value,
       ],
     }
+  // "Salvo · versão N" sai pelo SaveStatus; sem segundo aviso igual.
   adopt(value)
-  message.value = `Versão ${value.revision} salva.`
 }
 async function inspectLatest() {
   failure.value = ''
@@ -307,9 +310,13 @@ async function restoreVersion() {
   if (!selectedVersion.value || !(await confirmDiscard())) return
   await persist(selectedVersion.value.revision)
 }
-// "Restaurar" direto na linha do histórico (protótipo): mesma regra do diálogo.
-async function restoreRevision(revision: number) {
-  if (!(await confirmDiscard())) return
+// "Restaurar" na linha do histórico (protótipo) pede confirmação antes, já que
+// a pessoa não está vendo o texto daquela versão.
+const restoreTarget = ref<number | null>(null)
+async function decideRestore(confirmed: boolean) {
+  const revision = restoreTarget.value
+  restoreTarget.value = null
+  if (!confirmed || revision === null || !(await confirmDiscard())) return
   await persist(revision)
 }
 function rebaseDraft() {
@@ -405,6 +412,7 @@ watch(
       </InlineNotice>
       <ChoiceChips
         variant="strong"
+        manual
         label="Categorias do caderno"
         :options="categoryOptions"
         :model-value="category"
@@ -422,7 +430,7 @@ watch(
               categoryLabel
             }}</label>
             <span v-if="saveState === 'idle'" class="font-mono text-xs text-muted-foreground">Caderno ainda não iniciado</span>
-            <SaveStatus v-else :state="saveState" :version="saved?.revision" />
+            <SaveStatus :state="saveState" :version="saved?.revision" />
           </div>
           <Textarea
             id="documentary-content"
@@ -521,7 +529,7 @@ watch(
                   class="text-primary hover:bg-accent hover:text-primary"
                   :disabled="!writable || saving || conflicted || versionBusy || exitProtection.pending.value"
                   :aria-label="`Restaurar a versão ${version.revision}`"
-                  @click="restoreRevision(version.revision)"
+                  @click="restoreTarget = version.revision"
                   >Restaurar</Button
                 >
               </li>
@@ -604,5 +612,12 @@ watch(
       ></Dialog
     >
     <UnsavedChangesDialog :open="confirmOpen" @decision="decide" />
+    <ConfirmDialog
+      :open="restoreTarget !== null"
+      :title="`Restaurar a versão ${restoreTarget}?`"
+      :description="`O texto da versão ${restoreTarget} vira a versão ${(saved?.revision ?? 0) + 1}, a atual. As versões anteriores continuam no histórico.`"
+      confirm-label="Restaurar"
+      @decision="decideRestore"
+    />
   </div>
 </template>
