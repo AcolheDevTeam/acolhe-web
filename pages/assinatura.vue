@@ -47,7 +47,7 @@ const {
 
 // Equipe ativa da clínica: avatares e conta de vagas (só a administração lê).
 const { data: team } = useFetch<ClinicTeam>('/api/clinic/team', {
-  key: 'clinic-team',
+  key: clinicTeamKey(me.value?.workspace?.organizationId),
   default: () => ({ members: [], invitations: [] }),
   immediate: isClinicAdmin(me.value),
 })
@@ -218,15 +218,16 @@ onMounted(async () => {
             {{ card ? `Não conseguimos cobrar o cartão final ${card.last4}` : 'Não conseguimos cobrar a assinatura' }}
           </p>
           <p class="text-sm leading-normal text-secondary-foreground">
-            <template v-if="sub.writable && sub.pastDueSince">Se o pagamento não for feito até {{ longCalendarDate(pastDueDeadline(sub.pastDueSince)) }}, a criação de registros novos fica pausada.</template>
+            <template v-if="sub.writable && sub.pastDueSince">Se o pagamento não for feito até {{ longDate(pastDueDeadline(sub.pastDueSince)) }}, às {{ formatTime(pastDueDeadline(sub.pastDueSince)) }}, a criação de registros novos fica pausada.</template>
             <template v-else>A criação de registros novos está pausada.</template>
             Ver os dados continua liberado.
           </p>
         </div>
         <Button v-if="canManage" :loading="busy === 'portal'" :disabled="!!busy" @click="updateCard">{{ busy === 'portal' ? 'Abrindo…' : 'Atualizar cartão' }}</Button>
       </section>
+      <!-- Independente do atraso: quem cancelou com pagamento atrasado também pode reativar. -->
       <section
-        v-else-if="cancelScheduled"
+        v-if="cancelScheduled"
         class="flex animate-fade flex-wrap items-center gap-4 rounded-[14px] border bg-card px-5 py-4"
       >
         <p class="min-w-0 flex-[1_1_320px] text-sm leading-normal text-secondary-foreground">
@@ -237,7 +238,7 @@ onMounted(async () => {
       </section>
       <InlineNotice v-else-if="sub.status === 'canceled'" tone="neutral">
         <strong class="font-semibold text-foreground">Assinatura cancelada.</strong>
-        Você e suas pacientes continuam podendo ver os dados. Para voltar a criar e editar, assine de novo.
+        {{ isClinic ? 'A equipe e as pacientes continuam' : 'Você e suas pacientes continuam' }} podendo ver os dados. Para voltar a criar e editar, assine de novo.
       </InlineNotice>
 
       <InlineNotice v-if="canManage && paid && detailsError" tone="warning" class="flex flex-wrap items-center justify-between gap-3">
@@ -413,7 +414,7 @@ onMounted(async () => {
           </PlanCard>
         </div>
         <p class="text-[13px] leading-relaxed text-muted-foreground">
-          Se a assinatura vencer, você e suas pacientes continuam podendo ver todos os dados. Só não é possível criar registros novos.
+          Se a assinatura vencer, {{ isClinic ? 'a equipe e as pacientes continuam' : 'você e suas pacientes continuam' }} podendo ver todos os dados. Só não é possível criar registros novos.
         </p>
       </section>
     </template>

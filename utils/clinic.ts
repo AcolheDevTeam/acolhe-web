@@ -34,3 +34,8 @@ export function deliveryMessage(status: 'sent' | 'failed' | 'disabled'): string 
   if (status === 'failed') return 'Não conseguimos enviar o e-mail. Copie o link abaixo e envie você mesma.'
   return 'O envio por e-mail não está configurado. Copie o link abaixo e envie você mesma.'
 }
+
+/** Chave de cache da equipe por organização (LGPD: nada cruza entre clínicas). */
+export function clinicTeamKey(organizationId?: string | null): string {
+  return `clinic-team-${organizationId ?? 'none'}`
+}

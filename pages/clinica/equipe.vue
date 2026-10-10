@@ -20,7 +20,7 @@ const isOwner = computed(() => me.value?.workspace?.roles.includes('clinic_owner
 const { workspaces } = useWorkspaces()
 const clinicName = computed(() => workspaces.value.find(w => w.current)?.name ?? 'Clínica')
 const { data: team, error, status, refresh } = useFetch<ClinicTeam>('/api/clinic/team', {
-  key: 'clinic-team',
+  key: clinicTeamKey(me.value?.workspace?.organizationId),
   default: () => ({ members: [], invitations: [] }),
 })
 // Nº de pacientes por pessoa vem do painel (só números); sem ele, a coluna mostra "—".

@@ -4,7 +4,7 @@ import type { InvoiceStatus, Subscription, SubscriptionStatus } from '~/schemas/
 import type { UserRole, WorkspaceContext } from '~/types'
 import { apiErrorInfo, apiErrorMessage } from './api-error'
 import { PLANS, type BillingCycle, type Plan } from './plans'
-import { addCalendarDays, APP_TIMEZONE, zonedDay } from './timezone'
+import { APP_TIMEZONE, zonedDay } from './timezone'
 
 export const BILLING_PATH = '/assinatura'
 /** Dias de aviso antes do fim do teste. */
@@ -41,9 +41,9 @@ export function trialDaysLeft(trialEndsAt: string, now: Date | string = new Date
   return dayDiff(zonedDay(now), zonedDay(trialEndsAt))
 }
 
-/** Dia (`YYYY-MM-DD`) em que o atraso passa a bloquear a escrita. */
+/** Instante (ISO) em que o atraso passa a bloquear a escrita: a API bloqueia 7 × 24 h depois. */
 export function pastDueDeadline(pastDueSince: string): string {
-  return addCalendarDays(zonedDay(pastDueSince), PAST_DUE_GRACE_DAYS)
+  return new Date(Date.parse(pastDueSince) + PAST_DUE_GRACE_DAYS * 86_400_000).toISOString()
 }
 
 /** Planos que o tipo de workspace pode assinar (mesma regra da API). */

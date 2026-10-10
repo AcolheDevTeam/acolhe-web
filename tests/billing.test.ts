@@ -6,7 +6,6 @@ import {
   cardExpiry,
   invoicePeriodLabel,
   invoiceStatusMeta,
-  longCalendarDate,
   longDate,
   billingErrorMessage,
   canManageBilling,
@@ -53,8 +52,11 @@ describe('dias de teste no fuso de São Paulo', () => {
     expect(trialBannerText({ ...trial, status: 'active' }, '2026-10-12T12:00:00Z')).toBeNull()
   })
 
-  it('prazo do atraso: 7 dias depois do primeiro dia em atraso', () => {
-    expect(pastDueDeadline('2026-10-02T02:00:00Z')).toBe('2026-10-08')
+  it('prazo do atraso: o instante exato 7 × 24 h depois, exibido no fuso do app', () => {
+    const deadline = pastDueDeadline('2026-10-02T02:00:00Z')
+    expect(deadline).toBe('2026-10-09T02:00:00.000Z')
+    // 02:00 UTC ainda é o dia 8 às 23:00 em São Paulo: o texto não pode prometer o dia 9.
+    expect(longDate(deadline, '2026-10-02T12:00:00Z')).toBe('8 de outubro')
   })
 })
 
@@ -162,7 +164,6 @@ describe('cartão e faturas', () => {
   it('datas por extenso no fuso do app, com ano só quando muda', () => {
     expect(longDate('2026-11-10T00:54:43Z', '2026-10-09T12:00:00Z')).toBe('9 de novembro')
     expect(longDate('2027-01-01T12:00:00Z', '2026-10-09T12:00:00Z')).toBe('1 de janeiro de 2027')
-    expect(longCalendarDate('2026-10-08', '2026-10-09T12:00:00Z')).toBe('8 de outubro')
   })
 
   it('validade do cartão', () => {
