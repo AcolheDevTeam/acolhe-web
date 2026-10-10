@@ -43,12 +43,18 @@ export function useUnreadNotifications() {
     onResponseError: () => {},
   })
   const nuxtApp = useNuxtApp()
-  if (import.meta.client && enabled.value && !navigationHooked.has(nuxtApp)) {
+  if (import.meta.client && !navigationHooked.has(nuxtApp)) {
     navigationHooked.add(nuxtApp)
     // Navegar é o momento natural de o contador mudar (abriu a revisão,
-    // marcou na caixa); o custo é uma contagem indexada.
+    // marcou na caixa); o custo é uma contagem indexada. A chave e a
+    // permissão são lidas a cada navegação: depois de sair e entrar, ou de
+    // trocar de espaço de trabalho, valem as da conta atual.
     useRouter().afterEach((to, from) => {
-      if (to.path !== from.path) void refreshNuxtData(key)
+      if (to.path === from.path) return
+      const me = nuxtApp.payload.data.me as User | null | undefined
+      if (me?.role !== 'psychologist') return
+      const organizationId = me.workspace?.organizationId ?? me.organizationId
+      void refreshNuxtData(notificationsKey('unread', me.id, organizationId))
     })
   }
   const count = computed(() => data.value?.count ?? 0)
