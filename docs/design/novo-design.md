@@ -6,6 +6,16 @@ Base de código comparada: `acolhe-web` na branch `feat/aco-62-area-clinica` (co
 
 Este documento é só levantamento. Nada foi implementado.
 
+**Atualização de produto (2026-10-10):** para as telas Criar clínica, Admin e os avisos de
+cobrança, seguir o [plano de superadmin e cadastro de clínicas](../../../acolhe-api/docs/plano-superadmin-e-cadastro-clinicas.md)
+e a [ADR 0003](../../../acolhe-api/docs/architecture/0003-cadastro-direto-de-clinicas-e-superadmin.md).
+O CNPJ da clínica é obrigatório; o cadastro é direto, sem aprovação; o superadmin pode criar
+clínicas e consultar assinaturas. A aba de cortesias do protótipo fica fora de escopo (cupons
+eventuais são gerados no Stripe). A verificação de titularidade do CNPJ é bloqueio de release
+público; até lá, `CLINIC_SELF_SIGNUP_ENABLED` fica desabilitada por padrão na API e no web.
+O protótipo continua como referência visual, mas essas decisões prevalecem sobre os
+campos e ações desenhados em 2026-10-09.
+
 **Decisões tomadas em 2026-10-09 (ao adotar o protótipo)**
 
 - A A5 do guia e a Regra 1 do `AGENTS.md` foram atualizadas para o protótipo; os artboards estão
