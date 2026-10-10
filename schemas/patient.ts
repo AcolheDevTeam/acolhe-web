@@ -36,6 +36,8 @@ export const patientSchema = z.object({
     accepted: z.boolean(),
     version: z.string(),
     decidedAt: z.string().datetime({ offset: true }),
+    // A paciente revogou o consentimento em Ajustes (ACO-102).
+    revokedAt: z.string().datetime({ offset: true }).nullable().optional(),
   }).nullable().optional(),
 }).passthrough()
 
