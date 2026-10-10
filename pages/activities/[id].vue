@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Check, ChevronLeft, ChevronRight } from 'lucide-vue-next'
+import { onBeforeRouteLeave, onBeforeRouteUpdate } from 'vue-router'
 import { toast } from 'vue-sonner'
 import {
   REVIEW_COMMENT_MAX,
@@ -97,23 +98,25 @@ const metaLine = computed(() => {
   return parts.join(' · ')
 })
 
-// Rascunho da revisão. Recomeça do que está salvo sempre que a atividade
-// carrega ou é salva.
-const EMPTY_REVIEW: ReviewNote = { comment: null, visibility: null, commentUpdatedAt: null, tags: [] }
+// Rascunho da revisão. Recomeça do que está salvo quando a atividade troca ou
+// quando chega uma versão nova e não há nada por salvar; com rascunho sujo, um
+// refetch não apaga o que a psicóloga escreveu.
+const EMPTY_REVIEW: ReviewNote = { comment: null, visibility: null, commentUpdatedAt: null, tags: [], updatedAt: null }
 const savedReview = computed<ReviewNote>(() =>
   activity.value?.state === 'reviewed' ? activity.value.review ?? EMPTY_REVIEW : EMPTY_REVIEW)
 const visibility = ref<CommentVisibility>('shared')
 const comment = ref('')
 const tags = ref<string[]>([])
 const reviewError = ref('')
+const versionConflict = ref(false)
 function resetDraft() {
   const saved = savedReview.value
   visibility.value = saved.visibility ?? 'shared'
   comment.value = saved.comment ?? ''
   tags.value = [...saved.tags]
   reviewError.value = ''
+  versionConflict.value = false
 }
-watch(() => [activity.value?.id, activity.value?.state, savedReview.value], resetDraft, { immediate: true })
 
 const visibilityOptions: { value: CommentVisibility, label: string }[] = [
   { value: 'shared', label: 'Compartilhado' },
@@ -145,42 +148,93 @@ const dirty = computed(() => {
   return !sameTags(tags.value, saved.tags)
 })
 
+let draftFor: string | undefined
+watch(() => [activity.value?.id, activity.value?.state, savedReview.value] as const, ([id]) => {
+  if (id !== draftFor || !dirty.value) {
+    draftFor = id
+    resetDraft()
+  }
+}, { immediate: true })
+
 async function saveReview() {
   const text = comment.value.trim()
   const parsed = reviewRequestSchema.safeParse({
     comment: text || undefined,
     visibility: text ? visibility.value : undefined,
     tags: tags.value,
+    // Versão que esta tela leu; a API recusa (409) se outra aba salvou antes.
+    expectedUpdatedAt: savedReview.value.updatedAt ?? null,
   })
   if (!parsed.success) {
     reviewError.value = parsed.error.issues[0]?.message ?? 'Confira o comentário e as tags.'
     return
   }
   reviewError.value = ''
+  versionConflict.value = false
   const firstTime = activity.value?.state === 'submitted'
   reviewing.value = true
   try {
     await $fetch(`/api/activities/${activityId.value}/review`, {
       method: 'PUT',
-      body: parsed.data,
+      body: { ...parsed.data, tags: parsed.data.tags ?? [] },
     })
+    // Gravado: o rascunho passa a ser a versão salva que vem no refetch.
+    draftFor = undefined
     await Promise.all([
       refreshNuxtData(`activity-${activityId.value}`),
       refreshNuxtData('activities-all'),
     ])
     if (!firstTime) toast.success('Revisão atualizada.')
   } catch (error) {
-    reviewError.value = apiErrorMessage(error, {
-      400: 'Confira o comentário e as tags: algum passou do limite.',
-      403: 'Só a psicóloga responsável pode revisar esta atividade.',
-      404: 'Esta atividade ainda não tem uma resposta completa para revisar.',
-      409: 'Esta atividade não está mais aguardando revisão. Recarregue a página.',
-      default: 'Não foi possível salvar a revisão agora. Tente de novo.',
-    })
+    versionConflict.value = isReviewVersionConflict(error)
+    reviewError.value = reviewErrorMessage(error)
   } finally {
     reviewing.value = false
   }
 }
+
+// Conflito de versão: busca a revisão atual sem apagar o rascunho (o watcher
+// não reseta com rascunho sujo). O próximo "Salvar" usa a versão nova.
+const reloading = ref(false)
+async function reloadReview() {
+  reloading.value = true
+  try {
+    await refreshNuxtData(`activity-${activityId.value}`)
+    versionConflict.value = false
+    reviewError.value = ''
+    toast.info('Versão atual carregada. Confira o que mudou antes de salvar de novo.')
+  } finally {
+    reloading.value = false
+  }
+}
+
+// Sair (ou ir para outra atividade) com revisão não salva pede confirmação.
+const leaveConfirmOpen = ref(false)
+let resolveLeave: ((leave: boolean) => void) | undefined
+function decideLeave(leave: boolean) {
+  leaveConfirmOpen.value = false
+  resolveLeave?.(leave)
+  resolveLeave = undefined
+}
+function confirmLeave(): Promise<boolean> {
+  if (reviewing.value) return Promise.resolve(false)
+  if (!dirty.value) return Promise.resolve(true)
+  if (resolveLeave) return Promise.resolve(false)
+  leaveConfirmOpen.value = true
+  return new Promise<boolean>(resolve => { resolveLeave = resolve })
+}
+onBeforeRouteLeave(() => confirmLeave())
+onBeforeRouteUpdate(() => confirmLeave())
+function beforeUnload(event: BeforeUnloadEvent) {
+  if (!dirty.value && !reviewing.value) return
+  event.preventDefault()
+  event.returnValue = ''
+}
+onMounted(() => window.addEventListener('beforeunload', beforeUnload))
+onBeforeUnmount(() => {
+  window.removeEventListener('beforeunload', beforeUnload)
+  decideLeave(false)
+})
 </script>
 
 <template>
@@ -276,7 +330,7 @@ async function saveReview() {
               v-model="visibility"
               :options="visibilityOptions"
               label="Visibilidade do comentário"
-              :class="reviewing ? 'pointer-events-none opacity-60' : ''"
+              :disabled="reviewing"
             />
             <p class="text-[13px] leading-relaxed text-muted-foreground">{{ visibilityHelp }}</p>
             <InlineNotice v-if="becomingShared" tone="warning">
@@ -301,12 +355,15 @@ async function saveReview() {
             <h2 class="flex items-baseline gap-2 text-base font-semibold">
               Tags <span class="label-mono font-normal">só você vê</span>
             </h2>
-            <TagInput v-model="tags" label="Nova tag" :disabled="reviewing" @update:model-value="reviewError = ''" />
+            <TagInput v-model="tags" label="Nova tag" list-label="Tags desta atividade" :disabled="reviewing" @update:model-value="reviewError = ''" />
           </Card>
         </template>
 
         <div aria-live="polite" class="flex flex-col gap-2.5">
           <p v-if="reviewError" class="text-sm text-destructive" role="alert">{{ reviewError }}</p>
+          <Button v-if="versionConflict" variant="outline" class="w-full" :loading="reloading" @click="reloadReview">
+            Recarregar a versão atual
+          </Button>
           <Button
             v-if="canReview"
             size="xl"
@@ -352,4 +409,13 @@ async function saveReview() {
       Não foi possível carregar uma resposta íntegra. A revisão está bloqueada.
     </InlineNotice>
   </div>
+  <ConfirmDialog
+    :open="leaveConfirmOpen"
+    title="Sair sem salvar a revisão?"
+    description="O comentário e as tags que você mudou ainda não foram salvos. Se sair agora, essas mudanças se perdem."
+    confirm-label="Sair sem salvar"
+    cancel-label="Continuar revisando"
+    destructive
+    @decision="decideLeave"
+  />
 </template>

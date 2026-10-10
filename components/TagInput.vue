@@ -7,17 +7,21 @@ import { Input } from '@/components/ui/input'
 // adiciona). Apara, ignora repetidas sem diferenciar caixa e respeita os
 // limites; o aviso aparece embaixo, em português.
 const props = withDefaults(defineProps<{
+  /** Rótulo do campo de nova tag. */
   label: string
+  /** Rótulo da lista de tags já adicionadas. */
+  listLabel?: string
   placeholder?: string
   max?: number
   maxLength?: number
   disabled?: boolean
-}>(), { placeholder: 'Nova tag', max: REVIEW_TAG_LIMITS.max, maxLength: REVIEW_TAG_LIMITS.maxLength })
+}>(), { listLabel: 'Tags adicionadas', placeholder: 'Nova tag', max: REVIEW_TAG_LIMITS.max, maxLength: REVIEW_TAG_LIMITS.maxLength })
 const tags = defineModel<string[]>({ required: true })
 
 const draft = ref('')
 const error = ref<string | null>(null)
 const inputId = useId()
+const input = ref<{ $el?: HTMLInputElement } | null>(null)
 
 function add() {
   const result = addReviewTag(tags.value, draft.value, { max: props.max, maxLength: props.maxLength })
@@ -27,15 +31,17 @@ function add() {
   draft.value = ''
 }
 
+// Depois de remover, o foco volta ao campo: o botão removido some da tela.
 function remove(tag: string) {
   tags.value = tags.value.filter(t => t !== tag)
   error.value = null
+  void nextTick(() => input.value?.$el?.focus())
 }
 </script>
 
 <template>
   <div class="flex flex-col gap-3">
-    <ul v-if="tags.length" class="flex flex-wrap gap-2" :aria-label="label">
+    <ul v-if="tags.length" class="flex flex-wrap gap-2" :aria-label="listLabel">
       <li
         v-for="tag in tags"
         :key="tag"
@@ -58,6 +64,7 @@ function remove(tag: string) {
       <label :for="inputId" class="sr-only">{{ label }}</label>
       <Input
         :id="inputId"
+        ref="input"
         v-model="draft"
         :placeholder="placeholder"
         :maxlength="maxLength * 2"

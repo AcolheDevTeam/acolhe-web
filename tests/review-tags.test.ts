@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { addReviewTag, normalizeTag, sameTags } from '../utils/review-tags'
+import { addReviewTag, codePointLength, hasHiddenChars, normalizeTag, sameTags } from '../utils/review-tags'
+import { isReviewVersionConflict, REVIEW_CONFLICT_MESSAGE, reviewErrorMessage } from '../utils/review-errors'
 import { reviewRequestSchema } from '../schemas/activity'
 import { patientActivityDetailSchema, patientSubmittedActivitySchema } from '../schemas/patient-activity'
 
@@ -20,6 +21,18 @@ describe('tags da revisão', () => {
     expect(addReviewTag(ten, 'nova').error).toBe('Use no máximo 10 tags por atividade.')
   })
 
+  it('conta tamanho em code points, como a API', () => {
+    expect(codePointLength('\u{1F600}'.repeat(32))).toBe(32)
+    expect(addReviewTag([], '\u{1F600}'.repeat(32)).error).toBeNull()
+    expect(addReviewTag([], '\u{1F600}'.repeat(33)).error).toBe('Cada tag pode ter até 32 caracteres.')
+  })
+
+  it('tag com caractere oculto ou quebra de linha é recusada', () => {
+    expect(hasHiddenChars('a\nb', true)).toBe(false)
+    expect(hasHiddenChars('a\nb', false)).toBe(true)
+    expect(addReviewTag([], 'So\u200Bno').error).toBe('As tags não podem ter caracteres invisíveis, de controle ou quebra de linha.')
+  })
+
   it('compara listas na ordem', () => {
     expect(sameTags(['a', 'b'], ['a', 'b'])).toBe(true)
     expect(sameTags(['a', 'b'], ['b', 'a'])).toBe(false)
@@ -33,8 +46,22 @@ describe('corpo da revisão (BFF)', () => {
     expect(result.error?.issues[0]?.message).toBe('Escolha se o comentário é compartilhado com a paciente ou interno.')
   })
 
-  it('sem corpo vira revisão vazia', () => {
-    expect(reviewRequestSchema.parse({})).toEqual({ tags: [] })
+  it('sem corpo continua vazio (a API só marca como revisada e mantém o que existe)', () => {
+    expect(reviewRequestSchema.parse({})).toEqual({})
+  })
+
+  it('leva a versão lida para a concorrência otimista', () => {
+    expect(reviewRequestSchema.parse({ tags: [], expectedUpdatedAt: '2026-10-10T14:25:31.123456Z' }))
+      .toEqual({ tags: [], expectedUpdatedAt: '2026-10-10T14:25:31.123456Z' })
+    expect(reviewRequestSchema.safeParse({ tags: [], expectedUpdatedAt: 'ontem' }).success).toBe(false)
+  })
+
+  it('recusa caracteres invisíveis com a mensagem da regra', () => {
+    const bidi = reviewRequestSchema.safeParse({ comment: 'ok \u202Etxt', visibility: 'shared' })
+    expect(bidi.error?.issues[0]?.message).toBe('O comentário tem caracteres invisíveis ou de controle. Apague-os e tente de novo.')
+    expect(reviewRequestSchema.safeParse({ comment: 'a\u0000b', visibility: 'shared' }).success).toBe(false)
+    expect(reviewRequestSchema.safeParse({ tags: ['So\u200Bno'] }).success).toBe(false)
+    expect(reviewRequestSchema.safeParse({ comment: 'linha 1\nlinha 2 \u{1F469}\u200D\u{1F4BB}', visibility: 'shared' }).success).toBe(true)
   })
 
   it('aceita comentário interno com tags', () => {
@@ -86,5 +113,28 @@ describe('aba Enviadas', async () => {
     expect(submittedStatusMeta('submitted').label).toBe('Aguardando revisão')
     expect(patientActivitiesTab('enviadas')).toBe('enviadas')
     expect(patientActivitiesTab('qualquer')).toBe('pendentes')
+  })
+})
+
+describe('erros da revisão', () => {
+  const relayed = (statusCode: number, message: string) => ({ statusCode, data: { data: { message } } })
+
+  it('400 da API vira a frase da lista fechada', () => {
+    expect(reviewErrorMessage(relayed(400, 'cada tag pode ter até 32 caracteres'))).toBe('Cada tag pode ter até 32 caracteres.')
+    expect(reviewErrorMessage(relayed(400, 'o comentário tem caracteres invisíveis ou de controle; apague-os e tente de novo')))
+      .toBe('O comentário tem caracteres invisíveis ou de controle. Apague-os e tente de novo.')
+  })
+
+  it('400 desconhecido não mostra o texto técnico', () => {
+    expect(reviewErrorMessage(relayed(400, 'corpo inválido'))).toBe('Confira o comentário e as tags: algum passou do limite.')
+  })
+
+  it('409 de versão é diferente do 409 de status', () => {
+    const version = relayed(409, 'a revisão foi alterada em outra aba ou dispositivo; recarregue para ver a versão atual')
+    expect(isReviewVersionConflict(version)).toBe(true)
+    expect(reviewErrorMessage(version)).toBe(REVIEW_CONFLICT_MESSAGE)
+    const status = relayed(409, 'atividade precisa estar submetida para revisão')
+    expect(isReviewVersionConflict(status)).toBe(false)
+    expect(reviewErrorMessage(status)).toBe('Esta atividade não está mais aguardando revisão. Recarregue a página.')
   })
 })

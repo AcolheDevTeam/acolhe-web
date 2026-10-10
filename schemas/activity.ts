@@ -1,4 +1,10 @@
 import { z } from 'zod'
+import {
+  codePointLength,
+  hasHiddenChars,
+  HIDDEN_CHARS_COMMENT_MESSAGE,
+  HIDDEN_CHARS_TAG_MESSAGE,
+} from '../utils/review-tags'
 
 export const assignActivitySchema = z.object({
   templateId: z.string({ required_error: 'Selecione um template' }).uuid('Selecione um template'),
@@ -81,17 +87,28 @@ export const commentVisibilitySchema = z.enum(['shared', 'private'])
 export const reviewNoteSchema = z.object({
   comment: z.string().nullable(),
   visibility: commentVisibilitySchema.nullable(),
-  commentUpdatedAt: z.string().datetime().nullable(),
+  commentUpdatedAt: z.string().datetime({ offset: true }).nullable(),
   tags: z.array(z.string()),
+  // Versão da revisão: volta no PUT como expectedUpdatedAt (concorrência otimista).
+  updatedAt: z.string().datetime({ offset: true }).nullable().optional(),
 })
 
-// Corpo do PUT: o estado completo da revisão. Comentário vazio remove.
+// Corpo do PUT: o estado completo da revisão. Comentário vazio remove. Tamanhos
+// em code points, como a API.
 export const reviewRequestSchema = z.object({
-  comment: z.string().trim().max(REVIEW_COMMENT_MAX, 'O comentário pode ter até 2000 caracteres.').optional(),
+  comment: z.string().trim()
+    .refine(value => codePointLength(value) <= REVIEW_COMMENT_MAX, 'O comentário pode ter até 2000 caracteres.')
+    .refine(value => !hasHiddenChars(value, true), HIDDEN_CHARS_COMMENT_MESSAGE)
+    .optional(),
   visibility: commentVisibilitySchema.optional(),
   tags: z.array(
-    z.string().trim().min(1, 'A tag não pode ficar em branco.').max(REVIEW_TAG_MAX, 'Cada tag pode ter até 32 caracteres.'),
-  ).max(REVIEW_TAGS_MAX, 'Use no máximo 10 tags por atividade.').default([]),
+    z.string()
+      .refine(value => !hasHiddenChars(value, false), HIDDEN_CHARS_TAG_MESSAGE)
+      .transform(value => value.trim())
+      .refine(value => value.length > 0, 'A tag não pode ficar em branco.')
+      .refine(value => codePointLength(value) <= REVIEW_TAG_MAX, 'Cada tag pode ter até 32 caracteres.'),
+  ).max(REVIEW_TAGS_MAX, 'Use no máximo 10 tags por atividade.').optional(),
+  expectedUpdatedAt: z.string().datetime({ offset: true }).nullable().optional(),
 }).refine(body => !body.comment || !!body.visibility, {
   message: 'Escolha se o comentário é compartilhado com a paciente ou interno.',
   path: ['visibility'],
