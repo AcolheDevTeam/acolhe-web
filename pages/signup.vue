@@ -19,6 +19,13 @@ const stepNames = signupSteps.map((step) => step.name)
 const lastStep = signupSteps.length - 1
 const step = ref(0)
 const submitError = ref('')
+const config = useRuntimeConfig()
+const signupKind = ref('solo')
+const signupKindOptions = computed(() => [
+  { value: 'solo', label: 'Atendo sozinha', description: 'Crie seu consultório individual.' },
+  ...(config.public.clinicSelfSignupEnabled ? [{ value: 'clinic', label: 'Tenho uma clínica', description: 'Crie um espaço para sua equipe.' }] : []),
+])
+watch(signupKind, (kind) => { if (kind === 'clinic') void navigateTo('/signup/clinic') })
 
 const { defineField, errors, handleSubmit, isSubmitting, validateField } = useForm({
   validationSchema: toTypedSchema(signupSchema),
@@ -114,6 +121,7 @@ const canSubmit = computed(() => acceptTerms.value === true && acceptPrivacy.val
     </template>
 
     <div class="flex flex-col gap-7 [@media(max-height:700px)]:gap-5">
+      <RadioCardGroup v-model="signupKind" :options="signupKindOptions" label="Tipo de cadastro" />
       <StepProgress :steps="stepNames" :current="step" label="Etapas do cadastro" class="animate-rise [animation-delay:.08s]" />
 
       <form

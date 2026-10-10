@@ -8,6 +8,9 @@ import { Label } from '@/components/ui/label'
 import type { User } from '~/types'
 
 definePageMeta({ layout: 'auth' })
+const route = useRoute()
+// Retorno controlado para o fluxo de criação de clínica iniciado no cadastro.
+const postLoginPath = route.query.redirect === '/clinica/criar' ? '/clinica/criar' : null
 
 const schema = z.object({
   email: z.string().email('Informe um e-mail válido.'),
@@ -35,7 +38,7 @@ const onSubmit = handleSubmit(async (values) => {
     clearNuxtData()
     // E-mail pendente trava o painel: o próximo passo é confirmar (ACO-63).
     if (user.nextStep === 'verify_email') return await navigateTo('/verify-email')
-    await navigateTo(homeFor(user))
+    await navigateTo(postLoginPath ?? homeFor(user))
   } catch (error) {
     // Só 401 significa credencial errada; qualquer outra falha recebe a causa real.
     loginError.value = apiErrorMessage(error, {

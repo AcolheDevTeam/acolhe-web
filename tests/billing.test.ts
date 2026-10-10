@@ -12,6 +12,7 @@ import {
   cycleFor,
   hasBilling,
   pastDueDeadline,
+  pastDueDaysLeft,
   plansForWorkspace,
   planTotals,
   subscriptionKey,
@@ -55,6 +56,9 @@ describe('dias de teste no fuso de São Paulo', () => {
   it('prazo do atraso: o instante exato 7 × 24 h depois, exibido no fuso do app', () => {
     const deadline = pastDueDeadline('2026-10-02T02:00:00Z')
     expect(deadline).toBe('2026-10-09T02:00:00.000Z')
+    expect(pastDueDaysLeft('2026-10-02T02:00:00Z', '2026-10-02T02:00:00Z')).toBe(7)
+    expect(pastDueDaysLeft('2026-10-02T02:00:00Z', '2026-10-08T10:00:00Z')).toBe(1)
+    expect(pastDueDaysLeft('2026-10-02T02:00:00Z', deadline)).toBe(0)
     // 02:00 UTC ainda é o dia 8 às 23:00 em São Paulo: o texto não pode prometer o dia 9.
     expect(longDate(deadline, '2026-10-02T12:00:00Z')).toBe('8 de outubro')
   })

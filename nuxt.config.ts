@@ -56,6 +56,8 @@ export default defineNuxtConfig({
       lgpdExportEnabled: process.env.NUXT_PUBLIC_LGPD_EXPORT_ENABLED === 'true',
       // E-mail do "Fale com a gente" da landing (plano Clínica). Vazio = botão "Em breve".
       contactEmail: process.env.NUXT_PUBLIC_CONTACT_EMAIL || '',
+      // Cadastro público de clínicas fica desabilitado até a validação de titularidade.
+      clinicSelfSignupEnabled: process.env.CLINIC_SELF_SIGNUP_ENABLED === 'true',
     },
   },
 })

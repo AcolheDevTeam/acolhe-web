@@ -46,6 +46,13 @@ export function pastDueDeadline(pastDueSince: string): string {
   return new Date(Date.parse(pastDueSince) + PAST_DUE_GRACE_DAYS * 86_400_000).toISOString()
 }
 
+/** Dias de 24 horas ainda disponíveis antes do bloqueio de escrita por atraso. */
+export function pastDueDaysLeft(pastDueSince: string, now: Date | string = new Date()): number {
+  const nowMs = typeof now === 'string' ? Date.parse(now) : now.getTime()
+  const remaining = Date.parse(pastDueDeadline(pastDueSince)) - nowMs
+  return Math.max(0, Math.ceil(remaining / 86_400_000))
+}
+
 /** Planos que o tipo de workspace pode assinar (mesma regra da API). */
 export function plansForWorkspace(type?: string | null): Plan[] {
   const codes = type === 'clinic' ? ['clinica'] : ['autonomo', 'fundador']

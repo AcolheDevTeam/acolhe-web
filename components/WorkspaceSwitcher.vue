@@ -5,6 +5,7 @@ import { CustomDropdown } from '@/components/ui/custom-dropdown'
 
 // Troca de workspace no menu, só para quem tem mais de um vínculo ativo.
 const { workspaces, switching, switchTo } = useWorkspaces()
+const config = useRuntimeConfig()
 const active = computed(() => workspaces.value.filter(w => w.membershipStatus === 'active' && w.organizationStatus === 'active'))
 const current = computed(() => workspaces.value.find(w => w.current))
 const options = computed(() => active.value.map(w => ({
@@ -53,4 +54,11 @@ async function onChange(organizationId: string) {
       <ChevronsUpDown class="size-4 shrink-0 text-muted-foreground" />
     </template>
   </CustomDropdown>
+  <NuxtLink
+    v-if="config.public.clinicSelfSignupEnabled"
+    to="/clinica/criar"
+    class="mt-2 flex min-h-10 items-center rounded-lg px-3 text-sm text-secondary-foreground transition-colors hover:bg-muted hover:text-foreground"
+  >
+    Criar clínica
+  </NuxtLink>
 </template>
