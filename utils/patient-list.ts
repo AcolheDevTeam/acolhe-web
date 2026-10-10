@@ -38,7 +38,7 @@ export function patientListMeta(patient: Patient, now: Date = new Date()): strin
       parts.push('vínculo encerrado')
       break
     case 'transferred':
-      parts.push('encaminhado')
+      parts.push('encaminhado(a)')
       break
     default:
       parts.push(relativeSince(patient.createdAt, now))

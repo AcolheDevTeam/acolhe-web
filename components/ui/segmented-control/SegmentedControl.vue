@@ -10,6 +10,7 @@ const props = defineProps<{
   options: { value: T, label: string }[]
   label: string
   size?: "sm" | "lg"
+  disabled?: boolean
   class?: HTMLAttributes["class"]
 }>()
 const model = defineModel<T>({ required: true })
@@ -21,7 +22,8 @@ const index = computed(() => Math.max(0, props.options.findIndex(o => o.value ==
   <div
     role="group"
     :aria-label="label"
-    :class="cn('relative flex rounded-xl bg-secondary p-1', props.class)"
+    :aria-disabled="disabled || undefined"
+    :class="cn('relative flex rounded-xl bg-secondary p-1', disabled && 'opacity-60', props.class)"
   >
     <span
       aria-hidden="true"
@@ -33,10 +35,12 @@ const index = computed(() => Math.max(0, props.options.findIndex(o => o.value ==
       :key="option.value"
       type="button"
       :aria-pressed="model === option.value"
+      :disabled="disabled"
       :class="cn(
         'relative z-[1] flex-1 rounded-lg font-medium transition-colors duration-300 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/15',
         size === 'lg' ? 'h-11 text-sm' : 'h-8 text-[13px]',
         model === option.value ? 'text-foreground' : 'text-muted-foreground hover:text-foreground',
+        'disabled:cursor-not-allowed',
       )"
       @click="model = option.value"
     >

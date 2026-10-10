@@ -41,7 +41,7 @@ export type UpdateSessionRecordInput = z.infer<typeof updateSessionRecordSchema>
 
 // Contrato entre frontend e backend — espelha as regras das queries.
 export const createSessionSchema = z.object({
-  patientId: z.string({ required_error: 'Selecione um paciente' }).uuid('Selecione um paciente'),
+  patientId: z.string({ required_error: 'Selecione o(a) paciente' }).uuid('Selecione o(a) paciente'),
   occurredAt: z.string({ required_error: 'Informe a data e a hora da sessão' })
     .datetime({ message: 'Informe a data e a hora da sessão' })
     .refine(value => new Date(value) >= new Date('1900-01-01T00:00:00Z'),

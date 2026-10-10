@@ -13,6 +13,8 @@ import { cn } from "@/lib/utils"
 //   Noite com texto branco), como os tipos do Registro Documental.
 // - `manual`: as setas só movem o foco; Enter/Espaço seleciona. Para quando
 //   trocar de opção tem custo (ex.: confirmar descarte de rascunho).
+// - `size="lg"`: pílula de 40px, para toque no fluxo da paciente (sentimentos
+//   do check-in).
 // - `disabled` usa aria-disabled: o chip continua focável e o foco não cai
 //   para o body enquanto, por exemplo, um salvamento está em andamento.
 const props = defineProps<{
@@ -20,6 +22,7 @@ const props = defineProps<{
   label: string
   multiple?: boolean
   variant?: "soft" | "strong"
+  size?: "default" | "lg"
   manual?: boolean
   disabled?: boolean
   class?: HTMLAttributes["class"]
@@ -78,7 +81,7 @@ function onKeydown(event: KeyboardEvent, index: number) {
       :aria-disabled="disabled || undefined"
       :class="cn(
         'rounded-full border transition-[background-color,border-color,color] duration-200 ease-out focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/15 aria-disabled:cursor-not-allowed aria-disabled:opacity-45',
-        variant === 'strong' ? 'h-9 px-3.5 text-sm font-medium' : 'h-8 px-3 text-[13px]',
+        size === 'lg' ? 'h-10 px-3.5 text-sm' : variant === 'strong' ? 'h-9 px-3.5 text-sm font-medium' : 'h-8 px-3 text-[13px]',
         selected(option.value)
           ? (variant === 'strong' ? 'border-brand bg-brand text-primary-foreground' : 'border-selected-border bg-accent text-success')
           : 'border-border bg-card text-secondary-foreground hover:border-input-hover',

@@ -78,7 +78,7 @@ useEventListener(document, 'keydown', (event: KeyboardEvent) => {
       <Button v-if="canOpenRecord" class="flex-1" :disabled="busy" @click="openRecord()">Abrir sessão</Button>
     </div>
 
-    <NuxtLink :to="`/patients/${appointment.patientId}`" class="self-start text-[13px] text-primary underline underline-offset-[3px] hover:text-accent-foreground">Ver ficha do paciente</NuxtLink>
+    <NuxtLink :to="`/patients/${appointment.patientId}`" class="self-start text-[13px] text-primary underline underline-offset-[3px] hover:text-accent-foreground">Ver ficha do(a) paciente</NuxtLink>
 
     <ConfirmDialog
       :open="pendingStatus !== null"

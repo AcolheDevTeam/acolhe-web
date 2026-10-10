@@ -1,8 +1,14 @@
 import { z } from 'zod'
+import {
+  codePointLength,
+  hasHiddenChars,
+  HIDDEN_CHARS_COMMENT_MESSAGE,
+  HIDDEN_CHARS_TAG_MESSAGE,
+} from '../utils/review-tags'
 
 export const assignActivitySchema = z.object({
   templateId: z.string({ required_error: 'Selecione um template' }).uuid('Selecione um template'),
-  patientId: z.string({ required_error: 'Selecione um paciente' }).uuid('Selecione um paciente'),
+  patientId: z.string({ required_error: 'Selecione o(a) paciente' }).uuid('Selecione o(a) paciente'),
   dueAt: z.string().datetime({ message: 'Informe a data e a hora do prazo' }).optional(),
 })
 
@@ -66,8 +72,51 @@ export const activityReviewDetailSchema = z.discriminatedUnion('state', [
     state: z.literal('reviewed'),
     submission: submissionSchema,
     reviewedAt: z.string().datetime(),
+    // Revisão da psicóloga (ACO-104). Opcional enquanto a API não devolve.
+    review: z.lazy(() => reviewNoteSchema).optional(),
   }),
 ])
 
+// Revisão (ACO-104): comentário compartilhado (a paciente vê) ou interno
+// ("private" na API: só a psicóloga) e tags que só a psicóloga vê.
+export const REVIEW_COMMENT_MAX = 2000
+export const REVIEW_TAG_MAX = 32
+export const REVIEW_TAGS_MAX = 10
+export const commentVisibilitySchema = z.enum(['shared', 'private'])
+
+export const reviewNoteSchema = z.object({
+  comment: z.string().nullable(),
+  visibility: commentVisibilitySchema.nullable(),
+  commentUpdatedAt: z.string().datetime({ offset: true }).nullable(),
+  tags: z.array(z.string()),
+  // Versão da revisão: volta no PUT como expectedUpdatedAt (concorrência otimista).
+  updatedAt: z.string().datetime({ offset: true }).nullable().optional(),
+})
+
+// Corpo do PUT: o estado completo da revisão. Comentário vazio remove. Tamanhos
+// em code points, como a API.
+export const reviewRequestSchema = z.object({
+  comment: z.string().trim()
+    .refine(value => codePointLength(value) <= REVIEW_COMMENT_MAX, 'O comentário pode ter até 2000 caracteres.')
+    .refine(value => !hasHiddenChars(value, true), HIDDEN_CHARS_COMMENT_MESSAGE)
+    .optional(),
+  visibility: commentVisibilitySchema.optional(),
+  tags: z.array(
+    z.string()
+      .refine(value => !hasHiddenChars(value, false), HIDDEN_CHARS_TAG_MESSAGE)
+      .transform(value => value.trim())
+      .refine(value => value.length > 0, 'A tag não pode ficar em branco.')
+      .refine(value => codePointLength(value) <= REVIEW_TAG_MAX, 'Cada tag pode ter até 32 caracteres.'),
+  ).max(REVIEW_TAGS_MAX, 'Use no máximo 10 tags por atividade.').optional(),
+  expectedUpdatedAt: z.string().datetime({ offset: true }).nullable().optional(),
+}).refine(body => !body.comment || !!body.visibility, {
+  message: 'Escolha se o comentário é compartilhado com o(a) paciente ou interno.',
+  path: ['visibility'],
+})
+
 export type AssignActivityInput = z.infer<typeof assignActivitySchema>
 export type ActivityReviewDetail = z.infer<typeof activityReviewDetailSchema>
+export type ActivityReviewField = z.infer<typeof activityReviewFieldSchema>
+export type ReviewNote = z.infer<typeof reviewNoteSchema>
+export type ReviewRequest = z.infer<typeof reviewRequestSchema>
+export type CommentVisibility = z.infer<typeof commentVisibilitySchema>

@@ -123,7 +123,7 @@ const listError = computed(() => (error.value ? apiErrorMessage(error.value, DOC
         v-model="patientId"
         :options="patientOptions"
         search-placeholder="Buscar paciente"
-        empty-text="Nenhuma paciente encontrada."
+        empty-text="Nenhum(a) paciente encontrado(a)."
         aria-label="Filtrar por paciente"
         class="h-10 w-auto gap-2.5 rounded-lg border-border bg-card px-3.5 text-foreground shadow-none hover:border-input-hover"
         content-class="w-64"

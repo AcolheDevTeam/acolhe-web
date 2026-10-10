@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Check, ChevronLeft } from 'lucide-vue-next'
 import { onBeforeRouteLeave } from 'vue-router'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
 import type {
@@ -34,6 +35,8 @@ const sent = ref(false)
 const direction = ref<'fwd' | 'back'>('fwd')
 
 const fields = computed(() => activity.value?.fields ?? [])
+// Atividade já enviada aberta pela aba "Enviadas" (ou de novo pelo link).
+const viewingSent = computed(() => !sent.value && !!activity.value && !activity.value.canRespond && !!activity.value.submittedAt)
 const total = computed(() => fields.value.length)
 const currentField = computed<PatientActivityField | undefined>(() => fields.value[step.value])
 const isLast = computed(() => step.value === total.value - 1)
@@ -174,7 +177,7 @@ onBeforeUnmount(() => {
     <header class="sticky top-0 z-20 border-b bg-background">
       <div class="mx-auto flex w-full max-w-2xl flex-col gap-3.5 px-4 pb-4 pt-5 md:px-8">
         <div class="flex items-center gap-2">
-          <Button variant="ghost" size="icon-lg" class="-ml-1 shrink-0 text-foreground" aria-label="Voltar para o início" :disabled="sending" @click="navigateTo('/patient')">
+          <Button variant="ghost" size="icon-lg" class="-ml-1 shrink-0 text-foreground" :aria-label="viewingSent ? 'Voltar para as atividades' : 'Voltar para o início'" :disabled="sending" @click="navigateTo(viewingSent ? '/patient/activities?tab=enviadas' : '/patient')">
             <ChevronLeft class="!size-5" />
           </Button>
           <div class="flex min-w-0 flex-1 flex-col">
@@ -213,25 +216,46 @@ onBeforeUnmount(() => {
             <Check class="size-8" :stroke-width="2.2" />
           </span>
           <h2 class="text-[22px] font-semibold tracking-[-0.02em]">Resposta enviada</h2>
-          <p class="max-w-[300px] text-[15px] leading-normal text-secondary-foreground">Sua psicóloga vê a resposta na revisão dela.</p>
+          <p class="max-w-[300px] text-[15px] leading-normal text-secondary-foreground">Sua(seu) psicóloga(o) vê a resposta na revisão.</p>
           <Button size="xl" class="mt-4 w-full max-w-sm" @click="navigateTo('/patient')">Voltar para o início</Button>
         </div>
 
-        <!-- Já respondida, expirada ou cancelada: não há formulário a mostrar. -->
+        <!-- Já enviada (ACO-104): as respostas dela, só leitura, e o comentário
+             compartilhado da psicóloga. A API nunca manda o interno nem as tags. -->
+        <div v-else-if="!activity.canRespond && activity.submittedAt" class="animate-fade flex flex-col gap-5">
+          <div class="flex flex-wrap items-center gap-2">
+            <Badge :variant="submittedStatusMeta(activity.status).variant">{{ submittedStatusMeta(activity.status).label }}</Badge>
+            <span class="text-[13px] text-muted-foreground">Enviada em {{ formatDayMonth(activity.submittedAt) }}</span>
+          </div>
+          <section v-if="activity.comment" aria-labelledby="t-comentario" class="flex flex-col gap-1.5 rounded-[14px] bg-accent px-4 py-3.5">
+            <h2 id="t-comentario" class="label-mono">Comentário de sua(seu) psicóloga(o) · {{ formatDayMonth(activity.comment.updatedAt) }}</h2>
+            <p class="whitespace-pre-line break-words text-[15px] leading-relaxed">{{ activity.comment.text }}</p>
+          </section>
+          <p v-else-if="activity.status !== 'reviewed'" class="text-sm text-secondary-foreground">
+            Sua(seu) psicóloga(o) ainda não revisou esta atividade.
+          </p>
+          <section aria-labelledby="t-respostas" class="flex flex-col gap-3">
+            <h2 id="t-respostas" class="label-mono">Suas respostas</h2>
+            <ActivityAnswerList v-if="activity.answers.length" :fields="activity.answers" />
+            <EmptyState v-else compact>Não foi possível mostrar suas respostas agora.</EmptyState>
+          </section>
+          <p class="text-xs text-muted-foreground">Só você e sua(seu) psicóloga(o) veem suas respostas.</p>
+          <Button variant="outline" size="xl" class="w-full" @click="navigateTo('/patient/activities?tab=enviadas')">Voltar para as atividades</Button>
+        </div>
+
+        <!-- Expirada ou cancelada: não há formulário a mostrar. -->
         <div v-else-if="!activity.canRespond" class="flex flex-col items-center gap-4 pt-16 text-center">
           <span aria-hidden="true" class="flex size-[72px] items-center justify-center rounded-full bg-secondary text-muted-foreground">
             <Check class="size-8" :stroke-width="2.2" />
           </span>
           <p class="max-w-[320px] text-[15px] leading-normal text-secondary-foreground">
-            {{ activity.submittedAt
-              ? 'Você já respondeu esta atividade. Sua psicóloga vê a resposta na revisão dela.'
-              : 'Esta atividade não está mais aberta para resposta.' }}
+            Esta atividade não está mais aberta para resposta.
           </p>
           <Button variant="outline" size="xl" class="mt-2 w-full max-w-sm" @click="navigateTo('/patient')">Voltar para o início</Button>
         </div>
 
         <EmptyState v-else-if="!total" compact>
-          Esta atividade ainda não tem perguntas. Fale com sua psicóloga.
+          Esta atividade ainda não tem perguntas. Fale com sua(seu) psicóloga(o).
         </EmptyState>
 
         <template v-else-if="currentField">

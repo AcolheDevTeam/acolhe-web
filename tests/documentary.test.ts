@@ -97,7 +97,7 @@ describe('erros do registro documental por caso (ACO-84)', async () => {
   it('separa somente leitura de caderno de outra autora', () => {
     expect(documentaryForbiddenReason(fetchError(403, 'read_only'))).toBe('read_only')
     expect(documentaryErrorText(fetchError(403, 'read_only'))).toContain('somente para leitura')
-    expect(documentaryErrorText(fetchError(403, 'not_author'))).toContain('privado da psicóloga autora')
+    expect(documentaryErrorText(fetchError(403, 'not_author'))).toContain('privado da(o) psicóloga(o) autor(a)')
     expect(documentaryErrorText(fetchError(403))).not.toContain('somente para leitura')
   })
 

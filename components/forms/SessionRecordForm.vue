@@ -73,7 +73,7 @@ const CONFLICT_TEXT = 'O prontuário foi alterado em outra aba ou dispositivo. S
 function recordErrorMessage(error: unknown, action: 'save' | 'conclude') {
   return apiErrorMessage(error, {
     400: fieldMessage(error) ?? 'Alguns campos não foram aceitos. Cada um aceita até 10.000 caracteres.',
-    403: 'A edição exige vínculo ativo com a paciente.',
+    403: 'A edição exige vínculo ativo com o(a) paciente.',
     404: 'Esta sessão não está disponível para você.',
     409: action === 'conclude' && apiErrorInfo(error).technical?.includes('falta ou cancelada')
       ? 'Esta sessão está ligada a uma consulta marcada como falta ou cancelada e não pode ser concluída.'
@@ -227,7 +227,7 @@ function nearLimit(key: string) {
           <section v-if="session.notes?.trim()" aria-labelledby="t-notes" class="flex flex-col gap-1.5 rounded-xl bg-secondary px-4 py-3">
             <h3 id="t-notes" class="label-mono">Anotações</h3>
             <p class="whitespace-pre-wrap break-words text-[15px] leading-relaxed">{{ session.notes }}</p>
-            <p class="text-xs text-muted-foreground">Texto registrado antes do prontuário em seções. Continua visível para a paciente e não é editado aqui.</p>
+            <p class="text-xs text-muted-foreground">Texto registrado antes do prontuário em seções. Continua visível para o(a) paciente e não é editado aqui.</p>
           </section>
           <FormField v-for="section in RECORD_SECTIONS" :key="section.key" v-slot="{ componentField }" :name="section.key">
             <FormItem class="flex flex-col gap-1.5 space-y-0">

@@ -44,9 +44,9 @@ describe('mensagens da área da clínica (ACO-62)', async () => {
   const { clinicErrorMessage, deliveryMessage } = await import('../utils/clinic')
   const err = (statusCode: number, message: string) => ({ statusCode, data: { message } })
   it('cada recusa diz o motivo', () => {
-    expect(clinicErrorMessage(err(403, 'só a responsável pela clínica pode fazer isto'))).toContain('Só a responsável')
+    expect(clinicErrorMessage(err(403, 'só a responsável pela clínica pode fazer isto'))).toContain('Só o(a) responsável')
     expect(clinicErrorMessage(err(403, 'você não pode alterar o seu próprio vínculo'))).toContain('próprio vínculo')
-    expect(clinicErrorMessage(err(409, 'a clínica precisa de ao menos uma responsável ativa; fale com o suporte'))).toContain('responsável ativa')
+    expect(clinicErrorMessage(err(409, 'a clínica precisa de ao menos uma responsável ativa; fale com o suporte'))).toContain('responsável ativo(a)')
     expect(clinicErrorMessage(err(409, 'já existe um convite pendente para este e-mail'))).toContain('convite pendente')
   })
   it('o link copiável aparece em qualquer resultado do e-mail', () => {

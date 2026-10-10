@@ -71,6 +71,13 @@ export interface PatientCheckin {
   mood: number
   note?: string | null
   createdAt: string
+  // ACO-103: sono e sentimentos, opcionais. Horários "HH:MM"; sleepMinutes
+  // já considera a virada da meia-noite. Sentimentos são códigos da lista.
+  sleepBedtime?: string | null
+  sleepWakeTime?: string | null
+  sleepMinutes?: number | null
+  sleepQuality?: number | null
+  feelings?: string[]
 }
 
 export interface PatientProcessSummary {
@@ -214,6 +221,13 @@ export interface Checkin {
   mood: number
   note?: string | null
   createdAt: string
+  // ACO-103: sono e sentimentos, opcionais. Horários "HH:MM"; sleepMinutes
+  // já considera a virada da meia-noite. Sentimentos são códigos da lista.
+  sleepBedtime?: string | null
+  sleepWakeTime?: string | null
+  sleepMinutes?: number | null
+  sleepQuality?: number | null
+  feelings?: string[]
 }
 
 // Documento emitido pela psicóloga (ACO-100). O PDF fica privado no

@@ -17,11 +17,12 @@ const items = [
 ]
 // Sem vínculo ativo, Início, Atividades e Check-in não têm dados para ela; em
 // vez do erro genérico, a tela diz o motivo e leva ao Histórico, que continua
-// aberto (CFP 01/2009, art. 5º, II).
+// aberto (CFP 01/2009, art. 5º, II), e aos Ajustes, onde ela revê os
+// consentimentos e pede os próprios dados (ACO-102).
 const { data: me } = useNuxtData<User | null>('me')
 const linkReason = computed(() => inactiveLinkReason(me.value?.patient))
 const blocked = computed(() => linkReason.value !== null && !openWithoutLink(route.path))
-// "Sair" fica no Início, que aqui não abre: o aviso oferece a saída.
+// "Sair" fica em Ajustes; o aviso também oferece a saída.
 const { logout, isLoggingOut } = useLogout()
 function isActive(to: string) {
   if (to === '/patient') return route.path === to
@@ -34,7 +35,7 @@ function isActive(to: string) {
     <header class="hidden border-b bg-card md:block">
       <div class="mx-auto flex h-16 max-w-3xl items-center justify-between px-8">
         <NuxtLink to="/patient" aria-label="Ir para o início"><AppLogo /></NuxtLink>
-        <nav class="flex items-center gap-1" aria-label="Navegação da paciente">
+        <nav class="flex items-center gap-1" aria-label="Navegação do(a) paciente">
           <NuxtLink
             v-for="item in items"
             :key="item.to"
@@ -59,12 +60,15 @@ function isActive(to: string) {
           <Button as-child>
             <NuxtLink to="/patient/historico">Ver meu histórico</NuxtLink>
           </Button>
+          <Button variant="outline" as-child>
+            <NuxtLink to="/patient/ajustes">Abrir ajustes</NuxtLink>
+          </Button>
           <Button variant="ghost" :disabled="isLoggingOut" @click="logout">{{ isLoggingOut ? 'Saindo…' : 'Sair' }}</Button>
         </div>
       </div>
       <slot v-else />
     </main>
-    <nav class="fixed inset-x-0 bottom-0 z-20 border-t bg-card px-2 pb-[max(12px,env(safe-area-inset-bottom))] pt-1 md:hidden" aria-label="Navegação da paciente">
+    <nav class="fixed inset-x-0 bottom-0 z-20 border-t bg-card px-2 pb-[max(12px,env(safe-area-inset-bottom))] pt-1 md:hidden" aria-label="Navegação do(a) paciente">
       <div class="mx-auto flex max-w-md">
         <NuxtLink
           v-for="item in items"

@@ -46,6 +46,6 @@ function dueText(activity: PatientPendingActivity) {
     </li>
   </ul>
   <EmptyState v-else compact>
-    Nenhuma atividade pendente. Quando sua psicóloga enviar uma nova, ela aparece aqui.
+    Nenhuma atividade pendente. Quando sua(seu) psicóloga(o) enviar uma nova, ela aparece aqui.
   </EmptyState>
 </template>

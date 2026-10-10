@@ -29,7 +29,7 @@ export const finalStatusConfirmation: Record<FinalAppointmentStatus, { title: st
   },
   no_show: {
     title: 'Registrar falta?',
-    description: 'O atendimento fica registrado como falta da paciente. Esta ação não pode ser desfeita.',
+    description: 'O atendimento fica registrado como falta do(a) paciente. Esta ação não pode ser desfeita.',
     confirmLabel: 'Registrar falta',
     destructive: true,
   },

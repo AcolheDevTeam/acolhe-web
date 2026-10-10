@@ -15,7 +15,7 @@ export function planDisplay(plan: Plan, cycle: BillingCycle): PlanDisplay {
   const effective: BillingCycle = plan.prices[cycle] ? cycle : 'monthly'
   const price = plan.prices[effective] ?? plan.prices.monthly
   if (!price) throw new Error(`plano sem preço: ${plan.code}`)
-  const seat = plan.perSeat ? ' por psicóloga' : ''
+  const seat = plan.perSeat ? ' por psicóloga(o)' : ''
   let caption: string
   if (effective === 'annual' && price.annualTotalCents) caption = `${formatBRL(price.annualTotalCents)} por ano${seat}, cobrado de uma vez`
   else if (cycle === 'annual') caption = 'Só no plano mensal'

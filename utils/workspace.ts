@@ -39,6 +39,6 @@ export function workspaceRoleLabel(role: WorkspaceRole): string {
     clinic_owner: 'Responsável',
     clinic_admin: 'Administração',
     clinical_supervisor: 'Supervisão clínica',
-    psychologist: 'Psicóloga',
+    psychologist: 'Psicóloga(o)',
   } as Record<WorkspaceRole, string>)[role] ?? role
 }

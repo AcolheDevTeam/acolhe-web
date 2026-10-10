@@ -70,7 +70,7 @@ async function resend() {
 <template>
   <AuthShell
     heading="Recuperar acesso à sua conta"
-    support="Vale para psicólogas e pacientes. O link de redefinição chega no e-mail cadastrado e expira em 1 hora."
+    support="Vale para psicólogas(os) e pacientes. O link de redefinição chega no e-mail cadastrado e expira em 1 hora."
   >
     <form v-if="!sent" class="animate-rise flex flex-col gap-[22px]" novalidate @submit="onSubmit">
       <div class="flex flex-col gap-2.5">

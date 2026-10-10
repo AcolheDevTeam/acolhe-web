@@ -191,9 +191,9 @@ const crpLine = computed(() => (me.value?.crp ? `CRP ${me.value.crp}` : ''))
           id="doc-paciente"
           v-model="patientId"
           :options="patientOptions"
-          placeholder="Selecione a paciente"
+          placeholder="Selecione o(a) paciente"
           search-placeholder="Buscar paciente…"
-          empty-text="Nenhuma paciente com vínculo ativo encontrada."
+          empty-text="Nenhum(a) paciente com vínculo ativo encontrado(a)."
           :disabled="locked"
           :aria-invalid="!!errors.patientId || undefined"
           class="h-11 rounded-lg border-input bg-card px-3.5 text-[15px] shadow-none hover:border-input-hover"
@@ -218,10 +218,10 @@ const crpLine = computed(() => (me.value?.crp ? `CRP ${me.value.crp}` : ''))
         </div>
         <p v-if="sessionsPending" class="text-sm text-muted-foreground">Carregando sessões…</p>
         <p v-else-if="sessionsError" class="text-sm text-destructive">
-          {{ apiErrorMessage(sessionsError, { default: 'Não foi possível carregar as sessões desta paciente. Recarregue a página.' }) }}
+          {{ apiErrorMessage(sessionsError, { default: 'Não foi possível carregar as sessões deste(a) paciente. Recarregue a página.' }) }}
         </p>
         <p v-else-if="!pastSessions.length" class="rounded-xl border border-dashed border-input-hover px-4 py-5 text-center text-sm text-muted-foreground">
-          Esta paciente ainda não tem sessões registradas. Registre a sessão antes de emitir o documento.
+          Este(a) paciente ainda não tem sessões registradas. Registre a sessão antes de emitir o documento.
         </p>
         <ul v-else class="flex max-h-72 flex-col overflow-y-auto rounded-xl border p-1">
           <li v-for="s in pastSessions" :key="s.id">
