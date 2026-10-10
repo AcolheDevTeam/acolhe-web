@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { adminAccountsSchema, adminOverviewSchema, createClinicFormSchema, cancelClinicSchema } from '~/schemas/clinic'
+import { adminAccountSchema, adminAccountsSchema, adminOverviewSchema, createClinicFormSchema, cancelClinicSchema } from '~/schemas/clinic'
+import { isValidCnpj } from '~/utils/cnpj'
 import { homeFor } from '~/utils/workspace'
 
 describe('contratos do painel administrativo', () => {
@@ -39,6 +40,15 @@ describe('contratos do painel administrativo', () => {
     expect(parsed.total).toBe(1)
   })
 
+  it('accepts clinic accounts without a subscription while the initial invitation is pending', () => {
+    const parsed = adminAccountSchema.parse({
+      id: '7bbaac5c-6fd5-44ce-a7e9-df542ec4e1fc', name: 'Clínica Exemplo', type: 'clinic', cnpj: null,
+      ownerEmail: 'owner@example.com', subscriptionStatus: null, planCode: null, billingCycle: null,
+      trialEndsAt: null, currentPeriodEnd: null, pastDueSince: null, initialInvitationStatus: 'pending',
+    })
+    expect(parsed.subscriptionStatus).toBeNull()
+  })
+
   it('normaliza CNPJ e e-mail e valida os dígitos do CNPJ', () => {
     expect(createClinicFormSchema.parse({
       name: 'Clínica Horizonte',
@@ -52,6 +62,18 @@ describe('contratos do painel administrativo', () => {
       ownerAttends: true,
     })
     expect(createClinicFormSchema.safeParse({ name: 'Clínica', cnpj: '11.222.333/0001-80', ownerEmail: 'dona@example.com', ownerAttends: false }).success).toBe(false)
+  })
+
+  it('valida CNPJs alfanuméricos pelo módulo 11 ASCII-48 da Receita', () => {
+    expect(isValidCnpj('00.000.000/E08G-12')).toBe(true)
+    expect(isValidCnpj('12.ABC.345/01DE-35')).toBe(true)
+    expect(createClinicFormSchema.parse({
+      name: 'Clínica Horizonte',
+      cnpj: '12.abc.345/01de-35',
+      ownerEmail: 'dona@example.com',
+      ownerAttends: false,
+    }).cnpj).toBe('12ABC34501DE35')
+    expect(isValidCnpj('12.ABC.345/01DE-36')).toBe(false)
   })
 
   it('exige motivo útil para cancelar uma clínica', () => {

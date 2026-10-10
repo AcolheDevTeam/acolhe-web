@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { isValidCnpj, normalizeCnpj } from '~/utils/cnpj'
 
 const invitationDeliveryStatus = z.enum(['sent', 'failed', 'disabled'])
 
@@ -23,7 +24,7 @@ export const adminAccountSchema = z.object({
   type: z.enum(['individual', 'clinic']),
   cnpj: z.string().nullable(),
   ownerEmail: z.string().email().nullable(),
-  subscriptionStatus: z.enum(['trialing', 'active', 'past_due', 'canceled']),
+  subscriptionStatus: z.enum(['trialing', 'active', 'past_due', 'canceled']).nullable(),
   planCode: z.string().nullable(),
   billingCycle: z.string().nullable(),
   trialEndsAt: z.string().datetime().nullable(),
@@ -39,13 +40,13 @@ export const adminAccountsSchema = z.object({
 
 export const createClinicSchema = z.object({
   name: z.string().trim().min(2, 'Informe o nome da clínica.').max(160, 'O nome deve ter no máximo 160 caracteres.'),
-  cnpj: z.string().transform(value => value.replace(/\D/g, '')).refine(value => isValidCnpj(value), 'Informe um CNPJ válido.'),
+  cnpj: z.string().transform(normalizeCnpj).refine(value => isValidCnpj(value), 'Informe um CNPJ válido.'),
   ownerEmail: z.string().trim().email('Informe um e-mail válido.').transform(value => value.toLowerCase()),
   ownerAttends: z.boolean(),
 }).strict()
 
 export const createClinicFormSchema = createClinicSchema.extend({
-  cnpj: z.string().trim().min(1, 'Informe o CNPJ.').transform(value => value.replace(/\D/g, '')).refine(value => isValidCnpj(value), 'Informe um CNPJ válido.'),
+  cnpj: z.string().trim().min(1, 'Informe o CNPJ.').transform(normalizeCnpj).refine(value => isValidCnpj(value), 'Informe um CNPJ válido.'),
 })
 
 export const adminInvitationSchema = z.object({
@@ -70,17 +71,6 @@ export type AdminAccounts = z.infer<typeof adminAccountsSchema>
 export type AdminInvitation = z.infer<typeof adminInvitationSchema>
 export type CreateClinic = z.infer<typeof createClinicSchema>
 
-function isValidCnpj(value: string): boolean {
-  if (!/^\d{14}$/.test(value) || /^([0-9])\1{13}$/.test(value)) return false
-  const digit = (base: string, weights: number[]) => {
-    const sum = [...base].reduce((total, char, index) => total + Number(char) * weights[index]!, 0)
-    const remainder = sum % 11
-    return remainder < 2 ? 0 : 11 - remainder
-  }
-  const first = digit(value.slice(0, 12), [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2])
-  const second = digit(value.slice(0, 12) + first, [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2])
-  return value.endsWith(`${first}${second}`)
-}
 
 // Área da clínica (ACO-62; API: ADR 0002, fase 5). Só dados da equipe e números:
 // nenhum dado de paciente chega aqui.

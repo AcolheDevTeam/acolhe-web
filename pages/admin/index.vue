@@ -9,11 +9,13 @@ import { Input } from '@/components/ui/input'
 import { RadioCardGroup } from '@/components/ui/radio-card-group'
 import type { AdminAccount, AdminAccounts, AdminInvitation, AdminOverview } from '~/schemas/clinic'
 import { cancelClinicSchema, createClinicFormSchema } from '~/schemas/clinic'
+import { APP_TIMEZONE } from '~/utils/timezone'
+import { normalizeCnpj } from '~/utils/cnpj'
 
 definePageMeta({ layout: 'admin', middleware: ['auth', 'platform-admin'] })
 
 const PAGE_SIZE = 20
-type DialogMode = 'closed' | 'create' | 'invitation' | 'resend' | 'cancel' | 'result'
+type DialogMode = 'closed' | 'create' | 'platform-invite' | 'invitation' | 'resend' | 'cancel' | 'result'
 
 const search = ref('')
 const searchQuery = ref('')
@@ -28,8 +30,10 @@ const formError = ref('')
 const formBusy = ref(false)
 const resultLink = ref('')
 const resultDelivery = ref<'sent' | 'failed' | 'disabled' | null>(null)
+const resultType = ref<'clinic' | 'platform'>('clinic')
 const copied = ref(false)
 const cancelReason = ref('')
+const platformInviteEmail = ref('')
 const form = reactive({ name: '', cnpj: '', ownerEmail: '', ownerAttends: false })
 const ownerAttendsChoice = computed({
   get: () => form.ownerAttends ? 'yes' : 'no',
@@ -87,12 +91,12 @@ const page = computed(() => Math.floor(offset.value / PAGE_SIZE) + 1)
 const pageCount = computed(() => Math.max(1, Math.ceil(total.value / PAGE_SIZE)))
 
 function cnpjMask(value: string) {
-  const digits = value.replace(/\D/g, '').slice(0, 14)
-  return digits
-    .replace(/^(\d{2})(\d)/, '$1.$2')
-    .replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3')
-    .replace(/\.(\d{3})(\d)/, '.$1/$2')
-    .replace(/(\d{4})(\d)/, '$1-$2')
+  const characters = normalizeCnpj(value).replace(/[^0-9A-Z]/g, '').slice(0, 14)
+  return characters
+    .replace(/^([0-9A-Z]{2})([0-9A-Z])/, '$1.$2')
+    .replace(/^([0-9A-Z]{2})\.([0-9A-Z]{3})([0-9A-Z])/, '$1.$2.$3')
+    .replace(/\.([0-9A-Z]{3})([0-9A-Z])/, '.$1/$2')
+    .replace(/([0-9A-Z]{4})([0-9A-Z])/, '$1-$2')
 }
 
 function openCreate() {
@@ -125,11 +129,13 @@ function invitationStatusLabel(value: string | null | undefined) {
   return 'Sem convite pendente'
 }
 
-function subscriptionLabel(value: AdminAccount['subscriptionStatus']) {
+function subscriptionLabel(value: AdminAccount['subscriptionStatus'], invitationStatus?: string | null) {
+  if (!value) return invitationStatus === 'pending' || invitationStatus === 'expired' ? 'Convite pendente' : 'Sem assinatura'
   return ({ trialing: 'Em avaliação', active: 'Ativa', past_due: 'Pagamento pendente', canceled: 'Cancelada' })[value]
 }
 
 function subscriptionClasses(value: AdminAccount['subscriptionStatus']) {
+  if (!value) return 'bg-[#FFF3D8] text-[#805B00]'
   if (value === 'past_due') return 'bg-[#FDEBE7] text-[#9E3522]'
   if (value === 'canceled') return 'bg-[#EFF2FB] text-[#5C6385]'
   return 'bg-[#E6EAFD] text-[#2B2E9E]'
@@ -146,7 +152,7 @@ function formatDate(value: string | null | undefined) {
   if (!value) return '—'
   const date = new Date(value)
   if (Number.isNaN(date.getTime())) return '—'
-  return new Intl.DateTimeFormat('pt-BR', { dateStyle: 'short', timeZone: 'America/Fortaleza' }).format(date)
+  return new Intl.DateTimeFormat('pt-BR', { dateStyle: 'short', timeZone: APP_TIMEZONE }).format(date)
 }
 
 function planLabel(value: string | null) {
@@ -155,7 +161,36 @@ function planLabel(value: string | null) {
 }
 
 function canManageInvitation(account: AdminAccount) {
-  return account.type === 'clinic' && account.initialInvitationStatus === 'pending'
+  return account.type === 'clinic' && ['pending', 'expired'].includes(account.initialInvitationStatus ?? '')
+}
+
+function openPlatformInvite() {
+  platformInviteEmail.value = ''
+  formError.value = ''
+  dialogMode.value = 'platform-invite'
+}
+
+async function sendPlatformInvite() {
+  const email = platformInviteEmail.value.trim().toLowerCase()
+  if (!z.string().email().safeParse(email).success) {
+    formError.value = 'Informe um e-mail válido.'
+    return
+  }
+  formBusy.value = true
+  formError.value = ''
+  try {
+    const result = await $fetch<{ email: string, link: string, expiresAt: string, deliveryStatus: 'sent' | 'failed' | 'disabled' }>('/api/admin/invitations', { method: 'POST', body: { email } })
+    resultLink.value = result.link
+    resultDelivery.value = result.deliveryStatus
+    resultType.value = 'platform'
+    dialogMode.value = 'result'
+  }
+  catch (error) {
+    formError.value = apiErrorMessage(error, { 409: 'Este e-mail já possui uma conta ou convite ativo.', default: 'Não foi possível enviar o convite agora. Tente novamente.' })
+  }
+  finally {
+    formBusy.value = false
+  }
 }
 
 async function showInvitation(account: AdminAccount) {
@@ -204,6 +239,7 @@ async function createClinic() {
     })
     resultLink.value = result.invitation.link ?? ''
     resultDelivery.value = result.invitation.deliveryStatus
+    resultType.value = 'clinic'
     dialogMode.value = 'result'
     await Promise.all([refreshAccounts(), refreshOverview()])
   }
@@ -301,7 +337,10 @@ const rangeEnd = computed(() => Math.min(offset.value + PAGE_SIZE, total.value))
         <h1 class="text-[28px] font-semibold tracking-[-0.03em] sm:text-[32px]">Contas e assinaturas</h1>
         <p class="max-w-3xl text-sm leading-6 text-secondary-foreground">Dados administrativos e de cobrança. Este painel não mostra pacientes, prontuários nem atividades.</p>
       </div>
-      <Button class="w-full sm:w-auto" @click="openCreate"><Plus class="size-4" aria-hidden="true" />Criar clínica</Button>
+      <div class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
+        <Button variant="outline" class="w-full sm:w-auto" @click="openPlatformInvite"><Mail class="size-4" aria-hidden="true" />Convidar admin</Button>
+        <Button class="w-full sm:w-auto" @click="openCreate"><Plus class="size-4" aria-hidden="true" />Criar clínica</Button>
+      </div>
     </div>
 
     <div v-if="overviewError" class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-destructive/30 bg-destructive/5 p-4 text-sm" role="alert">
@@ -376,7 +415,7 @@ const rangeEnd = computed(() => Math.min(offset.value + PAGE_SIZE, total.value))
                 </td>
                 <td class="px-4 py-3.5">{{ account.type === 'clinic' ? 'Clínica' : 'Consultório' }}</td>
                 <td class="px-4 py-3.5">{{ planLabel(account.planCode) }}<span v-if="account.billingCycle" class="block text-xs text-muted-foreground">{{ account.billingCycle === 'annual' ? 'Anual' : account.billingCycle === 'monthly' ? 'Mensal' : account.billingCycle }}</span></td>
-                <td class="px-4 py-3.5"><span class="inline-flex min-h-6 items-center rounded-full px-2.5 text-xs font-medium" :class="subscriptionClasses(account.subscriptionStatus)">{{ subscriptionLabel(account.subscriptionStatus) }}</span></td>
+                <td class="px-4 py-3.5"><span class="inline-flex min-h-6 items-center rounded-full px-2.5 text-xs font-medium" :class="subscriptionClasses(account.subscriptionStatus)">{{ subscriptionLabel(account.subscriptionStatus, account.initialInvitationStatus) }}</span></td>
                 <td class="px-4 py-3.5 font-mono text-xs text-secondary-foreground">{{ formatDate(account.currentPeriodEnd || account.trialEndsAt) }}</td>
                 <td class="px-4 py-3.5"><span v-if="account.type === 'clinic'" class="text-xs" :class="account.initialInvitationStatus === 'pending' ? 'font-medium text-[#9E3522]' : 'text-muted-foreground'">{{ invitationStatusLabel(account.initialInvitationStatus) }}</span><span v-else class="text-muted-foreground">—</span></td>
                 <td class="px-5 py-3 text-right">
@@ -399,7 +438,7 @@ const rangeEnd = computed(() => Math.min(offset.value + PAGE_SIZE, total.value))
                 <h3 class="truncate font-semibold">{{ account.name }}</h3>
                 <p class="truncate text-xs text-muted-foreground">{{ account.ownerEmail || account.cnpj || '—' }}</p>
               </div>
-              <span class="shrink-0 rounded-full px-2.5 py-1 text-xs font-medium" :class="subscriptionClasses(account.subscriptionStatus)">{{ subscriptionLabel(account.subscriptionStatus) }}</span>
+              <span class="shrink-0 rounded-full px-2.5 py-1 text-xs font-medium" :class="subscriptionClasses(account.subscriptionStatus)">{{ subscriptionLabel(account.subscriptionStatus, account.initialInvitationStatus) }}</span>
             </div>
             <dl class="grid grid-cols-2 gap-x-3 gap-y-2 text-xs">
               <div><dt class="label-mono">Tipo</dt><dd class="mt-1">{{ account.type === 'clinic' ? 'Clínica' : 'Consultório' }}</dd></div>
@@ -442,7 +481,7 @@ const rangeEnd = computed(() => Math.min(offset.value + PAGE_SIZE, total.value))
           </div>
           <div class="flex flex-col gap-1.5">
             <label for="clinic-cnpj" class="text-sm font-medium">CNPJ</label>
-            <Input id="clinic-cnpj" :model-value="form.cnpj" :aria-invalid="!!errors.cnpj" :aria-describedby="errors.cnpj ? 'clinic-cnpj-error' : undefined" inputmode="numeric" autocomplete="off" placeholder="00.000.000/0000-00" @update:model-value="form.cnpj = cnpjMask(String($event))" />
+<Input id="clinic-cnpj" :model-value="form.cnpj" :aria-invalid="!!errors.cnpj" :aria-describedby="errors.cnpj ? 'clinic-cnpj-error' : undefined" inputmode="text" autocomplete="off" placeholder="00.000.000/0000-00" @update:model-value="form.cnpj = cnpjMask(String($event))" />
             <p v-if="errors.cnpj" id="clinic-cnpj-error" class="text-[13px] text-destructive">{{ errors.cnpj }}</p>
           </div>
           <div class="flex flex-col gap-1.5">
@@ -459,6 +498,18 @@ const rangeEnd = computed(() => Math.min(offset.value + PAGE_SIZE, total.value))
             <Button type="button" variant="outline" :disabled="formBusy" @click="closeDialog">Fechar</Button>
             <Button type="submit" :loading="formBusy">Criar clínica</Button>
           </DialogFooter>
+        </form>
+      </template>
+
+      <template v-else-if="dialogMode === 'platform-invite'">
+        <DialogHeader><DialogTitle>Convidar admin da plataforma</DialogTitle><DialogDescription>Envie um convite para uma pessoa da equipe Acolhe acessar o painel administrativo.</DialogDescription></DialogHeader>
+        <form class="flex flex-col gap-4" @submit.prevent="sendPlatformInvite">
+          <div class="flex flex-col gap-1.5">
+            <label for="platform-invite-email" class="text-sm font-medium">E-mail</label>
+            <Input id="platform-invite-email" v-model="platformInviteEmail" type="email" autocomplete="email" placeholder="nome@acolhe.com.br" />
+          </div>
+          <p v-if="formError" class="text-sm text-destructive" role="alert">{{ formError }}</p>
+          <DialogFooter class="flex-col-reverse sm:flex-row"><Button type="button" variant="outline" :disabled="formBusy" @click="closeDialog">Cancelar</Button><Button type="submit" :loading="formBusy">Enviar convite</Button></DialogFooter>
         </form>
       </template>
 
@@ -495,7 +546,7 @@ const rangeEnd = computed(() => Math.min(offset.value + PAGE_SIZE, total.value))
       </template>
 
       <template v-else-if="dialogMode === 'result'">
-        <DialogHeader><DialogTitle>{{ resultDelivery === 'sent' ? 'Convite enviado' : 'Clínica criada' }}</DialogTitle><DialogDescription>{{ resultDelivery === 'sent' ? 'A responsável receberá o convite no e-mail informado.' : deliveryLabel(resultDelivery) + '. Você pode compartilhar o link de convite abaixo.' }}</DialogDescription></DialogHeader>
+        <DialogHeader><DialogTitle>{{ resultType === 'platform' || resultDelivery === 'sent' ? 'Convite enviado' : 'Clínica criada' }}</DialogTitle><DialogDescription>{{ resultDelivery === 'sent' ? 'A pessoa convidada receberá o convite no e-mail informado.' : deliveryLabel(resultDelivery) + '. Você pode compartilhar o link de convite abaixo.' }}</DialogDescription></DialogHeader>
         <div v-if="resultLink" class="flex flex-col gap-3 rounded-xl bg-accent p-4">
           <label for="invite-link" class="label-mono text-accent-foreground">Link do convite</label>
           <Input id="invite-link" :model-value="resultLink" readonly class="bg-white text-xs" />
