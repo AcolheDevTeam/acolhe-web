@@ -1,5 +1,9 @@
-// Textos da lista "Sessões ativas" (ACO-98). A API guarda o User-Agent cru e
-// só a rede do IP; aqui viram "Chrome no macOS" e "rede 189.40.12.x".
+import { formatDate } from './format'
+
+// Textos da lista "Sessões ativas" (ACO-98). O User-Agent cru vira "Chrome no
+// macOS". A rede do IP fica fora da tela por enquanto: em produção a API vê o
+// IP do BFF, não o do navegador, até o Caddy confiar no X-Forwarded-For
+// (trusted_proxies) e TRUSTED_PROXY_CIDRS incluir as faixas do BFF.
 
 export type DeviceKind = 'phone' | 'desktop'
 
@@ -32,14 +36,6 @@ export function describeDevice(userAgent: string): { label: string, kind: Device
   return { label: 'Navegador não identificado', kind }
 }
 
-// "189.40.12.0/24" → "rede 189.40.12.x"; IPv6 mostra o prefixo como veio.
-export function networkLabel(ipPrefix: string): string {
-  if (!ipPrefix) return ''
-  const v4 = ipPrefix.match(/^(\d+\.\d+\.\d+)\.0\/24$/)
-  if (v4) return `rede ${v4[1]}.x`
-  return `rede ${ipPrefix.replace(/\/\d+$/, '')}`
-}
-
 // Último uso, gravado no máximo a cada 5 minutos: abaixo disso é "agora".
 export function lastSeenLabel(iso: string, now: Date = new Date()): string {
   const minutes = Math.floor((now.getTime() - new Date(iso).getTime()) / 60000)
@@ -51,7 +47,6 @@ export function lastSeenLabel(iso: string, now: Date = new Date()): string {
   return days === 1 ? 'ativa há 1 dia' : `ativa há ${days} dias`
 }
 
-export function sessionMeta(session: { ipPrefix: string, lastSeenAt: string, current: boolean }, now: Date = new Date()): string {
-  const parts = [networkLabel(session.ipPrefix), session.current ? 'ativa agora' : lastSeenLabel(session.lastSeenAt, now)]
-  return parts.filter(Boolean).join(' · ')
+export function sessionMeta(session: { startedAt: string, lastSeenAt: string, current: boolean }, now: Date = new Date()): string {
+  return [`desde ${formatDate(session.startedAt)}`, session.current ? 'ativa agora' : lastSeenLabel(session.lastSeenAt, now)].join(' · ')
 }

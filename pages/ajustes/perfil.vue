@@ -40,6 +40,8 @@ watch(profile, (value) => {
   Object.assign(form, saved.value)
 })
 
+const phoneUnavailable = computed(() => profile.value?.phoneUnavailable === true)
+
 const dirty = computed(() => (Object.keys(form) as (keyof Form)[]).some(key => form[key] !== saved.value[key]))
 
 // Abordagens do cadastro; uma abordagem que não está na lista continua visível.
@@ -102,7 +104,8 @@ async function save() {
   const parsed = profileUpdateSchema.safeParse({
     fullName: form.fullName,
     socialName: form.socialName,
-    phone: form.phone,
+    // Telefone indisponível não vai no corpo: a API mantém o gravado.
+    phone: phoneUnavailable.value ? undefined : form.phone,
     approach: form.approach,
     defaultSessionMinutes: Number(form.duration),
   })
@@ -219,10 +222,12 @@ function decide(leave: boolean) {
               type="tel"
               inputmode="tel"
               autocomplete="tel"
-              placeholder="(11) 98765-4321"
+              :placeholder="phoneUnavailable ? undefined : '(11) 98765-4321'"
+              :disabled="phoneUnavailable"
               :aria-invalid="!!errors.phone || undefined"
-              :aria-describedby="errors.phone ? 'profile-phone-error' : undefined"
+              :aria-describedby="phoneUnavailable ? 'profile-phone-unavailable' : errors.phone ? 'profile-phone-error' : undefined"
             />
+            <p v-if="phoneUnavailable" id="profile-phone-unavailable" class="text-[13px] text-muted-foreground">Não foi possível carregar o telefone agora.</p>
             <p v-if="errors.phone" id="profile-phone-error" class="text-sm text-destructive">{{ errors.phone }}</p>
           </div>
         </div>

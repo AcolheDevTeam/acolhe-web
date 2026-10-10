@@ -13,13 +13,15 @@ export const profileUpdateSchema = z.object({
     .min(1, 'Informe o nome completo.')
     .max(200, 'O nome completo pode ter até 200 caracteres.'),
   socialName: z.string().trim().max(200, 'O nome social pode ter até 200 caracteres.').default(''),
+  // Ausente mantém o telefone gravado (ex.: não pôde ser decifrado agora);
+  // vazio apaga.
   phone: z.string().trim()
     .max(32, 'O telefone pode ter até 32 caracteres.')
     .refine(
       value => !value || (/^[+0-9() .-]+$/.test(value) && phoneDigits(value) >= 8 && phoneDigits(value) <= 15),
       'Informe um telefone válido, com DDD.',
     )
-    .default(''),
+    .optional(),
   approach: z.string().trim().max(100, 'A abordagem pode ter até 100 caracteres.').default(''),
   defaultSessionMinutes: z.number({ invalid_type_error: 'Escolha a duração padrão.' })
     .int('Escolha a duração padrão.')
@@ -31,6 +33,8 @@ export const profileSchema = z.object({
   fullName: z.string(),
   socialName: z.string().nullable(),
   phone: z.string().nullable(),
+  // Há telefone gravado, mas a API não conseguiu decifrá-lo agora.
+  phoneUnavailable: z.boolean().optional(),
   approach: z.string().nullable(),
   defaultSessionMinutes: z.number().int(),
   crpNumber: z.string(),

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { activeSessionSchema, changePasswordSchema, profileUpdateSchema } from '../schemas/account-settings'
-import { describeDevice, lastSeenLabel, networkLabel, sessionMeta } from '../utils/account-sessions'
+import { describeDevice, lastSeenLabel, sessionMeta } from '../utils/account-sessions'
 import { profileKey, sessionsKey } from '../composables/useAccountSettings'
 
 const valid = { fullName: ' Mariana Sá ', socialName: '', phone: '(11) 98765-4321', approach: 'TCC', defaultSessionMinutes: 50 }
@@ -24,6 +24,13 @@ describe('perfil da psicóloga (ACO-98)', () => {
 
   it('telefone e nome social são opcionais', () => {
     expect(profileUpdateSchema.safeParse({ fullName: 'Mariana', defaultSessionMinutes: 45 }).success).toBe(true)
+  })
+
+  it('telefone ausente continua ausente (a API mantém o gravado); vazio apaga', () => {
+    const omitted = profileUpdateSchema.parse({ fullName: 'Mariana', defaultSessionMinutes: 45 })
+    expect('phone' in omitted && omitted.phone !== undefined).toBe(false)
+    expect(JSON.stringify(omitted)).not.toContain('phone')
+    expect(profileUpdateSchema.parse({ ...valid, phone: '' }).phone).toBe('')
   })
 })
 
@@ -49,19 +56,16 @@ describe('sessões ativas (ACO-98)', () => {
     expect(describeDevice('').label).toBe('Navegador não identificado')
   })
 
-  it('mostra só a rede do IP', () => {
-    expect(networkLabel('189.40.12.0/24')).toBe('rede 189.40.12.x')
-    expect(networkLabel('2804:14c:5b::/48')).toBe('rede 2804:14c:5b::')
-    expect(networkLabel('')).toBe('')
-  })
-
   it('formata o último uso', () => {
     const now = new Date('2026-10-10T12:00:00Z')
     expect(lastSeenLabel('2026-10-10T11:58:00Z', now)).toBe('ativa agora')
     expect(lastSeenLabel('2026-10-10T11:40:00Z', now)).toBe('ativa há 20 min')
     expect(lastSeenLabel('2026-10-10T10:00:00Z', now)).toBe('ativa há 2 horas')
     expect(lastSeenLabel('2026-10-07T12:00:00Z', now)).toBe('ativa há 3 dias')
-    expect(sessionMeta({ ipPrefix: '189.40.12.0/24', lastSeenAt: '2026-10-07T12:00:00Z', current: true }, now)).toBe('rede 189.40.12.x · ativa agora')
+    const meta = sessionMeta({ startedAt: '2026-10-07T12:00:00Z', lastSeenAt: '2026-10-07T12:00:00Z', current: true }, now)
+    expect(meta).toMatch(/^desde .+ · ativa agora$/)
+    // A rede do IP não aparece enquanto o proxy não repassa o IP do navegador.
+    expect(sessionMeta({ startedAt: '2026-10-07T12:00:00Z', lastSeenAt: '2026-10-07T12:00:00Z', current: false }, now)).not.toContain('rede')
   })
 
   it('valida a resposta da API e separa o cache por usuário', () => {
