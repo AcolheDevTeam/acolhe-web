@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Check, ChevronLeft } from 'lucide-vue-next'
+import { onBeforeRouteLeave } from 'vue-router'
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
 import type {
@@ -132,6 +133,34 @@ async function send() {
     sending.value = false
   }
 }
+// Sair com respostas não enviadas pede confirmação: elas não ficam guardadas.
+// Durante o envio a saída fica bloqueada para não perder a confirmação.
+const hasAnswers = computed(() => !sent.value && fields.value.some(isAnswered))
+const leaveConfirmOpen = ref(false)
+let resolveLeave: ((leave: boolean) => void) | undefined
+function decideLeave(leave: boolean) {
+  leaveConfirmOpen.value = false
+  resolveLeave?.(leave)
+  resolveLeave = undefined
+}
+function confirmLeave(): Promise<boolean> {
+  if (sending.value) return Promise.resolve(false)
+  if (!hasAnswers.value) return Promise.resolve(true)
+  if (resolveLeave) return Promise.resolve(false)
+  leaveConfirmOpen.value = true
+  return new Promise<boolean>(resolve => { resolveLeave = resolve })
+}
+onBeforeRouteLeave(() => confirmLeave())
+function beforeUnload(event: BeforeUnloadEvent) {
+  if (!hasAnswers.value && !sending.value) return
+  event.preventDefault()
+  event.returnValue = ''
+}
+onMounted(() => window.addEventListener('beforeunload', beforeUnload))
+onBeforeUnmount(() => {
+  window.removeEventListener('beforeunload', beforeUnload)
+  decideLeave(false)
+})
 </script>
 
 <template>
@@ -139,7 +168,7 @@ async function send() {
     <header class="sticky top-0 z-20 border-b bg-background">
       <div class="mx-auto flex w-full max-w-2xl flex-col gap-3.5 px-4 pb-4 pt-5 md:px-8">
         <div class="flex items-center gap-2">
-          <Button variant="ghost" size="icon-lg" class="-ml-1 shrink-0 text-foreground" aria-label="Voltar para o início" @click="navigateTo('/patient')">
+          <Button variant="ghost" size="icon-lg" class="-ml-1 shrink-0 text-foreground" aria-label="Voltar para o início" :disabled="sending" @click="navigateTo('/patient')">
             <ChevronLeft class="!size-5" />
           </Button>
           <div class="flex min-w-0 flex-1 flex-col">
@@ -236,6 +265,15 @@ async function send() {
         </Button>
       </div>
     </footer>
+    <ConfirmDialog
+      :open="leaveConfirmOpen"
+      title="Sair sem enviar?"
+      description="Suas respostas ainda não foram enviadas e não ficam salvas. Se sair agora, elas serão perdidas."
+      confirm-label="Sair sem enviar"
+      cancel-label="Continuar respondendo"
+      destructive
+      @decision="decideLeave"
+    />
   </div>
 </template>
 

@@ -9,8 +9,12 @@ const props = defineProps<{ activities: PatientPendingActivity[], limit?: number
 const shown = computed(() => props.limit ? props.activities.slice(0, props.limit) : props.activities)
 const now = useNow({ interval: 60000 })
 
+// "quinta-feira, 8 de outubro, 14h00" (horário de Brasília).
 function formatDue(value: string) {
-  return new Intl.DateTimeFormat('pt-BR', { weekday: 'long', day: 'numeric', month: 'long', timeZone: APP_TIMEZONE }).format(new Date(value))
+  const date = new Date(value)
+  const day = new Intl.DateTimeFormat('pt-BR', { weekday: 'long', day: 'numeric', month: 'long', timeZone: APP_TIMEZONE }).format(date)
+  const time = new Intl.DateTimeFormat('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: APP_TIMEZONE }).format(date).replace(':', 'h')
+  return `${day}, ${time}`
 }
 
 function isLate(activity: PatientPendingActivity) {

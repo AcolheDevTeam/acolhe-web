@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button'
 
 definePageMeta({ layout: 'patient', middleware: ['auth', 'patient-only'] })
 
-const { me, context, nextSession, activities, checkins, summary, pending, error } = usePatientPortal()
+const { me, context, nextSession, activities, checkins, pending, error } = usePatientPortal()
 const confirmationSubmitting = ref(false)
 const confirmationError = ref('')
 const now = useNow({ interval: 60000 })
@@ -38,7 +38,7 @@ const firstName = computed(() => (context.data.value?.fullName ?? me.value?.pati
 const eyebrow = patientEyebrowDate()
 
 async function onCheckinSaved() {
-  await Promise.all([checkins.refresh(), summary.refresh()])
+  await checkins.refresh()
 }
 
 const pendingLabel = computed(() => {

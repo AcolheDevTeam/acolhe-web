@@ -31,11 +31,36 @@ const singleChoices = computed<{ label: string, value: string | boolean }[]>(() 
   ? [{ label: 'Sim', value: true }, { label: 'Não', value: false }]
   : options.value.map(option => ({ label: option, value: option })))
 
+const singleValues = computed(() => singleChoices.value.map(choice => choice.value))
+
 const selectedChoices = computed(() => (Array.isArray(props.modelValue) ? props.modelValue : []))
 
 function toggleChoice(option: string, checked: boolean) {
   const current = selectedChoices.value
   emit('update:modelValue', checked ? [...current, option] : current.filter((item) => item !== option))
+}
+
+// Grupos de rádio (escala, Sim/Não, escolha única): uma parada de Tab no item
+// marcado (ou no primeiro) e setas mudando a escolha, como no MoodPicker.
+function radioTabindex(values: FieldAnswer[], index: number) {
+  const selected = values.findIndex(value => value === props.modelValue)
+  return index === (selected === -1 ? 0 : selected) ? 0 : -1
+}
+function onRadioKeydown(event: KeyboardEvent, values: FieldAnswer[], index: number) {
+  const last = values.length - 1
+  const next = ({
+    ArrowRight: index === last ? 0 : index + 1,
+    ArrowDown: index === last ? 0 : index + 1,
+    ArrowLeft: index === 0 ? last : index - 1,
+    ArrowUp: index === 0 ? last : index - 1,
+    Home: 0,
+    End: last,
+  } as Record<string, number>)[event.key]
+  if (next === undefined) return
+  event.preventDefault()
+  emit('update:modelValue', values[next] ?? null)
+  const group = (event.currentTarget as HTMLElement).parentElement
+  ;(group?.querySelectorAll<HTMLElement>('[role="radio"]')[next])?.focus()
 }
 
 const maxLength = computed(() => props.field.config.maxLength)
@@ -74,14 +99,16 @@ const textLength = computed(() => (typeof props.modelValue === 'string' ? props.
     <div v-else-if="field.fieldType === 'scale'" class="flex flex-col gap-2">
       <div class="grid grid-cols-5 gap-2" role="radiogroup" :aria-label="field.label">
         <button
-          v-for="step in scaleSteps"
+          v-for="(step, index) in scaleSteps"
           :key="step"
           type="button"
           role="radio"
+          :tabindex="radioTabindex(scaleSteps, index)"
           class="h-12 rounded-lg border text-[15px] font-semibold tabular-nums transition-[transform,background-color,border-color,color] duration-300 ease-out focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/15"
           :class="modelValue === step ? '-translate-y-[3px] border-primary bg-primary text-primary-foreground' : 'border-border bg-card text-secondary-foreground hover:border-input-hover'"
           :aria-checked="modelValue === step"
           @click="emit('update:modelValue', step)"
+          @keydown="onRadioKeydown($event, scaleSteps, index)"
         >
           {{ step }}
         </button>
@@ -103,14 +130,16 @@ const textLength = computed(() => (typeof props.modelValue === 'string' ? props.
       :aria-label="field.label"
     >
       <button
-        v-for="choice in singleChoices"
+        v-for="(choice, index) in singleChoices"
         :key="String(choice.value)"
         type="button"
         role="radio"
+        :tabindex="radioTabindex(singleValues, index)"
         class="flex w-full items-center gap-3 rounded-[14px] border bg-card p-3.5 text-left text-[15px] font-medium transition-[background-color,border-color] duration-200 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/15"
         :class="modelValue === choice.value ? 'border-primary bg-surface-subtle' : 'border-border hover:border-input-hover'"
         :aria-checked="modelValue === choice.value"
         @click="emit('update:modelValue', choice.value)"
+        @keydown="onRadioKeydown($event, singleValues, index)"
       >
         <span
           aria-hidden="true"

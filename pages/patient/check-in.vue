@@ -4,7 +4,7 @@ import { useNow } from '@vueuse/core'
 
 definePageMeta({ layout: 'patient', middleware: ['auth', 'patient-only'] })
 
-const { checkins, summary, pending, error } = usePatientPortal()
+const { checkins, pending, error } = usePatientPortal()
 const eyebrow = patientEyebrowDate()
 const now = useNow({ interval: 60000 })
 
@@ -12,10 +12,11 @@ const now = useNow({ interval: 60000 })
 const days = computed(() => recentCheckinDays(checkins.data.value ?? [], 14, now.value))
 const weekAverage = computed(() => moodAverageLabel(days.value.slice(7)))
 const emptyDays = computed(() => days.value.filter(day => day.mood === null).length)
+const gridSummaryId = useId()
 const shades = ['bg-mood-1', 'bg-mood-2', 'bg-mood-3', 'bg-mood-4', 'bg-mood-5']
 
 async function onCheckinSaved() {
-  await Promise.all([checkins.refresh(), summary.refresh()])
+  await checkins.refresh()
 }
 </script>
 
@@ -37,18 +38,21 @@ async function onCheckinSaved() {
         <section class="animate-rise flex flex-col gap-3.5 rounded-2xl border bg-card p-[18px] [animation-delay:120ms]" aria-labelledby="t-14dias">
           <div class="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
             <h2 id="t-14dias" class="text-base font-semibold">Últimos 14 dias</h2>
-            <span class="text-[13px] text-secondary-foreground">Média da semana <strong class="font-semibold text-foreground">{{ weekAverage ?? '—' }}</strong></span>
+            <span class="text-[13px] text-secondary-foreground">Média dos últimos 7 dias <strong class="font-semibold text-foreground">{{ weekAverage ?? '—' }}</strong></span>
           </div>
-          <div role="img" :aria-label="`Humor dos últimos 14 dias. ${emptyDays} dias sem registro.`" class="grid max-w-[420px] grid-cols-7 gap-1.5">
-            <div v-for="cell in days" :key="cell.day" class="flex flex-col items-center gap-1">
+          <p :id="gridSummaryId" class="sr-only">{{ emptyDays }} de 14 dias sem check-in.</p>
+          <ol class="grid max-w-[420px] grid-cols-7 gap-1.5" aria-label="Humor dos últimos 14 dias" :aria-describedby="gridSummaryId">
+            <li v-for="cell in days" :key="cell.day" class="flex flex-col items-center gap-1">
+              <span class="sr-only">{{ checkinDateLabel(cell.day) }}: {{ cell.mood ? `humor ${moodLabel(cell.mood).toLowerCase()} (${cell.mood} de 5)` : 'sem check-in' }}</span>
               <span
+                aria-hidden="true"
                 :class="['aspect-square w-full rounded-lg', cell.mood ? shades[cell.mood - 1] : 'border border-dashed border-input-hover']"
-                :title="cell.mood ? `${checkinDateLabel(cell.day)}: ${moodLabel(cell.mood)}` : `${checkinDateLabel(cell.day)}: sem registro`"
+                :title="cell.mood ? `${checkinDateLabel(cell.day)}: ${moodLabel(cell.mood)}` : `${checkinDateLabel(cell.day)}: sem check-in`"
               />
-              <span class="font-mono text-[10px] text-muted-foreground">{{ cell.weekday }}</span>
-            </div>
-          </div>
-          <div class="flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
+              <span aria-hidden="true" class="font-mono text-[10px] text-muted-foreground">{{ cell.weekday }}</span>
+            </li>
+          </ol>
+          <div class="flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground" aria-hidden="true">
             <span>Difícil</span>
             <span v-for="shade in shades" :key="shade" aria-hidden="true" :class="['size-3.5 rounded', shade]" />
             <span>Bem</span>

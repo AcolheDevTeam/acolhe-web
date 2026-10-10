@@ -49,7 +49,11 @@ const firstName = computed(() => invitation.value?.patientName.split(' ')[0] ?? 
 const psychologistInitials = computed(() => (invitation.value?.psychologistName ?? '')
   .split(' ').filter(Boolean).map(part => part[0]).filter((_, index, all) => index === 0 || index === all.length - 1).join('').toUpperCase())
 
+// Mexer no formulário depois de um erro tira a mensagem antiga da tela.
+watch([password, passwordConfirmation], () => { actionError.value = '' })
+
 function toggleDocument(id: string, checked: boolean) {
+  actionError.value = ''
   selected.value = checked
     ? [...new Set([...selected.value, id])]
     : selected.value.filter(documentId => documentId !== id)
@@ -76,6 +80,13 @@ async function accept() {
   } finally {
     accepting.value = false
   }
+}
+
+// Recusar encerra o link: pede confirmação antes.
+const declineConfirmOpen = ref(false)
+function onDeclineDecision(confirmed: boolean) {
+  declineConfirmOpen.value = false
+  if (confirmed) void decline()
 }
 
 async function decline() {
@@ -193,12 +204,12 @@ async function decline() {
           </div>
           <div class="flex flex-col gap-1.5">
             <Label for="password">Senha</Label>
-            <PasswordInput id="password" v-model="password" autocomplete="new-password" placeholder="Mínimo de 8 caracteres" :aria-invalid="!!passwordError" aria-describedby="password-error" />
+            <PasswordInput id="password" v-model="password" autocomplete="new-password" placeholder="Mínimo de 8 caracteres" :aria-invalid="!!passwordError" :aria-describedby="passwordError ? 'password-error' : undefined" />
             <p v-if="passwordError" id="password-error" class="text-[13px] text-destructive">{{ passwordError }}</p>
           </div>
           <div class="flex flex-col gap-1.5">
             <Label for="password-confirmation">Repita a senha</Label>
-            <PasswordInput id="password-confirmation" v-model="passwordConfirmation" autocomplete="new-password" :aria-invalid="!!confirmationError" aria-describedby="password-confirmation-error" />
+            <PasswordInput id="password-confirmation" v-model="passwordConfirmation" autocomplete="new-password" :aria-invalid="!!confirmationError" :aria-describedby="confirmationError ? 'password-confirmation-error' : undefined" />
             <p v-if="confirmationError" id="password-confirmation-error" class="text-[13px] text-destructive">{{ confirmationError }}</p>
           </div>
         </section>
@@ -209,11 +220,19 @@ async function decline() {
             {{ accepting ? 'Criando conta…' : 'Aceitar e criar conta' }}
           </Button>
           <p v-if="requiredMissing" class="animate-fade text-center text-[13px] text-muted-foreground">Para criar a conta, ative os itens obrigatórios.</p>
-          <Button variant="ghost" size="xl" class="h-[50px] w-full" :disabled="accepting" :loading="declining" @click="decline">
+          <Button variant="ghost" size="xl" class="h-[50px] w-full" :disabled="accepting" :loading="declining" @click="declineConfirmOpen = true">
             {{ declining ? 'Registrando…' : 'Recusar convite' }}
           </Button>
         </div>
       </div>
     </main>
+    <ConfirmDialog
+      :open="declineConfirmOpen"
+      title="Recusar o convite?"
+      description="O link deixa de funcionar e nenhuma conta é criada. Para entrar depois, você vai precisar de um novo convite da sua psicóloga."
+      confirm-label="Recusar convite"
+      destructive
+      @decision="onDeclineDecision"
+    />
   </div>
 </template>
