@@ -1,7 +1,9 @@
-import { patientQuerySchema } from '~/schemas/common'
+import { documentsQuerySchema } from '~/schemas/document'
 import type { ClinicalDocument } from '~/types'
 
+// Documentos emitidos pela psicóloga logada, de todas as pacientes
+// (?patientId= opcional) — proxy autenticado.
 export default defineEventHandler(async (event) => {
-  const query = await getValidatedQuery(event, value => patientQuerySchema.parse(value))
+  const query = await getValidatedQuery(event, value => documentsQuerySchema.parse(value))
   return await apiFetch<ClinicalDocument[]>(event, '/documents', { query })
 })

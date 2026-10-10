@@ -73,7 +73,7 @@ const sections = computed<NavSection[]>(() => {
         },
         { label: 'Agenda', to: '/agenda', icon: CalendarDays },
         { label: 'Atividades', to: '/activities', icon: ListChecks },
-        { label: 'Documentos', to: '/documents', icon: FileText, disabled: true },
+        { label: 'Documentos', to: '/documents', icon: FileText },
         { label: 'Templates', to: '/templates', icon: LayoutTemplate },
       ],
     },
