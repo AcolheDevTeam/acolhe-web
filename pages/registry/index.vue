@@ -15,6 +15,7 @@ const { data, error, status, refresh } = useDocumentaryPatients(page)
         outras profissionais, nem incluídos na exportação da paciente.
       </p>
     </div>
+    <DocumentaryDepartures />
     <p class="text-sm text-muted-foreground">
       Para começar um caderno, abra Registro Documental na ficha da paciente.
     </p>

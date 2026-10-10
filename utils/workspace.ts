@@ -7,6 +7,8 @@ import type { UserRole, WorkspaceContext, WorkspaceRole } from '~/types'
 type SessionUser = { role: UserRole, workspace?: WorkspaceContext } | null | undefined
 
 export const INACTIVE_WORKSPACE_PATH = '/espaco-inativo'
+/** Baixar os cadernos da clínica que a psicóloga deixou (ACO-96); abre sem vínculo ativo. */
+export const DEPARTURE_EXPORT_PATH = '/registro-documental/exportar'
 export const CLINIC_HOME_PATH = '/clinica'
 /** Papel sem área no Acolhe (ex.: org_admin de consultório, legado do backfill). */
 export const NO_AREA_PATH = '/sem-acesso'

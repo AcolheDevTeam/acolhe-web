@@ -41,6 +41,7 @@ async function choose(organizationId: string) {
         </div>
       </CardHeader>
       <CardContent class="flex flex-col gap-4">
+        <DocumentaryDepartures :framed="false" />
         <template v-if="available.length">
           <p class="text-sm text-muted-foreground">Você pode continuar em outro espaço de trabalho:</p>
           <Button
