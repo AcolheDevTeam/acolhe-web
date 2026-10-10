@@ -98,8 +98,9 @@ export function badgeCount(count: number): string {
   return count > 99 ? '99+' : String(count)
 }
 
-export function unreadKey(organizationId?: string | null): string {
-  return `notifications-unread-${organizationId ?? 'none'}`
+/** Chaves de cache por pessoa e espaço de trabalho: nada serve a outra conta (LGPD). */
+export function notificationsKey(scope: 'unread' | 'list', userId?: string | null, organizationId?: string | null): string {
+  return `notifications-${scope}-${userId ?? 'none'}-${organizationId ?? 'none'}`
 }
 
 export type NotificationAction = 'load' | 'read' | 'read-all' | 'preferences' | 'save-preference'
@@ -114,7 +115,7 @@ export function notificationErrorMessage(error: unknown, action: NotificationAct
     'save-preference': 'Não foi possível salvar a preferência. O interruptor voltou ao que estava.',
   }
   return apiErrorMessage(error, {
-    403: 'As notificações são só da equipe; a paciente não tem caixa de notificações.',
+    403: 'Seu acesso a este espaço de trabalho não permite ver notificações. Se você atende pacientes aqui, peça à administração da clínica para revisar seu papel.',
     404: action === 'read' ? 'Esta notificação não existe mais ou não é sua.' : byAction[action],
     default: byAction[action],
   })

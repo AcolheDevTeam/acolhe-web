@@ -2,7 +2,6 @@
 import { CheckCheck, SlidersHorizontal } from 'lucide-vue-next'
 import { toast } from 'vue-sonner'
 import type { AppNotification, NotificationFilter, NotificationPage } from '~/schemas/notification'
-import type { User } from '~/types'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { EmptyState } from '@/components/ui/empty-state'
@@ -14,13 +13,12 @@ useHead({ title: 'Notificações' })
 
 // Caixa de notificações (protótipo "Notificações", ACO-99): Todas/Não lidas,
 // agrupada por dia, marcar uma ou todas como lidas. Cada item leva ao recurso.
-const { data: me } = useNuxtData<User | null>('me')
-const organizationId = me.value?.workspace?.organizationId ?? me.value?.organizationId ?? 'none'
 const { count: unread, refresh: refreshCount } = useUnreadNotifications()
+const keys = useNotificationKeys()
 
 const filter = ref<NotificationFilter>('all')
 const { data, status, error, refresh } = await useFetch<NotificationPage>('/api/notifications', {
-  key: `notifications-${organizationId}`,
+  key: keys.list,
   query: { filter },
   default: () => ({ items: [], nextCursor: null }),
 })
@@ -63,10 +61,12 @@ function applyRead(ids: Set<string> | 'all') {
   extra.value = touch(extra.value)
 }
 
-const marking = ref<string | null>(null)
+// Cada linha tem o próprio estado: marcar duas seguidas não apaga o spinner
+// da primeira nem permite dois envios da mesma.
+const marking = ref(new Set<string>())
 async function markRead(n: AppNotification, quiet = false) {
-  if (n.readAt) return
-  marking.value = n.id
+  if (n.readAt || marking.value.has(n.id)) return
+  marking.value = new Set(marking.value).add(n.id)
   try {
     await $fetch(`/api/notifications/${n.id}/read`, { method: 'POST' })
     applyRead(new Set([n.id]))
@@ -76,7 +76,9 @@ async function markRead(n: AppNotification, quiet = false) {
     if (!quiet) toast.error(notificationErrorMessage(err, 'read'))
   }
   finally {
-    marking.value = null
+    const next = new Set(marking.value)
+    next.delete(n.id)
+    marking.value = next
   }
 }
 
@@ -165,7 +167,7 @@ const filterOptions = computed(() => [
             v-for="n in group.items"
             :key="n.id"
             :notification="n"
-            :marking="marking === n.id"
+            :marking="marking.has(n.id)"
             @mark-read="markRead(n)"
             @open="markRead(n, true)"
           />

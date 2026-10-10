@@ -12,7 +12,7 @@ import {
   notificationTime,
   notificationWho,
   preferenceRows,
-  unreadKey,
+  notificationsKey,
   unreadSummary,
   withPreference,
 } from '~/utils/notifications'
@@ -69,7 +69,9 @@ describe('caixa de notificações (ACO-99)', () => {
     expect(unreadSummary(3)).toBe('3 não lidas.')
     expect(bellLabel(2)).toBe('Notificações, 2 não lidas')
     expect(badgeCount(120)).toBe('99+')
-    expect(unreadKey('org-1')).not.toBe(unreadKey('org-2'))
+    expect(notificationsKey('unread', 'u1', 'org-1')).not.toBe(notificationsKey('unread', 'u1', 'org-2'))
+    expect(notificationsKey('list', 'u1', 'org-1')).not.toBe(notificationsKey('list', 'u2', 'org-1'))
+    expect(notificationErrorMessage({ statusCode: 403 }, 'load')).not.toContain('a paciente não tem')
   })
 
   it('erros diferentes viram mensagens diferentes', () => {

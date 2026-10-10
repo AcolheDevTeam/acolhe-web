@@ -9,11 +9,9 @@ import { cn } from '@/lib/utils'
 // fica abaixo de 4,5:1 (novo-design.md, contraste).
 const props = defineProps<{ class?: HTMLAttributes['class'], size?: 'default' | 'sm' }>()
 
-const { count, refresh, enabled } = useUnreadNotifications()
+// O contador se atualiza a cada navegação dentro do composable, uma vez só.
+const { count, enabled } = useUnreadNotifications()
 const route = useRoute()
-// Navegar é o momento natural de o contador mudar (abriu a revisão, marcou
-// na caixa); o custo é uma contagem indexada.
-watch(() => route.path, () => { if (enabled.value) void refresh() })
 </script>
 
 <template>
