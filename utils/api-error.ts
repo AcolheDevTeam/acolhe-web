@@ -17,7 +17,7 @@ export interface ApiErrorInfo {
 // Workspace só leitura (teste vencido, atraso além da tolerância, cancelada):
 // a API recusa escritas com 402. O shell mostra a faixa com o link para
 // /assinatura (plugins/billing-readonly.client.ts).
-export const READ_ONLY_MESSAGE = 'Assinatura inativa: você pode ver e exportar, mas não criar nem editar.'
+export const READ_ONLY_MESSAGE = 'Assinatura inativa: você pode ver os dados, mas não criar nem editar.'
 
 const defaultMessages: Record<number, string> = {
   400: 'Alguns dados não foram aceitos. Revise o formulário e tente de novo.',

@@ -120,15 +120,19 @@ const route = useRoute()
 const router = useRouter()
 const confirmed = ref(route.query.status === 'sucesso')
 const waitingActivation = ref(false)
+// Saindo da página no meio da espera, as consultas param.
+let stopped = false
+onBeforeUnmount(() => { stopped = true })
 onMounted(async () => {
   if (!confirmed.value) return
   waitingActivation.value = true
-  for (let attempt = 0; attempt < 6 && sub.value?.status !== 'active'; attempt++) {
+  for (let attempt = 0; attempt < 6 && !stopped && sub.value?.status !== 'active'; attempt++) {
     await new Promise(resolve => setTimeout(resolve, 2500))
+    if (stopped) break
     await refresh()
   }
   waitingActivation.value = false
-  await router.replace({ query: {} })
+  if (!stopped && route.path === BILLING_PATH) await router.replace({ query: {} })
 })
 </script>
 
@@ -162,14 +166,14 @@ onMounted(async () => {
           <p class="text-sm leading-normal text-secondary-foreground">
             <template v-if="sub.writable && sub.pastDueSince">Se o pagamento não for feito até {{ formatDate(pastDueDeadline(sub.pastDueSince)) }}, a criação de registros novos fica pausada.</template>
             <template v-else>{{ READ_ONLY_MESSAGE }}</template>
-            Ver e exportar dados continua liberado.
+            Ver os dados continua liberado.
           </p>
         </div>
         <Button v-if="canManage" :loading="busy === 'portal'" :disabled="!!busy" @click="openPortal">{{ busy === 'portal' ? 'Abrindo…' : 'Atualizar pagamento' }}</Button>
       </section>
       <InlineNotice v-else-if="sub.status === 'canceled'" tone="neutral">
         <strong class="font-semibold text-foreground">Assinatura cancelada.</strong>
-        Você e suas pacientes continuam podendo ver e exportar os dados. Para voltar a criar e editar, assine de novo.
+        Você e suas pacientes continuam podendo ver os dados. Para voltar a criar e editar, assine de novo.
       </InlineNotice>
 
       <div class="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
@@ -179,7 +183,7 @@ onMounted(async () => {
           <p v-for="line in summary?.lines" :key="line" class="text-sm text-brand-foreground/80">{{ line }}</p>
         </section>
 
-        <Card v-if="isClinic" role="region" aria-labelledby="t-vagas" class="flex animate-rise flex-col gap-3.5 p-6 [animation-delay:.06s]">
+        <Card v-if="isClinic && (sub.seats || canManage)" role="region" aria-labelledby="t-vagas" class="flex animate-rise flex-col gap-3.5 p-6 [animation-delay:.06s]">
           <h2 id="t-vagas" class="label-mono text-[11px]">Psicólogas</h2>
           <p class="text-[26px] font-semibold tracking-[-0.02em]">
             {{ sub.seats ?? seatsFor(planByCode('clinica')) }}
@@ -231,7 +235,7 @@ onMounted(async () => {
           </PlanCard>
         </div>
         <p class="text-[13px] leading-relaxed text-muted-foreground">
-          Se a assinatura vencer, você e suas pacientes continuam podendo ver e exportar todos os dados. Só não é possível criar registros novos.
+          Se a assinatura vencer, você e suas pacientes continuam podendo ver todos os dados. Só não é possível criar registros novos.
         </p>
       </section>
     </template>
