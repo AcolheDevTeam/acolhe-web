@@ -364,6 +364,9 @@ const year = new Date().getFullYear()
   top: 4%;
   opacity: .14;
   stroke-width: .12;
+  /* Some antes da borda do hero, sem corte seco na curva da seção seguinte. */
+  -webkit-mask-image: linear-gradient(to bottom, #000 45%, transparent 72%);
+  mask-image: linear-gradient(to bottom, #000 45%, transparent 72%);
 }
 .hero-arcs path {
   stroke-dasharray: 1;
