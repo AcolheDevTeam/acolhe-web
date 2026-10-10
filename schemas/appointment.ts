@@ -31,7 +31,7 @@ const appointmentFields = {
 }
 
 export const createAppointmentSchema = z.object({
-  patientId: z.string({ required_error: 'Selecione um paciente' }).uuid('Selecione um paciente'),
+  patientId: z.string({ required_error: 'Selecione o(a) paciente' }).uuid('Selecione o(a) paciente'),
   ...appointmentFields,
 })
 

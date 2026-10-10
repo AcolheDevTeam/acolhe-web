@@ -104,7 +104,7 @@ const details = computed(() => {
             </div>
             <p class="text-sm leading-relaxed text-brand-muted">
               Hipóteses, observações técnicas e planejamento ficam no caderno do(a) paciente.
-              Não aparece para o(a) paciente nem na exportação de dados dela(e).
+              Não aparece para o(a) paciente nem na exportação de dados dela(dele).
             </p>
             <Button variant="on-brand-outline" class="self-start" as-child>
               <NuxtLink :to="`/patients/${session.patientId}/registry`">

@@ -128,9 +128,9 @@ const onSubmit = handleSubmit(async (values) => {
             <FormControl>
               <CustomDropdown
                 :options="patientOptions"
-                placeholder="Selecione um paciente"
+                placeholder="Selecione o(a) paciente"
                 search-placeholder="Buscar paciente…"
-                empty-text="Nenhum paciente encontrado."
+                empty-text="Nenhum(a) paciente encontrado(a)."
                 :model-value="value ?? ''"
                 @update:model-value="handleChange"
               />

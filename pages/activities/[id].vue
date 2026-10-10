@@ -124,7 +124,7 @@ const visibilityOptions: { value: CommentVisibility, label: string }[] = [
 ]
 const visibilityHelp = computed(() => visibility.value === 'shared'
   ? 'O(A) paciente vê este comentário junto da resposta.'
-  : 'Só você vê. Não aparece para o(a) paciente nem na exportação de dados dela(e).')
+  : 'Só você vê. Não aparece para o(a) paciente nem na exportação de dados dela(dele).')
 const commentPlaceholder = computed(() => visibility.value === 'shared'
   ? 'Escreva um retorno para o(a) paciente'
   : 'Anotação para você')

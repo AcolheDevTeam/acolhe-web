@@ -126,7 +126,7 @@ function focusForm() {
             :options="patientOptions"
             placeholder="Escolha o(a) paciente"
             search-placeholder="Buscar paciente"
-            empty-text="Nenhum paciente encontrado."
+            empty-text="Nenhum(a) paciente encontrado(a)."
             class="h-11 rounded-lg bg-card px-3.5 text-sm shadow-none hover:border-input-hover"
           />
           <div v-if="patientsError" role="alert" class="flex flex-wrap items-center gap-3 text-sm">

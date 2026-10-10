@@ -195,7 +195,7 @@ function open(id: string) {
             v-if="!rows.length"
             compact
             class="animate-fade rounded-none border-0"
-            :description="hasFilters ? 'Nenhum paciente encontrado com esses filtros.' : 'Nenhum paciente nesta lista.'"
+            :description="hasFilters ? 'Nenhum(a) paciente encontrado(a) com esses filtros.' : 'Nenhum(a) paciente nesta lista.'"
           >
             <template v-if="hasFilters" #action>
               <Button variant="outline" size="sm" @click="clearFilters">Limpar filtros</Button>
