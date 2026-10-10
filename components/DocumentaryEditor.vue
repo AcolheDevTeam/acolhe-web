@@ -64,9 +64,14 @@ const exitProtection = useNuxtApp().$protectedLogout
 const unregisterExit = exitProtection.register({ saving, confirm: confirmDiscard })
 onBeforeUnmount(unregisterExit)
 const dirty = computed(() => draft.value !== (saved.value?.content ?? ''))
+// Caderno que não decifrou (ACO-86): fica só leitura, sem texto, até a
+// chave voltar. Os outros cadernos da paciente seguem normais.
+const unreadable = computed(() => saved.value?.unreadable === true)
 const writable = computed(
   () =>
-    data.value?.patient.writable === true && identity.value === initialIdentity,
+    data.value?.patient.writable === true &&
+    identity.value === initialIdentity &&
+    !unreadable.value,
 )
 const contentValid = computed(
   () => documentaryContentSchema.safeParse(draft.value).success,
@@ -405,7 +410,13 @@ watch(
       Carregando cadernos…
     </p>
     <template v-else-if="data">
-      <InlineNotice v-if="!writable" tone="neutral">
+      <InlineNotice v-if="unreadable" tone="warning">
+        <span class="font-medium">Não foi possível abrir este caderno.</span>
+        O texto continua guardado, mas não pôde ser lido agora. Enquanto isso,
+        ele não pode ser editado. Recarregue a página mais tarde para tentar
+        de novo.
+      </InlineNotice>
+      <InlineNotice v-else-if="!writable" tone="neutral">
         <span class="font-medium text-foreground">Somente leitura.</span>
         Paciente ou vínculo clínico inativo. Você pode consultar os cadernos e
         o histórico.
@@ -437,7 +448,7 @@ watch(
             v-model="draft"
             :readonly="!writable || saving || exitProtection.pending.value"
             class="min-h-[360px] resize-y whitespace-pre-wrap leading-[1.6]"
-            placeholder="Escreva suas anotações nesta categoria…"
+            :placeholder="unreadable ? '' : 'Escreva suas anotações nesta categoria…'"
             spellcheck="false"
             autocomplete="off"
             autocorrect="off"
@@ -593,19 +604,26 @@ watch(
             alteração foi reenviada.</DialogDescription
           ></DialogHeader
         >
-        <pre
-          class="max-h-64 overflow-auto whitespace-pre-wrap break-words rounded-lg border p-4 font-sans text-sm"
-          >{{ latest?.content || '(texto vazio)' }}</pre
-        >
-        <TextComparison
-          :before="latest?.content ?? ''"
-          :after="draft"
-          before-label="Na versão mais recente"
-          after-label="No seu texto"
-        /><DialogFooter
+        <InlineNotice v-if="latest?.unreadable" tone="warning">
+          A versão mais recente não pôde ser aberta agora, então não dá para
+          comparar nem gravar por cima dela. Copie seu texto se quiser guardá-lo
+          e recarregue a página mais tarde.
+        </InlineNotice>
+        <template v-else>
+          <pre
+            class="max-h-64 overflow-auto whitespace-pre-wrap break-words rounded-lg border p-4 font-sans text-sm"
+            >{{ latest?.content || '(texto vazio)' }}</pre
+          >
+          <TextComparison
+            :before="latest?.content ?? ''"
+            :after="draft"
+            before-label="Na versão mais recente"
+            after-label="No seu texto"
+          />
+        </template><DialogFooter
           ><Button variant="outline" @click="useLatest"
             >Usar versão mais recente</Button
-          ><Button :disabled="!writable" @click="rebaseDraft"
+          ><Button :disabled="!writable || latest?.unreadable === true" @click="rebaseDraft"
             >Manter meu texto para revisar</Button
           ></DialogFooter
         ></DialogContent
