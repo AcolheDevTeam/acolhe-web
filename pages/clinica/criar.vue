@@ -86,7 +86,7 @@ const onSubmit = handleSubmit(async (values) => {
       </div>
       <div class="flex flex-col gap-2">
         <p class="text-sm font-medium">Qual será sua atuação na clínica?</p>
-        <RadioCardGroup v-model="ownerMode" :options="ownerOptions" label="Sua atuação na clínica" />
+        <RadioCardGroup v-model="ownerMode" :options="ownerOptions" label="Sua atuação na clínica" compact class="grid-cols-2" />
       </div>
       <div v-if="ownerAttends" class="grid gap-4 sm:grid-cols-2">
         <div class="flex flex-col gap-2">

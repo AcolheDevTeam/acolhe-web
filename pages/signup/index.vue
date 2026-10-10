@@ -121,7 +121,7 @@ const canSubmit = computed(() => acceptTerms.value === true && acceptPrivacy.val
     </template>
 
     <div class="flex flex-col gap-7 [@media(max-height:700px)]:gap-5">
-      <RadioCardGroup v-model="signupKind" :options="signupKindOptions" label="Tipo de cadastro" />
+      <RadioCardGroup v-model="signupKind" :options="signupKindOptions" label="Tipo de cadastro" compact class="grid-cols-2" />
       <StepProgress :steps="stepNames" :current="step" label="Etapas do cadastro" class="animate-rise [animation-delay:.08s]" />
 
       <form

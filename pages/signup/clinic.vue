@@ -93,9 +93,9 @@ const onSubmit = handleSubmit(async (values) => {
 
     <div class="flex flex-col gap-6">
       <div class="flex flex-col gap-3">
-        <RadioCardGroup v-model="signupKind" :options="signupKindOptions" label="Tipo de cadastro" />
+        <RadioCardGroup v-model="signupKind" :options="signupKindOptions" label="Tipo de cadastro" compact class="grid-cols-2" />
         <p class="text-sm font-medium text-secondary-foreground">Qual será sua atuação na clínica?</p>
-        <RadioCardGroup v-model="ownerMode" :options="ownerOptions" label="Sua atuação na clínica" />
+        <RadioCardGroup v-model="ownerMode" :options="ownerOptions" label="Sua atuação na clínica" compact class="grid-cols-2" />
       </div>
 
       <form class="flex flex-col gap-5 rounded-[20px] border bg-card px-5 py-6 sm:px-9 sm:py-9" novalidate @submit.prevent="onSubmit">
