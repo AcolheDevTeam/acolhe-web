@@ -13,8 +13,9 @@ const retrying = ref(false)
 
 useHead({ title: computed(() => kind.value === 'not-found' ? 'Página não encontrada · Acolhe' : 'Erro · Acolhe') })
 
+// "/" agora é a landing pública; o painel decide o destino de cada papel.
 function goHome() {
-  clearError({ redirect: '/' })
+  clearError({ redirect: '/dashboard' })
 }
 function signIn() {
   clearError({ redirect: '/login' })
