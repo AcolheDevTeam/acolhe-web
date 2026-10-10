@@ -64,9 +64,14 @@ const exitProtection = useNuxtApp().$protectedLogout
 const unregisterExit = exitProtection.register({ saving, confirm: confirmDiscard })
 onBeforeUnmount(unregisterExit)
 const dirty = computed(() => draft.value !== (saved.value?.content ?? ''))
+// Caderno que não decifrou (ACO-86): fica só leitura, sem texto, até a
+// chave voltar. Os outros cadernos da paciente seguem normais.
+const unreadable = computed(() => saved.value?.unreadable === true)
 const writable = computed(
   () =>
-    data.value?.patient.writable === true && identity.value === initialIdentity,
+    data.value?.patient.writable === true &&
+    identity.value === initialIdentity &&
+    !unreadable.value,
 )
 const contentValid = computed(
   () => documentaryContentSchema.safeParse(draft.value).success,
@@ -405,7 +410,12 @@ watch(
       Carregando cadernos…
     </p>
     <template v-else-if="data">
-      <InlineNotice v-if="!writable" tone="neutral">
+      <InlineNotice v-if="unreadable" tone="warning">
+        <span class="font-medium">Não foi possível abrir este caderno.</span>
+        O texto continua guardado, mas não pôde ser lido agora. Enquanto isso,
+        ele não pode ser editado. Tente de novo mais tarde.
+      </InlineNotice>
+      <InlineNotice v-else-if="!writable" tone="neutral">
         <span class="font-medium text-foreground">Somente leitura.</span>
         Paciente ou vínculo clínico inativo. Você pode consultar os cadernos e
         o histórico.

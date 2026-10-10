@@ -44,6 +44,8 @@ export const notebookSchema = z.object({
   content: documentaryContentSchema,
   revision: z.number().int().positive(),
   updatedAt: z.string().datetime({ offset: true }),
+  // A versão atual não decifrou: vem sem texto e não pode ser sobrescrita (ACO-86).
+  unreadable: z.boolean().optional(),
 })
 export const notebooksSchema = z.object({
   patient: documentaryPatientSchema,
