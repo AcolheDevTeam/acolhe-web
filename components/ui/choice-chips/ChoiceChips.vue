@@ -9,10 +9,14 @@ import { cn } from "@/lib/utils"
 // - Escolha única (padrão): `radiogroup` com `radio`, uma parada de Tab e setas
 //   movendo a seleção (tabindex móvel).
 // - `multiple`: cada chip é um `checkbox` independente; o modelo é uma lista.
+// - `variant="strong"`: filtro forte do protótipo (pílula de 36px, ativo em
+//   Noite com texto branco), como os tipos do Registro Documental.
 const props = defineProps<{
   options: { value: T, label: string }[]
   label: string
   multiple?: boolean
+  variant?: "soft" | "strong"
+  disabled?: boolean
   class?: HTMLAttributes["class"]
 }>()
 const model = defineModel<T | T[]>({ required: true })
@@ -21,6 +25,7 @@ const selected = (value: T) =>
   Array.isArray(model.value) ? model.value.includes(value) : model.value === value
 
 function toggle(value: T) {
+  if (props.disabled) return
   if (!props.multiple) {
     model.value = value
     return
@@ -34,7 +39,7 @@ const activeIndex = computed(() => Math.max(0, props.options.findIndex(o => sele
 const buttons = ref<HTMLButtonElement[]>([])
 
 function onKeydown(event: KeyboardEvent, index: number) {
-  if (props.multiple) return
+  if (props.multiple || props.disabled) return
   const last = props.options.length - 1
   const next = {
     ArrowRight: index === last ? 0 : index + 1,
@@ -65,10 +70,12 @@ function onKeydown(event: KeyboardEvent, index: number) {
       :role="multiple ? 'checkbox' : 'radio'"
       :aria-checked="selected(option.value)"
       :tabindex="multiple || index === activeIndex ? 0 : -1"
+      :disabled="disabled"
       :class="cn(
-        'h-8 rounded-full border px-3 text-[13px] transition-[background-color,border-color,color] duration-200 ease-out focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/15',
+        'rounded-full border transition-[background-color,border-color,color] duration-200 ease-out focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/15 disabled:pointer-events-none disabled:opacity-45',
+        variant === 'strong' ? 'h-9 px-3.5 text-sm font-medium' : 'h-8 px-3 text-[13px]',
         selected(option.value)
-          ? 'border-selected-border bg-accent text-success'
+          ? (variant === 'strong' ? 'border-brand bg-brand text-primary-foreground' : 'border-selected-border bg-accent text-success')
           : 'border-border bg-card text-secondary-foreground hover:border-input-hover',
       )"
       @click="toggle(option.value)"
