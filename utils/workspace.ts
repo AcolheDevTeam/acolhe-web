@@ -22,6 +22,7 @@ export function isClinicAdmin(user: SessionUser): boolean {
 
 export function homeFor(user: SessionUser): string {
   if (!user) return '/login'
+  if (user.role === 'platform_admin') return '/admin'
   if (user.role === 'patient') return '/patient'
   if (user.workspace && !user.workspace.active) return INACTIVE_WORKSPACE_PATH
   // Só quem administra uma clínica tem área própria; sem ela, a página explica

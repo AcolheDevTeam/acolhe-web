@@ -1,5 +1,87 @@
 import { z } from 'zod'
 
+const invitationDeliveryStatus = z.enum(['sent', 'failed', 'disabled'])
+
+export const adminOverviewSchema = z.object({
+  activeAccounts: z.number().int().nonnegative(),
+  trialingAccounts: z.number().int().nonnegative(),
+  pastDueAccounts: z.number().int().nonnegative(),
+  pendingClinicInvitations: z.number().int().nonnegative(),
+})
+
+export const adminAccountsQuerySchema = z.object({
+  query: z.string().trim().max(200).optional(),
+  type: z.enum(['individual', 'clinic']).optional(),
+  status: z.enum(['trialing', 'active', 'past_due', 'canceled']).optional(),
+  limit: z.coerce.number().int().min(1).max(100).default(20),
+  offset: z.coerce.number().int().min(0).default(0),
+})
+
+export const adminAccountSchema = z.object({
+  id: z.string().uuid(),
+  name: z.string(),
+  type: z.enum(['individual', 'clinic']),
+  cnpj: z.string().nullable(),
+  ownerEmail: z.string().email().nullable(),
+  subscriptionStatus: z.enum(['trialing', 'active', 'past_due', 'canceled']),
+  planCode: z.string().nullable(),
+  billingCycle: z.string().nullable(),
+  trialEndsAt: z.string().datetime().nullable(),
+  currentPeriodEnd: z.string().datetime().nullable(),
+  pastDueSince: z.string().datetime().nullable(),
+  initialInvitationStatus: z.string().nullable(),
+})
+
+export const adminAccountsSchema = z.object({
+  items: z.array(adminAccountSchema),
+  total: z.number().int().nonnegative(),
+})
+
+export const createClinicSchema = z.object({
+  name: z.string().trim().min(2, 'Informe o nome da clínica.').max(160, 'O nome deve ter no máximo 160 caracteres.'),
+  cnpj: z.string().transform(value => value.replace(/\D/g, '')).refine(value => isValidCnpj(value), 'Informe um CNPJ válido.'),
+  ownerEmail: z.string().trim().email('Informe um e-mail válido.').transform(value => value.toLowerCase()),
+  ownerAttends: z.boolean(),
+}).strict()
+
+export const createClinicFormSchema = createClinicSchema.extend({
+  cnpj: z.string().trim().min(1, 'Informe o CNPJ.').transform(value => value.replace(/\D/g, '')).refine(value => isValidCnpj(value), 'Informe um CNPJ válido.'),
+})
+
+export const adminInvitationSchema = z.object({
+  status: z.string(),
+  ownerEmail: z.string().email(),
+  expiresAt: z.string().datetime(),
+  deliveryStatus: invitationDeliveryStatus.nullable(),
+})
+
+export const adminClinicMutationSchema = z.object({
+  organizationId: z.string().uuid(),
+  invitation: adminInvitationSchema.extend({ link: z.string().url() }),
+})
+
+export const cancelClinicSchema = z.object({
+  reason: z.string().trim().min(5, 'Descreva o motivo do cancelamento.').max(500, 'O motivo deve ter no máximo 500 caracteres.'),
+}).strict()
+
+export type AdminOverview = z.infer<typeof adminOverviewSchema>
+export type AdminAccount = z.infer<typeof adminAccountSchema>
+export type AdminAccounts = z.infer<typeof adminAccountsSchema>
+export type AdminInvitation = z.infer<typeof adminInvitationSchema>
+export type CreateClinic = z.infer<typeof createClinicSchema>
+
+function isValidCnpj(value: string): boolean {
+  if (!/^\d{14}$/.test(value) || /^([0-9])\1{13}$/.test(value)) return false
+  const digit = (base: string, weights: number[]) => {
+    const sum = [...base].reduce((total, char, index) => total + Number(char) * weights[index]!, 0)
+    const remainder = sum % 11
+    return remainder < 2 ? 0 : 11 - remainder
+  }
+  const first = digit(value.slice(0, 12), [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2])
+  const second = digit(value.slice(0, 12) + first, [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2])
+  return value.endsWith(`${first}${second}`)
+}
+
 // Área da clínica (ACO-62; API: ADR 0002, fase 5). Só dados da equipe e números:
 // nenhum dado de paciente chega aqui.
 const workspaceRole = z.enum(['clinic_owner', 'clinic_admin', 'clinical_supervisor', 'psychologist'])
