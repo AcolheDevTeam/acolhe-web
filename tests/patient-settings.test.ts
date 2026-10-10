@@ -71,7 +71,7 @@ describe('textos dos Ajustes', () => {
   it('aviso da revogação do consentimento de saúde, sem promessas além do que acontece', () => {
     expect(healthRevokedNotice(patientSettingsSchema.parse(settings))).toBeNull()
     const revoked = patientSettingsSchema.parse({ ...settings, consents: [consent({ status: 'revoked', revokedAt: '2026-10-09T13:00:00Z' })] })
-    expect(healthRevokedNotice(revoked)).toBe('Consentimento de dados de saúde revogado em 09/10/2026. O acompanhamento pelo app está pausado. Seus registros continuam guardados pelo prazo previsto em lei.')
+    expect(healthRevokedNotice(revoked)).toBe('Consentimento de dados de saúde revogado em 09/10/2026. O acompanhamento pelo app está pausado. Seus registros continuam guardados pelo prazo previsto na Resolução CFP 01/2009.')
   })
 
   it('situação do pedido dos próprios dados', () => {

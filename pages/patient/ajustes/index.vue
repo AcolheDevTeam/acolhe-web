@@ -103,9 +103,17 @@ async function sendConsent(scope: PatientSettingsConsent['scope'], action: 'acce
     busyScope.value = null
   }
 }
+// O sheet fica aberto, com o botão em espera, até a API responder.
+const revokingHealth = ref(false)
 async function confirmHealthRevoke() {
-  confirmHealthOpen.value = false
-  await sendConsent('health_data', 'revoke')
+  if (revokingHealth.value) return
+  revokingHealth.value = true
+  try {
+    await sendConsent('health_data', 'revoke')
+  } finally {
+    revokingHealth.value = false
+    confirmHealthOpen.value = false
+  }
 }
 
 // Baixar meus dados.
@@ -227,14 +235,14 @@ const rowClass = 'flex min-h-[52px] w-full items-center justify-between gap-3 bo
       </form>
     </PatientBottomSheet>
 
-    <PatientBottomSheet v-model:open="confirmHealthOpen" title="Revogar consentimento de dados de saúde?">
+    <PatientBottomSheet :open="confirmHealthOpen" title="Revogar consentimento de dados de saúde?" @update:open="(value: boolean) => { if (!revokingHealth) confirmHealthOpen = value }">
       <div class="flex flex-col gap-3 text-sm leading-relaxed text-secondary-foreground">
         <p>Sem esse consentimento, o acompanhamento pelo app fica pausado e você deixa de receber atividades e check-ins por aqui.</p>
         <p>O prontuário já registrado continua guardado pelo prazo previsto na Resolução CFP 01/2009, e você pode baixar seus dados quando quiser. Se mudar de ideia, é só autorizar de novo nesta tela.</p>
       </div>
       <div class="flex flex-col gap-2.5 pt-1">
-        <Button variant="destructive" size="xl" class="w-full" @click="confirmHealthRevoke">Revogar consentimento</Button>
-        <Button variant="outline" size="xl" class="w-full" @click="confirmHealthOpen = false">Manter como está</Button>
+        <Button variant="destructive" size="xl" class="w-full" :loading="revokingHealth" :aria-disabled="revokingHealth" @click="confirmHealthRevoke">{{ revokingHealth ? 'Revogando…' : 'Revogar consentimento' }}</Button>
+        <Button variant="outline" size="xl" class="w-full" :disabled="revokingHealth" @click="confirmHealthOpen = false">Manter como está</Button>
       </div>
     </PatientBottomSheet>
   </div>

@@ -65,7 +65,7 @@ export function selfExportNotice(exportRequest: PatientSelfExport | null): strin
 export function healthRevokedNotice(settings: PatientSettings | null): string | null {
   const health = settings?.consents.find(consent => consent.scope === 'health_data')
   if (health?.status !== 'revoked' || !health.revokedAt) return null
-  return `Consentimento de dados de saúde revogado em ${settingsDate(health.revokedAt)}. O acompanhamento pelo app está pausado. Seus registros continuam guardados pelo prazo previsto em lei.`
+  return `Consentimento de dados de saúde revogado em ${settingsDate(health.revokedAt)}. O acompanhamento pelo app está pausado. Seus registros continuam guardados pelo prazo previsto na Resolução CFP 01/2009.`
 }
 
 export function consentErrorMessage(error: unknown, action: 'revoke' | 'accept'): string {
