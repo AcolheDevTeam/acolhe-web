@@ -1,15 +1,16 @@
 <script setup lang="ts">
-import { CircleDot, Home, ListChecks } from 'lucide-vue-next'
+import { CircleDot, History, Home, ListChecks } from 'lucide-vue-next'
 
 // Shell da paciente: no celular, tabbar fixa embaixo (protótipo); a partir de
-// `md`, a mesma navegação vai para uma barra no topo. "Histórico" (prontuário
-// da paciente) entra quando o endpoint do portal existir. Responder uma
-// atividade usa tela própria, sem este layout (pages/patient/activities/[id]).
+// `md`, a mesma navegação vai para uma barra no topo. "Histórico" é o "Meu
+// prontuário" (ACO-88). Responder uma atividade usa tela própria, sem este
+// layout (pages/patient/activities/[id]).
 const route = useRoute()
 const items = [
   { label: 'Início', to: '/patient', icon: Home },
   { label: 'Atividades', to: '/patient/activities', icon: ListChecks },
   { label: 'Check-in', to: '/patient/check-in', icon: CircleDot },
+  { label: 'Histórico', to: '/patient/historico', icon: History },
 ]
 function isActive(to: string) {
   if (to === '/patient') return route.path === to

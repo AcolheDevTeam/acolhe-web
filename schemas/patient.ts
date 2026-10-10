@@ -99,3 +99,26 @@ export const patientCheckinInputSchema = z.object({
   mood: z.number().int().min(1).max(5),
   note: z.string().trim().max(1000, 'A observação deve ter no máximo 1.000 caracteres').optional(),
 }).strict()
+
+// "Meu prontuário" da paciente (ACO-88): sessões já ocorridas, a mais recente
+// primeiro. A lista não traz o texto; `hasNotes` diz se há anotação. A leitura
+// de uma sessão traz o texto livre (`notes`) e a duração.
+export const patientRecordSessionSchema = z.object({
+  id: z.string().uuid(),
+  number: z.number().int().positive(),
+  occurredAt: z.string().datetime({ offset: true }),
+  updatedAt: z.string().datetime({ offset: true }),
+  version: z.number().int().positive(),
+  modality: z.string().nullable(),
+  hasNotes: z.boolean(),
+})
+
+export const patientRecordSessionsSchema = z.array(patientRecordSessionSchema)
+
+export const patientRecordSessionDetailSchema = patientRecordSessionSchema.extend({
+  durationMinutes: z.number().int().positive().nullable().optional(),
+  notes: z.string(),
+})
+
+export type PatientRecordSession = z.infer<typeof patientRecordSessionSchema>
+export type PatientRecordSessionDetail = z.infer<typeof patientRecordSessionDetailSchema>
