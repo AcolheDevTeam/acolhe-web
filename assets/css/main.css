@@ -167,6 +167,21 @@
   }
 }
 
+/* Entrada dos diálogos (Dialog). Só opacidade e `scale`: o `transform` já
+   centraliza o conteúdo, então animar transform faria o diálogo saltar. */
+.dialog-overlay[data-state='open'] {
+  animation: dialog-overlay-in 160ms var(--ease-out);
+}
+.dialog-content[data-state='open'] {
+  animation: dialog-content-in 200ms var(--ease-out);
+}
+@keyframes dialog-overlay-in {
+  from { opacity: 0; }
+}
+@keyframes dialog-content-in {
+  from { opacity: 0; scale: 0.97; }
+}
+
 @keyframes rise {
   from { opacity: 0; transform: translateY(12px); }
   to { opacity: 1; transform: none; }
